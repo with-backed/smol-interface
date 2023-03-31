@@ -22,7 +22,7 @@ export default function Index() {
   );
 
   return (
-    <div className="wrapper">
+    <div className="wrapper flex flex-col bg-white">
       <Header />
       <div
         className="content flex h-full items-center justify-center"

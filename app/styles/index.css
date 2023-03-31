@@ -4,11 +4,8 @@ body {
 }
 
 .wrapper {
-  display: flex;
-  flex-direction: column;
   width: 360px;
   height: 640px;
-  background: white;
 }
 
 .content {
