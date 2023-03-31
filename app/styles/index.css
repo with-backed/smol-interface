@@ -11,6 +11,10 @@ body {
   background: white;
 }
 
+.content {
+  max-height: 540px;
+}
+
 header {
   height: 40px;
   padding: 0 16px;
