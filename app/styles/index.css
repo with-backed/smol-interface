@@ -1,0 +1,22 @@
+body {
+  background-image: url("/lilies.jpg");
+  min-height: 100vh;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 360px;
+  height: 640px;
+  background: white;
+}
+
+header {
+  height: 40px;
+  padding: 0 16px;
+}
+
+footer {
+  height: 60px;
+  padding: 0 16px;
+}
