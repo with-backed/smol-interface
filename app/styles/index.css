@@ -8,8 +8,15 @@ body {
   height: 640px;
 }
 
+@media screen and (max-width: 480px) {
+  .wrapper {
+    height: 100vh;
+    width: 100vw;
+  }
+}
+
 .content {
-  max-height: 540px;
+  /* max-height: 540px; */
 }
 
 header {
