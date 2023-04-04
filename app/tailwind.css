@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    font-family: "Courier Prime", "Courier New", ui-monospace, SFMono-Regular,
+      Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  }
+}
