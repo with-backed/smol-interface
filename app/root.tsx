@@ -7,12 +7,19 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import "@rainbow-me/rainbowkit/styles.css";
+import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { configureChains, createClient, WagmiConfig } from "wagmi";
+import { mainnet, polygon, optimism, arbitrum } from "wagmi/chains";
+import { alchemyProvider } from "wagmi/providers/alchemy";
+import { publicProvider } from "wagmi/providers/public";
+import { APP_NAME } from "~/lib/constants";
 
-import styles from "./tailwind.css";
+import styles from "~/tailwind.css";
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
-  title: "paprSMOOTHBRAIN",
+  title: APP_NAME,
   viewport: "width=device-width,initial-scale=1",
 });
 
@@ -29,6 +36,22 @@ export const links: LinksFunction = () => [
   },
 ];
 
+const { chains, provider } = configureChains(
+  [mainnet, polygon, optimism, arbitrum],
+  [alchemyProvider({ apiKey: process.env.ALCHEMY_ID || "" }), publicProvider()]
+);
+
+const { connectors } = getDefaultWallets({
+  appName: APP_NAME,
+  chains,
+});
+
+const wagmiClient = createClient({
+  autoConnect: true,
+  connectors,
+  provider,
+});
+
 export default function App() {
   return (
     <html lang="en">
@@ -37,10 +60,14 @@ export default function App() {
         <Links />
       </head>
       <body className="flex justify-center items-center bg-no-repeat bg-cover">
-        <Outlet />
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
+        <WagmiConfig client={wagmiClient}>
+          <RainbowKitProvider chains={chains}>
+            <Outlet />
+            <ScrollRestoration />
+            <Scripts />
+            <LiveReload />
+          </RainbowKitProvider>
+        </WagmiConfig>
       </body>
     </html>
   );
