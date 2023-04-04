@@ -7,14 +7,14 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-import "@rainbow-me/rainbowkit/styles.css";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
-import { mainnet, polygon, optimism, arbitrum } from "wagmi/chains";
+import { mainnet } from "wagmi/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 import { APP_NAME } from "~/lib/constants";
 
+import rainbowKitStyles from "@rainbow-me/rainbowkit/styles.css";
 import styles from "~/tailwind.css";
 
 export const meta: MetaFunction = () => ({
@@ -25,6 +25,7 @@ export const meta: MetaFunction = () => ({
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
+  { rel: "stylesheet", href: rainbowKitStyles },
   {
     rel: "preconnect",
     href: "https://fonts.gstatic.com",
@@ -37,8 +38,8 @@ export const links: LinksFunction = () => [
 ];
 
 const { chains, provider } = configureChains(
-  [mainnet, polygon, optimism, arbitrum],
-  [alchemyProvider({ apiKey: process.env.ALCHEMY_ID || "" }), publicProvider()]
+  [mainnet],
+  [alchemyProvider({ apiKey: "" }), publicProvider()]
 );
 
 const { connectors } = getDefaultWallets({

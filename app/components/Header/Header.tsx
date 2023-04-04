@@ -1,7 +1,9 @@
+import { ConnectWallet } from "~/components/Buttons/ConnectWallet";
+
 export function Header() {
   return (
-    <header className="flex items-center bg-black text-white">
-      Connected: 0x123a...
+    <header className="flex justify-center items-center bg-black text-white">
+      <ConnectWallet />
     </header>
   );
 }
