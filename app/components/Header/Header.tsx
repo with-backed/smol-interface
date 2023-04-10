@@ -7,6 +7,7 @@ import {
   DisclosureContent,
   Disclosure,
 } from "reakit/Disclosure";
+import { Caret } from "~/components/Caret";
 
 export function Header() {
   const { isConnected } = useAccount();
@@ -35,6 +36,10 @@ export function Header() {
 
 type DropdownButtonProps = DisclosureStateReturn;
 
-function DropdownButton({ ...props }: DropdownButtonProps) {
-  return <Disclosure {...props}>lol</Disclosure>;
+function DropdownButton({ visible, ...props }: DropdownButtonProps) {
+  return (
+    <Disclosure visible={visible} {...props}>
+      <Caret orientation={visible ? "up" : "down"} />
+    </Disclosure>
+  );
 }
