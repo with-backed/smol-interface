@@ -8,11 +8,17 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import {
+  createClient as createUrqlClient,
+  cacheExchange,
+  fetchExchange,
+  Provider as UrqlProvider,
+} from "urql";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { mainnet } from "wagmi/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
-import { APP_NAME } from "~/lib/constants";
+import { APP_NAME, MAINNET_PAPR_SUBGRAPH } from "~/lib/constants";
 
 import rainbowKitStyles from "@rainbow-me/rainbowkit/styles.css";
 import styles from "~/tailwind.css";
@@ -53,6 +59,11 @@ const wagmiClient = createClient({
   provider,
 });
 
+const paprClient = createUrqlClient({
+  url: MAINNET_PAPR_SUBGRAPH,
+  exchanges: [cacheExchange, fetchExchange],
+});
+
 export default function App() {
   return (
     <html lang="en">
@@ -61,14 +72,16 @@ export default function App() {
         <Links />
       </head>
       <body className="flex justify-center items-center bg-no-repeat bg-cover">
-        <WagmiConfig client={wagmiClient}>
-          <RainbowKitProvider chains={chains}>
-            <Outlet />
-            <ScrollRestoration />
-            <Scripts />
-            <LiveReload />
-          </RainbowKitProvider>
-        </WagmiConfig>
+        <UrqlProvider value={paprClient}>
+          <WagmiConfig client={wagmiClient}>
+            <RainbowKitProvider chains={chains}>
+              <Outlet />
+              <ScrollRestoration />
+              <Scripts />
+              <LiveReload />
+            </RainbowKitProvider>
+          </WagmiConfig>
+        </UrqlProvider>
       </body>
     </html>
   );
