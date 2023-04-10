@@ -1,0 +1,10 @@
+overwrite: true
+schema: 'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr/0.2.02/gn'
+documents: './graphql/inKind/**/*.graphql'
+generates:
+  types/generated/graphql/papr.ts:
+    plugins:
+      - 'typescript'
+      - 'typescript-operations'
+      - 'urql-introspection'
+      - 'typed-document-node'

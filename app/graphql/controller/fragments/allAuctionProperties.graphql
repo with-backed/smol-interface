@@ -1,0 +1,30 @@
+fragment allAuctionProperties on Auction {
+  id
+  vault {
+    id
+    account
+    controller {
+      id
+    }
+  }
+  auctionAssetID
+  auctionAssetContract {
+    ...allERC721Properties
+  }
+  startedBy
+  startPrice
+  endPrice
+  paymentAsset {
+    ...allERC20Properties
+  }
+  secondsInPeriod
+  perPeriodDecayPercentWad
+  start {
+    timestamp
+  }
+  end {
+    timestamp
+    # id in this case is transaction hash
+    id
+  }
+}

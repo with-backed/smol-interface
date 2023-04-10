@@ -24,3 +24,9 @@ a {
   text-decoration: underline;
   color: rgba(68, 210, 255, 1);
 }
+
+.graphPapr {
+  background: url("/graph-square.png"),
+    linear-gradient(120deg, #00cdfa50 0, #0064fa50 100%);
+  width: 100%;
+}

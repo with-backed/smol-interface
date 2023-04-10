@@ -1,0 +1,13 @@
+fragment allVaultProperties on Vault {
+  id
+  account
+  debt
+  token {
+    ...allERC721Properties
+  }
+  collateral {
+    id
+    tokenId
+  }
+  collateralCount
+}

@@ -1,0 +1,14 @@
+query mostRecentBorrowbyAccountAndController($vaultId: String) {
+activities(
+    where: {
+      and: [
+        { vault: $vaultId }
+        { and: [{ amountBorrowed_not: null }, { amountIn_not: null }] }
+      ]
+    }
+    orderBy: timestamp
+    orderDirection: desc
+  ) {
+    ...allActivityProperties
+  }
+}
