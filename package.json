@@ -8,8 +8,8 @@
     "typecheck": "tsc",
     "lint": "eslint",
     "codegen": "graphql-codegen --config codegen/papr-codegen.ts",
-    "prestart": "yarn generate",
-    "predev": "yarn generate"
+    "prestart": "yarn codegen",
+    "predev": "yarn codegen"
   },
   "dependencies": {
     "@rainbow-me/rainbowkit": "0.12.6",
@@ -21,6 +21,7 @@
     "isbot": "3.6.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "reakit": "1.3.11",
     "urql": "4.0.0",
     "wagmi": "0.12.9"
   },

@@ -45,7 +45,7 @@ export function ConnectWallet() {
 
               return (
                 <TextButton onClick={openAccountModal} type="button">
-                  Connected: {account.displayName}
+                  {account.displayName}
                 </TextButton>
               );
             })()}
