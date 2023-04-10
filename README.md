@@ -1,16 +1,22 @@
-# Welcome to Remix!
-
-- [Remix Docs](https://remix.run/docs)
+# a much _smoother_ interface
 
 ## Development
 
 From your terminal:
 
 ```sh
-npm run dev
+yarn dev
 ```
 
 This starts your app in development mode, rebuilding assets on file changes.
+
+If working with graphql, you'll also want:
+
+```sh
+yarn graphql-codegen --watch
+```
+
+This will type your graphql queries and mutations as you write them.
 
 ## Deployment
 
