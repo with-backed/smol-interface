@@ -15,11 +15,12 @@ body {
   }
 }
 
-.content {
-  /* max-height: 540px; */
-}
-
 footer {
   height: 60px;
   padding: 0 16px;
+}
+
+a {
+  text-decoration: underline;
+  color: rgba(68, 210, 255, 1);
 }

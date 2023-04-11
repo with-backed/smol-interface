@@ -8,6 +8,7 @@ import {
   Disclosure,
 } from "reakit/Disclosure";
 import { Caret } from "~/components/Caret";
+import { Link } from "@remix-run/react";
 
 export function Header() {
   const { isConnected } = useAccount();
@@ -25,10 +26,12 @@ export function Header() {
         {isConnected && <DropdownButton {...disclosure} />}
       </div>
       <DisclosureContent
-        className="absolute top-12 left-0 w-full bg-black text-white"
+        className="absolute top-12 left-0 w-full bg-black text-white p-4 flex flex-col gap-2 items-center"
         {...disclosure}
       >
-        y halo thar
+        <NewLoan />
+        <Info />
+        <Links />
       </DisclosureContent>
     </header>
   );
@@ -41,5 +44,44 @@ function DropdownButton({ visible, ...props }: DropdownButtonProps) {
     <Disclosure visible={visible} {...props}>
       <Caret orientation={visible ? "up" : "down"} />
     </Disclosure>
+  );
+}
+
+function NewLoan() {
+  return (
+    <button
+      className="bg-neutral-700 rounded-lg h-7 w-full"
+      onClick={() => alert("This will eventually do somethhing")}
+    >
+      New Loan
+    </button>
+  );
+}
+
+function Info() {
+  return (
+    <span className="flex items-center gap-4">
+      built by <img className="w-12" src="/bunn.png" alt="" aria-hidden />{" "}
+      backed
+    </span>
+  );
+}
+
+function Links() {
+  return (
+    <ul className="flex gap-4 whitespace-nowrap flex-wrap items-center justify-center">
+      <li>
+        <Link to="https://papr.wtf/legal/privacy-policy.pdf">privacy</Link>
+      </li>
+      <li>
+        <Link to="https://discord.gg/ZCxGuE6Ytk">discord</Link>
+      </li>
+      <li>
+        <Link to="https://twitter.com/backed_xyz">twitter</Link>
+      </li>
+      <li>
+        <Link to="https://www.papr.wtf">powered by papr.wtf</Link>
+      </li>
+    </ul>
   );
 }
