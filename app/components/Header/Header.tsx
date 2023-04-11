@@ -26,7 +26,7 @@ export function Header() {
         {isConnected && <DropdownButton {...disclosure} />}
       </div>
       <DisclosureContent
-        className="absolute top-12 left-0 w-full bg-black text-white p-4 flex flex-col gap-2 items-center"
+        className="absolute top-12 left-0 w-full bg-black text-white p-4 pt-0 flex flex-col gap-3 items-center"
         {...disclosure}
       >
         <NewLoan />
