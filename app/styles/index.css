@@ -15,16 +15,12 @@ body {
   }
 }
 
-.content {
-  /* max-height: 540px; */
-}
-
-header {
-  height: 40px;
-  padding: 0 16px;
-}
-
 footer {
   height: 60px;
   padding: 0 16px;
+}
+
+a {
+  text-decoration: underline;
+  color: rgba(68, 210, 255, 1);
 }
