@@ -126,7 +126,9 @@ export default function App() {
                 value={serverSideData.paprSubgraphData as PaprController}
               >
                 <Header />
-                <Outlet />
+                <div className="grow">
+                  <Outlet />
+                </div>
                 <ScrollRestoration />
                 <script
                   dangerouslySetInnerHTML={{

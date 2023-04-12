@@ -17,8 +17,6 @@ body {
 
 footer {
   height: 60px;
-  position: sticky;
-  top: 100vh;
 }
 
 a {
