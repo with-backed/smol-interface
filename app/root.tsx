@@ -1,4 +1,5 @@
-import { LinksFunction, MetaFunction, json } from "@remix-run/node";
+import type { LinksFunction, MetaFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -22,16 +23,16 @@ import { publicProvider } from "wagmi/providers/public";
 import { APP_NAME, MAINNET_PAPR_SUBGRAPH } from "~/lib/constants";
 
 import rainbowKitStyles from "@rainbow-me/rainbowkit/styles.css";
-import styles from "~/tailwind.css";
-import { SupportedToken, configs } from "./lib/config";
-import {
-  PaprControllerByIdDocument,
-  PaprControllerByIdQuery,
-} from "./gql/graphql";
-import {
-  ControllerContextProvider,
-  PaprController,
-} from "./hooks/usePaprController";
+import type { SupportedToken } from "./lib/config";
+import { configs } from "./lib/config";
+import type { PaprControllerByIdQuery } from "./gql/graphql";
+import { PaprControllerByIdDocument } from "./gql/graphql";
+import type { PaprController } from "./hooks/usePaprController";
+import { ControllerContextProvider } from "./hooks/usePaprController";
+import tailwindStyles from "~/tailwind.css";
+import customStyles from "~/styles/index.css";
+import { Header } from "~/components/Header";
+import { Footer } from "~/components/Footer";
 
 declare global {
   interface Window {
@@ -50,7 +51,8 @@ export const meta: MetaFunction = () => ({
 });
 
 export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: styles },
+  { rel: "stylesheet", href: tailwindStyles },
+  { rel: "stylesheet", href: customStyles },
   { rel: "stylesheet", href: rainbowKitStyles },
   {
     rel: "preconnect",
@@ -123,7 +125,10 @@ export default function App() {
               <ControllerContextProvider
                 value={serverSideData.paprSubgraphData as PaprController}
               >
-                <Outlet />
+                <Header />
+                <div className="grow">
+                  <Outlet />
+                </div>
                 <ScrollRestoration />
                 <script
                   dangerouslySetInnerHTML={{
@@ -134,6 +139,7 @@ export default function App() {
                 />
                 <Scripts />
                 <LiveReload />
+                <Footer />
               </ControllerContextProvider>
             </RainbowKitProvider>
           </WagmiConfig>
