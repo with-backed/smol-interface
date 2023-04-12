@@ -39,7 +39,7 @@ declare global {
     ENV: {
       TOKEN: string;
       ALCHEMY_KEY: string;
-      QUOTER: string;
+      ETHERSCAN_API_KEY: string;
     };
   }
 }
@@ -67,7 +67,15 @@ export const links: LinksFunction = () => [
 
 const { chains, provider } = configureChains(
   [mainnet],
-  [alchemyProvider({ apiKey: "" }), publicProvider()]
+  [
+    alchemyProvider({
+      apiKey:
+        typeof window === "undefined"
+          ? process.env.ALCHEMY_KEY || ""
+          : window.ENV.ALCHEMY_KEY || "",
+    }),
+    publicProvider(),
+  ]
 );
 
 const { connectors } = getDefaultWallets({
@@ -105,6 +113,7 @@ export const loader = async () => {
       ALCHEMY_KEY: process.env.ALCHEMY_KEY,
       QUOTER: process.env.QUOTER,
       TOKEN: process.env.TOKEN,
+      ETHERSCAN_API_KEY: process.env.ETHERSCAN_API_KEY,
     },
   });
 };

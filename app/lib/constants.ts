@@ -5,3 +5,4 @@ export const MAINNET_CONTROLLER_ID =
   "0x3b29c19ff2fcea0ff98d0ef5b184354d74ea74b0";
 
 export const FEE_TIER = 10000;
+export const DEFAULT_CLIENT_FEE_BIPS = 30;
