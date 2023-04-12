@@ -2,7 +2,6 @@ import type { LinksFunction } from "@remix-run/node";
 import { useCallback, useState } from "react";
 import { Footer } from "~/components/Footer";
 import { Header } from "~/components/Header";
-import { LoanSummary } from "~/components/LoanSummary/LoanSummary";
 import stylesUrl from "~/styles/index.css";
 
 export const links: LinksFunction = () => {
