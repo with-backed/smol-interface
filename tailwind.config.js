@@ -2,12 +2,11 @@
 module.exports = {
   content: ["./app/**/*.{ts,tsx,jsx,js}"],
   theme: {
-    extend: {},
-  },
-  plugins: [],
-  extend: {
-    colors: {
-      adventureYellow: "#FFCF53",
+    extend: {
+      colors: {
+        adventureYellow: "#FFCF53",
+      },
     },
   },
+  plugins: [],
 };
