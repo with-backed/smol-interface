@@ -15,8 +15,11 @@ body {
   }
 
   @supports (height: 100svh) {
+    body {
+      min-height: 100svh;
+    }
     .wrapper {
-      height: calc(100svh - 2px);
+      height: 100svh;
     }
   }
 }
