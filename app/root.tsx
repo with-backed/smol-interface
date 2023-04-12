@@ -1,4 +1,4 @@
-import type { LinksFunction, MetaFunction } from "@remix-run/node";
+import { LinksFunction, MetaFunction, json } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -6,6 +6,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import {
@@ -22,6 +23,25 @@ import { APP_NAME, MAINNET_PAPR_SUBGRAPH } from "~/lib/constants";
 
 import rainbowKitStyles from "@rainbow-me/rainbowkit/styles.css";
 import styles from "~/tailwind.css";
+import { SupportedToken, configs } from "./lib/config";
+import {
+  PaprControllerByIdDocument,
+  PaprControllerByIdQuery,
+} from "./gql/graphql";
+import {
+  ControllerContextProvider,
+  PaprController,
+} from "./hooks/usePaprController";
+
+declare global {
+  interface Window {
+    ENV: {
+      TOKEN: string;
+      ALCHEMY_KEY: string;
+      QUOTER: string;
+    };
+  }
+}
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
@@ -64,7 +84,32 @@ const paprClient = createUrqlClient({
   exchanges: [cacheExchange, fetchExchange],
 });
 
+export const loader = async () => {
+  const controllerAddress =
+    configs[process.env.TOKEN as SupportedToken].controllerAddress;
+  const queryResult = await paprClient
+    .query<PaprControllerByIdQuery>(PaprControllerByIdDocument, {
+      id: controllerAddress,
+    })
+    .toPromise();
+  if (!queryResult.data?.paprController) {
+    throw new Error(
+      `Unable to find subgraph data for controller ${controllerAddress}`
+    );
+  }
+  return json({
+    paprSubgraphData: { ...queryResult.data.paprController },
+    env: {
+      ALCHEMY_KEY: process.env.ALCHEMY_KEY,
+      QUOTER: process.env.QUOTER,
+      TOKEN: process.env.TOKEN,
+    },
+  });
+};
+
 export default function App() {
+  const serverSideData = useLoaderData<typeof loader>();
+
   return (
     <html lang="en">
       <head>
@@ -75,10 +120,21 @@ export default function App() {
         <UrqlProvider value={paprClient}>
           <WagmiConfig client={wagmiClient}>
             <RainbowKitProvider chains={chains}>
-              <Outlet />
-              <ScrollRestoration />
-              <Scripts />
-              <LiveReload />
+              <ControllerContextProvider
+                value={serverSideData.paprSubgraphData as PaprController}
+              >
+                <Outlet />
+                <ScrollRestoration />
+                <script
+                  dangerouslySetInnerHTML={{
+                    __html: `window.ENV = ${JSON.stringify(
+                      serverSideData.env
+                    )}`,
+                  }}
+                />
+                <Scripts />
+                <LiveReload />
+              </ControllerContextProvider>
             </RainbowKitProvider>
           </WagmiConfig>
         </UrqlProvider>
