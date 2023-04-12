@@ -9,7 +9,8 @@
     "lint": "eslint",
     "codegen": "graphql-codegen --config codegen/papr-codegen.ts",
     "prestart": "yarn codegen",
-    "predev": "yarn codegen"
+    "predev": "yarn codegen",
+    "abis:generate": "npx dotenv -e .env -- wagmi generate"
   },
   "dependencies": {
     "@rainbow-me/rainbowkit": "0.12.6",
@@ -36,7 +37,9 @@
     "@types/react-dom": "18.0.8",
     "@typescript-eslint/eslint-plugin": "5.57.0",
     "@typescript-eslint/parser": "5.57.0",
+    "@wagmi/cli": "0.1.14",
     "autoprefixer": "10.4.14",
+    "dotenv-cli": "5.0.0",
     "eslint": "8.27.0",
     "eslint-config-prettier": "8.8.0",
     "eslint-plugin-prettier": "4.2.1",
