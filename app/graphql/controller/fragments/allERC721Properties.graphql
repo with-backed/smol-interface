@@ -1,5 +1,0 @@
-fragment allERC721Properties on ERC721Token {
-    id,
-    name,
-    symbol
-}

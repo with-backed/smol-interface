@@ -29,7 +29,9 @@ export default function Index() {
         className="content flex h-full justify-center"
         onClick={advanceSlide}
       >
-        <LoanSummary />
+        <LoanSummary
+          collateralAddress={"0xCa7cA7BcC765F77339bE2d648BA53ce9c8a262bD"}
+        />
       </div>
       <Footer />
     </div>

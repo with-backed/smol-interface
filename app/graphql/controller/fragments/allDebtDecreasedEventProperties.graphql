@@ -1,8 +1,0 @@
-fragment allDebtDecreasedEventProperties on DebtDecreasedEvent {
-  id
-  timestamp
-  vault {
-    id
-  }
-  amount
-}
