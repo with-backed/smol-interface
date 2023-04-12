@@ -3,7 +3,6 @@ import { SupportedToken, configs } from "./config";
 import { Quoter } from "./contracts";
 
 export const ONE = ethers.BigNumber.from(10).pow(18);
-export const TICK_SPACING = 200;
 export const FEE_TIER = 10000;
 
 export type QuoterResult = {
@@ -31,7 +30,6 @@ export async function getQuoteForSwap(
       amountIn: amount,
       sqrtPriceLimitX96: 0,
     });
-    console.log({ q });
     return { quote: q.amountOut, sqrtPriceX96After: q.sqrtPriceX96After };
   } catch (_e) {
     return nullQuoteResult;

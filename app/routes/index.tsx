@@ -2,7 +2,6 @@ import type { LinksFunction } from "@remix-run/node";
 import { useCallback, useState } from "react";
 import { Footer } from "~/components/Footer";
 import { Header } from "~/components/Header";
-import { LoanSummary } from "~/components/LoanSummary/LoanSummary";
 import stylesUrl from "~/styles/index.css";
 
 export const links: LinksFunction = () => {
@@ -26,12 +25,10 @@ export default function Index() {
     <div className="wrapper flex flex-col bg-white">
       <Header />
       <div
-        className="content flex h-full justify-center"
+        className="content flex h-full items-center justify-center"
         onClick={advanceSlide}
       >
-        <LoanSummary
-          collateralAddress={"0xCa7cA7BcC765F77339bE2d648BA53ce9c8a262bD"}
-        />
+        <img src={SLIDES[currentSlide]} alt="" />
       </div>
       <Footer />
     </div>

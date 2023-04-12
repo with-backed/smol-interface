@@ -10,7 +10,6 @@ export function makeProvider(jsonRpcProvider: string, token: SupportedToken) {
   );
 }
 
-////// controller code /////
 export function Quoter(jsonRpcProvider: string, token: SupportedToken) {
   const provider = makeProvider(jsonRpcProvider, token);
   return IQuoter__factory.connect(window.ENV.QUOTER, provider);
