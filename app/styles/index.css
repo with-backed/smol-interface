@@ -16,7 +16,7 @@ body {
 
   @supports (height: 100svh) {
     .wrapper {
-      height: 100svh;
+      height: calc(100svh - 2px);
     }
   }
 }
