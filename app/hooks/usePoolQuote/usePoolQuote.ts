@@ -2,16 +2,15 @@ import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { quoterABI, quoterAddress } from "types/generatedABI";
 import { useContract, useProvider } from "wagmi";
+import { FEE_TIER } from "~/lib/constants";
 
 type UsePoolQuoteParams = {
-  amount: ethers.BigNumber;
+  amount: ethers.BigNumber | null;
   inputToken: string;
   outputToken: string;
   tradeType: "exactIn" | "exactOut";
   skip?: boolean;
 };
-
-export const FEE_TIER = 10000;
 
 export function usePoolQuote({
   amount,
