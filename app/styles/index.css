@@ -13,6 +13,13 @@ body {
     height: 100vh;
     width: 100vw;
   }
+
+  /* CSS specific to iOS devices */
+  @supports (-webkit-touch-callout: none) {
+    .wrapper {
+      height: -webkit-fill-available;
+    }
+  }
 }
 
 footer {
