@@ -12,7 +12,7 @@ import {
 } from "~/gql/graphql";
 import { usePoolQuote } from "../usePoolQuote";
 import { usePaprController } from "../usePaprController";
-import { formatBigNum } from "~/lib/numberFormat";
+import { formatBigNum, formatPercent } from "~/lib/numberFormat";
 import { DEFAULT_CLIENT_FEE_BIPS } from "~/lib/constants";
 
 dayjs.extend(duration);
@@ -40,9 +40,13 @@ const mostRecentLoanByVaultQuery = graphql(`
 
 type LoanDetails = {
   borrowed: ethers.BigNumber | null;
+  formattedBorrowed: string;
   interest: ethers.BigNumber | null;
+  formattedInterest: string;
   totalRepayment: ethers.BigNumber | null;
+  formattedTotalRepayment: string;
   costPercentage: number | null;
+  formattedCostPercentage: string;
   numDays: number | null;
 };
 
@@ -58,17 +62,13 @@ export function useLoan(
     return generateVaultId(controllerId, collateralAddress, address);
   }, [controllerId, collateralAddress]);
 
-  const {
-    "0": { data: vaultData },
-  } = useQuery<VaultbyIdQuery>({
+  const [{ data: vaultData }] = useQuery<VaultbyIdQuery>({
     query: VaultbyIdDocument,
     variables: {
       id: vaultId,
     },
   });
-  const {
-    "0": { data: recentLoanData },
-  } = useQuery<MostRecentLoanByVaultQuery>({
+  const [{ data: recentLoanData }] = useQuery<MostRecentLoanByVaultQuery>({
     query: MostRecentLoanByVaultDocument,
     variables: {
       vaultId: vaultId,
@@ -151,12 +151,36 @@ export function useLoan(
     return interestNum / principalNum;
   }, [interest, borrowedFromSwap, loanDuration, underlying.decimals]);
 
+  const formattedBorrowed = useMemo(() => {
+    if (!borrowedFromSwap) return "...";
+    return formatBigNum(borrowedFromSwap, underlying.decimals) + " ETH";
+  }, [borrowedFromSwap, underlying.decimals]);
+
+  const formattedInterest = useMemo(() => {
+    if (!interest) return "...";
+    return formatBigNum(interest, underlying.decimals) + " ETH";
+  }, [interest, underlying.decimals]);
+
+  const formattedTotalRepayment = useMemo(() => {
+    if (!totalRepayment) return "...";
+    return formatBigNum(totalRepayment, underlying.decimals) + " ETH";
+  }, [totalRepayment, underlying.decimals]);
+
+  const formattedCostPercentage = useMemo(() => {
+    if (!costPercentage) return "...";
+    return formatPercent(costPercentage);
+  }, [costPercentage]);
+
   return {
     borrowed: borrowedFromSwap,
+    formattedBorrowed,
     interest,
+    formattedInterest,
     totalRepayment,
-    numDays,
+    formattedTotalRepayment,
     costPercentage,
+    formattedCostPercentage,
+    numDays,
   };
 }
 

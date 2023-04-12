@@ -8,29 +8,14 @@ type LoanSummaryProps = {
 };
 
 export function LoanSummary({ collateralAddress }: LoanSummaryProps) {
-  const { id, underlying } = usePaprController();
-  const { borrowed, totalRepayment, interest, numDays, costPercentage } =
-    useLoan(id, collateralAddress);
-
-  const formattedBorrow = useMemo(() => {
-    if (!borrowed) return "...";
-    return formatBigNum(borrowed, underlying.decimals) + " ETH";
-  }, [borrowed, underlying.decimals]);
-
-  const formattedInterest = useMemo(() => {
-    if (!interest) return "...";
-    return formatBigNum(interest, underlying.decimals) + " ETH";
-  }, [interest, underlying.decimals]);
-
-  const formattedRepayment = useMemo(() => {
-    if (!totalRepayment) return "...";
-    return formatBigNum(totalRepayment, underlying.decimals) + " ETH";
-  }, [totalRepayment, underlying.decimals]);
-
-  const formattedCostPercentage = useMemo(() => {
-    if (!costPercentage) return "...";
-    return formatPercent(costPercentage);
-  }, [costPercentage]);
+  const { id } = usePaprController();
+  const {
+    formattedBorrowed,
+    formattedTotalRepayment,
+    formattedInterest,
+    formattedCostPercentage,
+    numDays,
+  } = useLoan(id, collateralAddress);
 
   return (
     <div className="w-full flex flex-col">
@@ -40,7 +25,7 @@ export function LoanSummary({ collateralAddress }: LoanSummaryProps) {
             <p>Borrowed:</p>
           </div>
           <div>
-            <p>{formattedBorrow}</p>
+            <p>{formattedBorrowed}</p>
           </div>
         </div>
         <div className="flex flex-row justify-between py-1">
@@ -56,7 +41,7 @@ export function LoanSummary({ collateralAddress }: LoanSummaryProps) {
             <p>Total Repayment:</p>
           </div>
           <div>
-            <p>{formattedRepayment}</p>
+            <p>{formattedTotalRepayment}</p>
           </div>
         </div>
         <div className="flex flex-row justify-between py-1">
@@ -74,7 +59,7 @@ export function LoanSummary({ collateralAddress }: LoanSummaryProps) {
       <div className="graphPapr flex-auto flex flex-col justify-center items-center">
         {/* TODO(adamgobes): use tx button with write */}
         <button className="bg-adventureYellow p-2 rounded-lg w-48">
-          Repay {formattedRepayment}
+          Repay {formattedTotalRepayment}
         </button>
       </div>
     </div>
