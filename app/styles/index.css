@@ -14,10 +14,9 @@ body {
     width: 100vw;
   }
 
-  /* CSS specific to iOS devices */
-  @supports (-webkit-touch-callout: none) {
+  @supports (height: 100svh) {
     .wrapper {
-      height: -webkit-fill-available;
+      height: 100svh;
     }
   }
 }
