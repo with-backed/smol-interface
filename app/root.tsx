@@ -34,9 +34,6 @@ import customStyles from "~/styles/index.css";
 import { Header } from "~/components/Header";
 import { Footer } from "~/components/Footer";
 
-// Polyfill buffer so we can connect wallets on iOS
-require("buffer/");
-
 declare global {
   interface Window {
     ENV: {
