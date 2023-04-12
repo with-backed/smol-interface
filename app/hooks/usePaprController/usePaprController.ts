@@ -64,6 +64,60 @@ const allVaultProperties = graphql(`
   }
 `);
 
+const allActivityProperties = graphql(`
+  fragment allActivityProperties on Activity {
+    id
+    timestamp
+    user
+    sqrtPricePool
+    tickCurrent
+    amountBorrowed
+    amountRepaid
+    amountIn
+    amountOut
+    clientFeeBips
+    vault {
+      ...allVaultProperties
+    }
+    tokenIn {
+      ...allERC20Properties
+    }
+    tokenOut {
+      ...allERC20Properties
+    }
+    addedCollateral {
+      id
+      collateral {
+        id
+      }
+      tokenId
+    }
+    removedCollateral {
+      id
+      collateral {
+        id
+      }
+      tokenId
+    }
+    auctionCollateral {
+      ...allERC721Properties
+    }
+    auctionTokenId
+    auctionEndPrice
+    cumulativeLiquidity
+    cumulativeToken0
+    cumulativeToken1
+    liquidityDelta
+    token0Delta
+    token1Delta
+    uniswapLiquidityPosition {
+      id
+      tickLower
+      tickUpper
+    }
+  }
+`);
+
 const paprControllerByIdDocument = graphql(`
   query paprControllerById($id: ID!) {
     paprController(id: $id) {

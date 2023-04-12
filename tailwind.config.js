@@ -5,4 +5,9 @@ module.exports = {
     extend: {},
   },
   plugins: [],
+  extend: {
+    colors: {
+      adventureYellow: "#FFCF53",
+    },
+  },
 };
