@@ -1,5 +1,4 @@
 import type { SupportedToken } from "~/lib/config";
-import { getTokenFromEnv } from "~/lib/config";
 import type { ReservoirResponseData } from "~/lib/reservoir";
 import { OraclePriceType } from "~/lib/reservoir";
 import type { PropsWithChildren } from "react";
@@ -11,6 +10,7 @@ import {
   useState,
 } from "react";
 import { getAddress } from "ethers/lib/utils.js";
+import { useConfig } from "../useConfig";
 
 const ORACLE_POLL_INTERVAL = 1200000;
 
@@ -61,7 +61,7 @@ export function OracleInfoProvider({
   collections,
   children,
 }: PropsWithChildren<{ collections: string[] }>) {
-  const tokenName = getTokenFromEnv();
+  const { tokenName } = useConfig();
   const [registeredKinds, setRegisteredKinds] = useState<OraclePriceType[]>([]);
   const [oracleInfoRepository, setOracleInfoRepository] =
     useState<OracleInfoRepository>(EMPTY);
