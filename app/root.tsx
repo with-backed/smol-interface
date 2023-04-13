@@ -33,7 +33,7 @@ import tailwindStyles from "~/tailwind.css";
 import customStyles from "~/styles/index.css";
 import { Header } from "~/components/Header";
 import { Footer } from "~/components/Footer";
-import { OracleInfoProvider } from "./hooks/useOracleInfo/useOracleInfo";
+import { OracleInfoProvider } from "./hooks/useOracleInfo";
 import { useMemo } from "react";
 
 declare global {
