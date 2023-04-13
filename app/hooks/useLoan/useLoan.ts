@@ -39,7 +39,8 @@ const mostRecentLoanByVaultQuery = graphql(`
 `);
 
 type LoanDetails = {
-  borrowed: ethers.BigNumber | null;
+  borrowedPapr: ethers.BigNumber | null;
+  borrowedUnderlying: ethers.BigNumber | null;
   formattedBorrowed: string;
   interest: ethers.BigNumber | null;
   formattedInterest: string;
@@ -172,7 +173,8 @@ export function useLoan(
   }, [costPercentage]);
 
   return {
-    borrowed: borrowedFromSwap,
+    borrowedPapr: vaultDebt,
+    borrowedUnderlying: borrowedFromSwap,
     formattedBorrowed,
     interest,
     formattedInterest,
