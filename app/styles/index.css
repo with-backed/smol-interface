@@ -4,6 +4,7 @@ body {
 }
 
 .wrapper {
+  background-color: white;
   width: 360px;
   height: 640px;
 }
@@ -19,7 +20,7 @@ body {
       min-height: 100svh;
     }
     .wrapper {
-      height: 100svh;
+      height: calc(100svh - 108px);
     }
   }
 }
