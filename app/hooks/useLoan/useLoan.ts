@@ -4,16 +4,15 @@ import { useQuery } from "urql";
 import { graphql } from "~/gql";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
+import type { MostRecentLoanByVaultQuery, VaultbyIdQuery } from "~/gql/graphql";
 import {
   MostRecentLoanByVaultDocument,
-  MostRecentLoanByVaultQuery,
   VaultbyIdDocument,
-  VaultbyIdQuery,
 } from "~/gql/graphql";
 import { usePoolQuote } from "../usePoolQuote";
 import { usePaprController } from "../usePaprController";
 import { formatBigNum, formatPercent } from "~/lib/numberFormat";
-import { DEFAULT_CLIENT_FEE_BIPS } from "~/lib/constants";
+import { calculateSwapFee } from "~/lib/fees";
 
 dayjs.extend(duration);
 
@@ -39,7 +38,8 @@ const mostRecentLoanByVaultQuery = graphql(`
 `);
 
 type LoanDetails = {
-  borrowed: ethers.BigNumber | null;
+  borrowedPapr: ethers.BigNumber | null;
+  borrowedUnderlying: ethers.BigNumber | null;
   formattedBorrowed: string;
   interest: ethers.BigNumber | null;
   formattedInterest: string;
@@ -90,14 +90,7 @@ export function useLoan(
     if (!recentLoanActivity.amountOut) return ethers.BigNumber.from(0);
     const amountOut = ethers.BigNumber.from(recentLoanActivity.amountOut);
 
-    return amountOut.sub(
-      calculateSwapFee(
-        amountOut,
-        ethers.BigNumber.from(
-          recentLoanActivity.clientFeeBips || DEFAULT_CLIENT_FEE_BIPS
-        )
-      )
-    );
+    return amountOut.sub(calculateSwapFee(amountOut));
   }, [recentLoanActivity]);
 
   const totalRepaymentQuote = usePoolQuote({
@@ -111,14 +104,7 @@ export function useLoan(
   const totalRepayment = useMemo(() => {
     if (!totalRepaymentQuote || !recentLoanActivity) return null;
 
-    return totalRepaymentQuote.add(
-      calculateSwapFee(
-        totalRepaymentQuote,
-        ethers.BigNumber.from(
-          recentLoanActivity.clientFeeBips || DEFAULT_CLIENT_FEE_BIPS
-        )
-      )
-    );
+    return totalRepaymentQuote.add(calculateSwapFee(totalRepaymentQuote));
   }, [totalRepaymentQuote, recentLoanActivity]);
 
   const interest = useMemo(() => {
@@ -172,7 +158,8 @@ export function useLoan(
   }, [costPercentage]);
 
   return {
-    borrowed: borrowedFromSwap,
+    borrowedPapr: vaultDebt,
+    borrowedUnderlying: borrowedFromSwap,
     formattedBorrowed,
     interest,
     formattedInterest,
@@ -182,13 +169,6 @@ export function useLoan(
     formattedCostPercentage,
     numDays,
   };
-}
-
-function calculateSwapFee(
-  base: ethers.BigNumber,
-  swapFeeBips: ethers.BigNumber
-) {
-  return base.mul(swapFeeBips).div(10000);
 }
 
 function generateVaultId(
