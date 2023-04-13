@@ -33,11 +33,13 @@ import tailwindStyles from "~/tailwind.css";
 import customStyles from "~/styles/index.css";
 import { Header } from "~/components/Header";
 import { Footer } from "~/components/Footer";
+import { OracleInfoProvider } from "./hooks/useOracleInfo/useOracleInfo";
+import { useMemo } from "react";
 
 declare global {
   interface Window {
     ENV: {
-      TOKEN: string;
+      TOKEN: SupportedToken;
       ALCHEMY_KEY: string;
       ETHERSCAN_API_KEY: string;
     };
@@ -121,6 +123,12 @@ export const loader = async () => {
 export default function App() {
   const serverSideData = useLoaderData<typeof loader>();
 
+  const allowedCollateral = useMemo(() => {
+    return serverSideData.paprSubgraphData.allowedCollateral.map(
+      (ac) => ac.token.id
+    );
+  }, [serverSideData.paprSubgraphData.allowedCollateral]);
+
   return (
     <html lang="en">
       <head>
@@ -131,25 +139,27 @@ export default function App() {
         <UrqlProvider value={paprClient}>
           <WagmiConfig client={wagmiClient}>
             <RainbowKitProvider chains={chains}>
-              <ControllerContextProvider
-                value={serverSideData.paprSubgraphData as PaprController}
-              >
-                <Header />
-                <div className="wrapper">
-                  <Outlet />
-                </div>
-                <ScrollRestoration />
-                <script
-                  dangerouslySetInnerHTML={{
-                    __html: `window.ENV = ${JSON.stringify(
-                      serverSideData.env
-                    )}`,
-                  }}
-                />
-                <Scripts />
-                <LiveReload />
-                <Footer />
-              </ControllerContextProvider>
+              <OracleInfoProvider collections={allowedCollateral}>
+                <ControllerContextProvider
+                  value={serverSideData.paprSubgraphData as PaprController}
+                >
+                  <Header />
+                  <div className="grow">
+                    <Outlet />
+                  </div>
+                  <ScrollRestoration />
+                  <script
+                    dangerouslySetInnerHTML={{
+                      __html: `window.ENV = ${JSON.stringify(
+                        serverSideData.env
+                      )}`,
+                    }}
+                  />
+                  <Scripts />
+                  <LiveReload />
+                  <Footer />
+                </ControllerContextProvider>
+              </OracleInfoProvider>
             </RainbowKitProvider>
           </WagmiConfig>
         </UrqlProvider>

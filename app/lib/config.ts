@@ -57,3 +57,7 @@ export const configs = {
   paprHero,
   paprMeme,
 };
+
+export function getTokenFromEnv() {
+  return typeof window === "undefined" ? process.env.TOKEN : window.ENV.TOKEN;
+}
