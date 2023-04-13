@@ -8,6 +8,7 @@ import React, {
   useState,
 } from "react";
 import { useBlockNumber, useWebSocketProvider } from "wagmi";
+import { useConfig } from "../useConfig";
 
 type TimestampResult = {
   blockNumber: number;
@@ -20,7 +21,7 @@ type TimestampResult = {
 export const TimestampContext = createContext<TimestampResult | null>(null);
 
 export function TimestampProvider({ children }: PropsWithChildren<{}>) {
-  const jsonRpcProvider = "";
+  const { jsonRpcProvider } = useConfig();
   const webSocketProvider = useWebSocketProvider();
   const [result, setResult] = useState<TimestampResult | null>(null);
 

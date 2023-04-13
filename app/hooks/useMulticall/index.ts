@@ -1,1 +1,0 @@
-export { useMulticall } from "./useMulticall";

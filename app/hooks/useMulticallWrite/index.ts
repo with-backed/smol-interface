@@ -1,0 +1,1 @@
+export { useMulticallWrite } from "./useMulticallWrite";

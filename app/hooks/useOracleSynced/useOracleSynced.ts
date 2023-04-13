@@ -1,7 +1,7 @@
-import { useOracleInfo } from "hooks/useOracleInfo/useOracleInfo";
-import { useTimestamp } from "hooks/useTimestamp";
-import { OraclePriceType } from "lib/oracle/reservoir";
+import { useOracleInfo } from "~/hooks/useOracleInfo";
+import { useTimestamp } from "~/hooks/useTimestamp";
 import { useEffect, useState } from "react";
+import type { OraclePriceType } from "~/lib/reservoir";
 
 export function useOracleSynced(
   collateralContractAddress: string,

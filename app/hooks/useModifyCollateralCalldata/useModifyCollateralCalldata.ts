@@ -1,18 +1,16 @@
-import { BigNumberish, ethers } from "ethers";
-import { useOracleInfo } from "hooks/useOracleInfo/useOracleInfo";
-import { oracleInfoArgEncoded } from "lib/constants";
-import { deconstructFromId } from "lib/controllers";
+import type { BigNumberish } from "ethers";
+import { ethers } from "ethers";
+import { useOracleInfo } from "~/hooks/useOracleInfo";
 import { useMemo } from "react";
-import {
-  IPaprController,
-  ReservoirOracleUnderwriter,
-} from "types/generated/abis/PaprController";
-import PaprControllerABI from "abis/PaprController.json";
+import type { OracleInfoStruct } from "~/lib/reservoir";
 import {
   getOraclePayloadFromReservoirObject,
   OraclePriceType,
 } from "~/lib/reservoir";
 import { useAccount } from "wagmi";
+import { oracleInfoArgEncoded } from "~/lib/constants";
+import { deconstructFromId } from "~/lib/utils";
+import { paprControllerABI } from "types/generatedABI";
 
 type CollateralStruct = { addr: string; id: BigNumberish };
 
@@ -31,7 +29,7 @@ interface RemoveCollateralArgsStruct {
 
 const RemoveCollateralEncoderString = `removeCollateral(address sendTo, tuple(address addr, uint256 id)[] collateralArr, ${oracleInfoArgEncoded})`;
 
-const paprControllerIFace = new ethers.utils.Interface(PaprControllerABI.abi);
+const paprControllerIFace = new ethers.utils.Interface(paprControllerABI);
 
 export function useModifyCollateralCalldata(
   depositNFTs: string[],
