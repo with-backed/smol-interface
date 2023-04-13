@@ -144,7 +144,7 @@ export default function App() {
                   value={serverSideData.paprSubgraphData as PaprController}
                 >
                   <Header />
-                  <div className="grow">
+                  <div className="wrapper">
                     <Outlet />
                   </div>
                   <ScrollRestoration />
