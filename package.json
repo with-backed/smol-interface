@@ -1,6 +1,8 @@
 {
   "private": true,
-  "sideEffects": false,
+  "sideEffects": [
+    "polyfills.ts"
+  ],
   "scripts": {
     "build": "yarn codegen && remix build",
     "dev": "remix dev",
