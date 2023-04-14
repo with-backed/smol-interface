@@ -10,7 +10,7 @@ import {
 import { Caret } from "~/components/Caret";
 import { Link } from "@remix-run/react";
 import { TextButton } from "../Buttons/TextButton";
-import { useAccountNFTs } from "~/hooks/useAccountNFTs/useAccountNFTs";
+import { useAccountNFTs } from "~/hooks/useAccountNFTs";
 import { usePaprController } from "~/hooks/usePaprController";
 import { Asset } from "@center-inc/react";
 
