@@ -1,5 +1,7 @@
-import { ButtonHTMLAttributes, useMemo } from "react";
+import type { ButtonHTMLAttributes } from "react";
+import { useMemo } from "react";
 
+// background color can be fine bg-risky bg-rekt bg-fine-faint bg-risky-faint bg-rekt-faint bg-unclickable-grey
 export type ButtonBaseTheme = "fine" | "risky" | "rekt";
 export type ButtonFaintTheme = `${ButtonBaseTheme}-faint`;
 export type ButtonTheme = ButtonBaseTheme | ButtonFaintTheme;
