@@ -90,7 +90,7 @@ export function LoanSummary({ collateralAddress }: LoanSummaryProps) {
           <div className="my-2">
             <ApproveTokenButton
               token={underlying}
-              theme="rekt-faint"
+              theme="bg-rekt-faint"
               tokenApproved={underlyingApproved}
               setTokenApproved={setUnderlyingApproved}
             />
@@ -103,7 +103,7 @@ export function LoanSummary({ collateralAddress }: LoanSummaryProps) {
                 ? "Waiting for oracle..."
                 : `Repay ${formattedTotalRepayment}`
             }
-            theme="rekt"
+            theme="bg-rekt"
             onClick={write!}
             transactionData={data}
             disabled={!underlyingApproved || !oracleSynced}
