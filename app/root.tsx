@@ -21,7 +21,7 @@ import { mainnet } from "wagmi/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 import { APP_NAME } from "~/lib/constants";
-
+import { CenterProvider } from "@center-inc/react";
 import rainbowKitStyles from "@rainbow-me/rainbowkit/styles.css";
 import type { SupportedToken } from "./lib/config";
 import { configs } from "./lib/config";
@@ -130,7 +130,8 @@ export default function App() {
     );
   }, [serverSideData.paprSubgraphData.allowedCollateral]);
 
-  const { paprSubgraph } = configs[serverSideData.env.TOKEN as SupportedToken];
+  const { centerKey, centerNetwork, paprSubgraph } =
+    configs[serverSideData.env.TOKEN as SupportedToken];
 
   const paprClient = useMemo(() => {
     return createUrqlClient({
@@ -154,21 +155,26 @@ export default function App() {
                   <ControllerContextProvider
                     value={serverSideData.paprSubgraphData as PaprController}
                   >
-                    <Header />
-                    <div className="wrapper">
-                      <Outlet />
-                    </div>
-                    <ScrollRestoration />
-                    <script
-                      dangerouslySetInnerHTML={{
-                        __html: `window.ENV = ${JSON.stringify(
-                          serverSideData.env
-                        )}`,
-                      }}
-                    />
-                    <Scripts />
-                    <LiveReload />
-                    <Footer />
+                    <CenterProvider
+                      apiKey={centerKey}
+                      network={centerNetwork as any}
+                    >
+                      <Header />
+                      <div className="wrapper">
+                        <Outlet />
+                      </div>
+                      <ScrollRestoration />
+                      <script
+                        dangerouslySetInnerHTML={{
+                          __html: `window.ENV = ${JSON.stringify(
+                            serverSideData.env
+                          )}`,
+                        }}
+                      />
+                      <Scripts />
+                      <LiveReload />
+                      <Footer />
+                    </CenterProvider>
                   </ControllerContextProvider>
                 </OracleInfoProvider>
               </TimestampProvider>
