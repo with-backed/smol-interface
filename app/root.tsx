@@ -20,7 +20,7 @@ import { configureChains, createClient, goerli, WagmiConfig } from "wagmi";
 import { mainnet } from "wagmi/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
-import { APP_NAME, MAINNET_PAPR_SUBGRAPH } from "~/lib/constants";
+import { APP_NAME } from "~/lib/constants";
 
 import rainbowKitStyles from "@rainbow-me/rainbowkit/styles.css";
 import type { SupportedToken } from "./lib/config";
@@ -93,14 +93,13 @@ const wagmiClient = createClient({
   webSocketProvider,
 });
 
-const paprClient = createUrqlClient({
-  url: "https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.95/gn",
-  exchanges: [cacheExchange, fetchExchange],
-});
-
 export const loader = async () => {
-  const controllerAddress =
-    configs[process.env.TOKEN as SupportedToken].controllerAddress;
+  const { controllerAddress, paprSubgraph } =
+    configs[process.env.TOKEN as SupportedToken];
+  const paprClient = createUrqlClient({
+    url: paprSubgraph,
+    exchanges: [cacheExchange, fetchExchange],
+  });
   const queryResult = await paprClient
     .query<PaprControllerByIdQuery>(PaprControllerByIdDocument, {
       id: controllerAddress,
@@ -130,6 +129,15 @@ export default function App() {
       (ac) => ac.token.id
     );
   }, [serverSideData.paprSubgraphData.allowedCollateral]);
+
+  const { paprSubgraph } = configs[serverSideData.env.TOKEN as SupportedToken];
+
+  const paprClient = useMemo(() => {
+    return createUrqlClient({
+      url: paprSubgraph,
+      exchanges: [cacheExchange, fetchExchange],
+    });
+  }, [paprSubgraph]);
 
   return (
     <html lang="en">
