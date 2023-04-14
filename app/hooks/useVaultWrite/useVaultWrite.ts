@@ -15,17 +15,29 @@ import { deconstructFromId } from "~/lib/utils";
 import { useSwapParams } from "~/hooks/useSwapParams";
 import { useSafeTransferFromWrite } from "~/hooks/useSafeTransferFromWrite";
 
-export function useVaultWrite(
-  writeType: VaultWriteType,
-  collateralContractAddress: string,
-  depositNFTs: string[],
-  withdrawNFTs: string[],
-  amount: ethers.BigNumber,
-  quote: ethers.BigNumber | null,
-  usingSafeTransferFrom: boolean,
-  disabled: boolean,
-  refresh: () => void
-) {
+type UseVaultWriteParams = {
+  writeType: VaultWriteType;
+  collateralContractAddress: string;
+  depositNFTs: string[];
+  withdrawNFTs: string[];
+  amount: ethers.BigNumber | null;
+  quote: ethers.BigNumber | null;
+  usingSafeTransferFrom: boolean;
+  disabled: boolean;
+  refresh: () => void;
+};
+
+export function useVaultWrite({
+  writeType,
+  collateralContractAddress,
+  depositNFTs,
+  withdrawNFTs,
+  amount,
+  quote,
+  usingSafeTransferFrom,
+  disabled,
+  refresh,
+}: UseVaultWriteParams) {
   const { address } = useAccount();
   const oracleInfo = useOracleInfo(OraclePriceType.lower);
   const swapParams = useSwapParams(amount, quote);
@@ -38,14 +50,14 @@ export function useVaultWrite(
       case VaultWriteType.BorrowWithSwap:
         return generateBorrowWithSwapCalldata(
           collateralContractAddress,
-          address!,
+          address,
           swapParams,
           oracleInfo
         );
       case VaultWriteType.RepayWithSwap:
         return generateRepayWithSwapCalldata(
           collateralContractAddress,
-          address!,
+          address,
           swapParams
         );
     }
@@ -89,7 +101,7 @@ export function useVaultWrite(
   } = useSafeTransferFromWrite(
     collateralContractAddress,
     nftTokenId,
-    amount,
+    amount || ethers.constants.Zero,
     quote,
     disabled,
     refresh

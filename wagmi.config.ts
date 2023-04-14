@@ -13,7 +13,10 @@ export default defineConfig({
         },
         {
           name: "PaprController",
-          address: "0x3b29c19ff2fcea0ff98d0ef5b184354d74ea74b0",
+          address: {
+            1: "0x3b29c19ff2fcea0ff98d0ef5b184354d74ea74b0",
+            5: "0x092018ff54df5bfa53e1c6e75ad0e2d8991a8b1e",
+          },
         },
       ],
       chainId: 1,

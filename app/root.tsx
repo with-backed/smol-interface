@@ -16,7 +16,7 @@ import {
   fetchExchange,
   Provider as UrqlProvider,
 } from "urql";
-import { configureChains, createClient, WagmiConfig } from "wagmi";
+import { configureChains, createClient, goerli, WagmiConfig } from "wagmi";
 import { mainnet } from "wagmi/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
@@ -35,6 +35,7 @@ import { Header } from "~/components/Header";
 import { Footer } from "~/components/Footer";
 import { OracleInfoProvider } from "./hooks/useOracleInfo";
 import { useMemo } from "react";
+import { TimestampProvider } from "./hooks/useTimestamp";
 
 declare global {
   interface Window {
@@ -67,8 +68,8 @@ export const links: LinksFunction = () => [
   },
 ];
 
-const { chains, provider } = configureChains(
-  [mainnet],
+const { chains, provider, webSocketProvider } = configureChains(
+  [mainnet, goerli],
   [
     alchemyProvider({
       apiKey:
@@ -89,10 +90,11 @@ const wagmiClient = createClient({
   autoConnect: true,
   connectors,
   provider,
+  webSocketProvider,
 });
 
 const paprClient = createUrqlClient({
-  url: MAINNET_PAPR_SUBGRAPH,
+  url: "https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.95/gn",
   exchanges: [cacheExchange, fetchExchange],
 });
 
@@ -139,27 +141,29 @@ export default function App() {
         <UrqlProvider value={paprClient}>
           <WagmiConfig client={wagmiClient}>
             <RainbowKitProvider chains={chains}>
-              <OracleInfoProvider collections={allowedCollateral}>
-                <ControllerContextProvider
-                  value={serverSideData.paprSubgraphData as PaprController}
-                >
-                  <Header />
-                  <div className="wrapper">
-                    <Outlet />
-                  </div>
-                  <ScrollRestoration />
-                  <script
-                    dangerouslySetInnerHTML={{
-                      __html: `window.ENV = ${JSON.stringify(
-                        serverSideData.env
-                      )}`,
-                    }}
-                  />
-                  <Scripts />
-                  <LiveReload />
-                  <Footer />
-                </ControllerContextProvider>
-              </OracleInfoProvider>
+              <TimestampProvider>
+                <OracleInfoProvider collections={allowedCollateral}>
+                  <ControllerContextProvider
+                    value={serverSideData.paprSubgraphData as PaprController}
+                  >
+                    <Header />
+                    <div className="wrapper">
+                      <Outlet />
+                    </div>
+                    <ScrollRestoration />
+                    <script
+                      dangerouslySetInnerHTML={{
+                        __html: `window.ENV = ${JSON.stringify(
+                          serverSideData.env
+                        )}`,
+                      }}
+                    />
+                    <Scripts />
+                    <LiveReload />
+                    <Footer />
+                  </ControllerContextProvider>
+                </OracleInfoProvider>
+              </TimestampProvider>
             </RainbowKitProvider>
           </WagmiConfig>
         </UrqlProvider>

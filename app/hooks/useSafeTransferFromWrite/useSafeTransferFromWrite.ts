@@ -40,12 +40,13 @@ export function useSafeTransferFromWrite(
   const swapParams = useSwapParams(debt, quote);
 
   const onERC721ReceivedData = useMemo(() => {
+    if (!address || !oracleInfo) return "";
     const erc721ReceivedArgs: OnERC721ReceivedArgsStruct = {
-      proceedsTo: address!,
+      proceedsTo: address,
       debt,
       swapParams,
       oracleInfo: getOraclePayloadFromReservoirObject(
-        oracleInfo && oracleInfo[nftContractAddress]
+        oracleInfo[nftContractAddress]
       ),
     };
     return ethers.utils.defaultAbiCoder.encode(

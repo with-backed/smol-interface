@@ -22,10 +22,12 @@ interface IncreaseAndSwapStruct {
 }
 export function generateBorrowWithSwapCalldata(
   collateralContractAddress: string,
-  address: string,
+  address: string | undefined,
   swapParams: SwapParamsStruct,
   oracleInfo: OracleInfo | undefined
 ) {
+  if (!address) return "";
+
   const borrowWithSwapArgs: IncreaseAndSwapStruct = {
     proceedsTo: address,
     collateralAsset: collateralContractAddress,
@@ -51,9 +53,10 @@ interface BuyAndReduceArgsStruct {
 }
 export function generateRepayWithSwapCalldata(
   collateralContractAddress: string,
-  address: string,
+  address: string | undefined,
   swapParams: SwapParamsStruct
 ) {
+  if (!address) return "";
   const repayWithSwapArgs: BuyAndReduceArgsStruct = {
     account: address,
     collateralAsset: collateralContractAddress,

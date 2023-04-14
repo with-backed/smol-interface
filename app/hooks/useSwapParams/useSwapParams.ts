@@ -23,11 +23,11 @@ const emptySwapParams: SwapParamsStruct = {
 };
 
 export function useSwapParams(
-  amount: ethers.BigNumber,
+  amount: ethers.BigNumber | null,
   minOut: ethers.BigNumber | null
 ) {
   const swapParams: SwapParamsStruct = useMemo(() => {
-    if (!minOut) return emptySwapParams;
+    if (!minOut || !amount) return emptySwapParams;
     return {
       amount,
       minOut,
