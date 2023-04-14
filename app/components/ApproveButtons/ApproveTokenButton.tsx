@@ -1,4 +1,4 @@
-import { TransactionButton } from "~/components/Buttons/TransactionButton/TransactionButton";
+import { TransactionButton } from "~/components/Buttons/TransactionButton";
 import { ethers } from "ethers";
 import { usePaprController } from "~/hooks/usePaprController";
 import { useEffect, useState } from "react";

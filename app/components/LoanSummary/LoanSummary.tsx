@@ -1,10 +1,10 @@
 import { useLoan } from "~/hooks/useLoan";
 import { usePaprController } from "~/hooks/usePaprController";
-import { ApproveTokenButton } from "../ApproveButtons/ApproveTokenButton";
+import { ApproveTokenButton } from "~/components/ApproveButtons";
 import { useMemo, useState } from "react";
 import { useVaultWrite } from "~/hooks/useVaultWrite";
 import { VaultWriteType } from "~/hooks/useVaultWrite/helpers";
-import { TransactionButton } from "../Buttons/TransactionButton/TransactionButton";
+import { TransactionButton } from "~/components/Buttons/TransactionButton";
 import { useOracleSynced } from "~/hooks/useOracleSynced";
 import { OraclePriceType } from "~/lib/reservoir";
 

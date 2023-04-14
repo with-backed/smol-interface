@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { SendTransactionResult } from "@wagmi/core";
 import { EtherscanTransactionLink } from "~/components/EtherscanLink";
 
-import { Button } from "../Button";
-import type { ButtonProps } from "../Button";
+import { Button } from "~/components/Buttons/Button";
+import type { ButtonProps } from "~/components/Buttons/Button";
 
 interface TransactionButtonProps extends ButtonProps {
   text: string;
