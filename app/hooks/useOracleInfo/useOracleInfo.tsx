@@ -26,6 +26,20 @@ const EMPTY = {
   spot: undefined,
 };
 
+export function oracleInfoProxy<T>(obj: { [key: string]: T }) {
+  const proxy = new Proxy(obj, {
+    get(target, prop) {
+      try {
+        return target[getAddress(prop as string)];
+      } catch (e) {
+        return undefined;
+      }
+    },
+  });
+
+  return proxy;
+}
+
 async function getOracleInfoFromAllowedCollateral(
   collections: string[],
   token: SupportedToken,
@@ -49,7 +63,7 @@ async function getOracleInfoFromAllowedCollateral(
     }),
     {} as OracleInfo
   );
-  return oracleInfo;
+  return oracleInfoProxy(oracleInfo);
 }
 
 export const OracleInfoContext = createContext<{

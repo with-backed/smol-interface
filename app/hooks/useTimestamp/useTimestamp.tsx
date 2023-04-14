@@ -21,8 +21,8 @@ type TimestampResult = {
 export const TimestampContext = createContext<TimestampResult | null>(null);
 
 export function TimestampProvider({ children }: PropsWithChildren<{}>) {
-  const { jsonRpcProvider } = useConfig();
-  const webSocketProvider = useWebSocketProvider();
+  const { jsonRpcProvider, chainId } = useConfig();
+  const webSocketProvider = useWebSocketProvider({ chainId });
   const [result, setResult] = useState<TimestampResult | null>(null);
 
   // Get the latest block number right away instead of waiting for the

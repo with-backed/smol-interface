@@ -85,7 +85,8 @@ export function useModifyCollateralCalldata(
   const removeCollateralCalldata = useMemo(() => {
     if (
       withdrawContractsAndTokenIds.length === 0 ||
-      !allWithdrawNFTsEqualContracts
+      !allWithdrawNFTsEqualContracts ||
+      !oracleInfo
     )
       return "";
 
@@ -98,7 +99,7 @@ export function useModifyCollateralCalldata(
         })
       ),
       oracleInfo: getOraclePayloadFromReservoirObject(
-        oracleInfo && oracleInfo[withdrawContractsAndTokenIds[0][0]]
+        oracleInfo[withdrawContractsAndTokenIds[0][0]]
       ),
     };
 

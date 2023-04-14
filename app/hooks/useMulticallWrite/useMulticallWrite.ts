@@ -1,14 +1,16 @@
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import { useMemo } from "react";
-import { paprControllerABI, paprControllerAddress } from "types/generatedABI";
+import { paprControllerABI } from "types/generatedABI";
+import { usePaprController } from "../usePaprController";
 
 export function useMulticallWrite(
   calldata: string[],
   skip: boolean,
   refresh: () => void
 ) {
+  const { id } = usePaprController();
   const { config: multicallConfig } = usePrepareContractWrite({
-    address: skip ? undefined : (paprControllerAddress[1] as `0x${string}`),
+    address: skip ? undefined : (id as `0x${string}`),
     abi: paprControllerABI,
     functionName: "multicall",
     args: [calldata as `0x${string}`[]],

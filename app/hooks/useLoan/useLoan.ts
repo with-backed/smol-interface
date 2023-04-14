@@ -13,6 +13,7 @@ import { usePoolQuote } from "../usePoolQuote";
 import { usePaprController } from "../usePaprController";
 import { formatBigNum, formatPercent } from "~/lib/numberFormat";
 import { calculateSwapFee } from "~/lib/fees";
+import { useAccount } from "wagmi";
 
 dayjs.extend(duration);
 
@@ -43,24 +44,25 @@ type LoanDetails = {
   formattedBorrowed: string;
   interest: ethers.BigNumber | null;
   formattedInterest: string;
+  repaymentQuote: ethers.BigNumber | null;
   totalRepayment: ethers.BigNumber | null;
   formattedTotalRepayment: string;
   costPercentage: number | null;
   formattedCostPercentage: string;
   numDays: number | null;
+  vaultNFTs: string[];
 };
-
-const address = "0x82c1b61da09b5fdce098a212bb8070210ab91049";
 
 export function useLoan(
   controllerId: string,
   collateralAddress: string
 ): LoanDetails {
+  const { address } = useAccount();
   const { paprToken, underlying } = usePaprController();
 
   const vaultId = useMemo(() => {
-    return generateVaultId(controllerId, collateralAddress, address);
-  }, [controllerId, collateralAddress]);
+    return generateVaultId(controllerId, collateralAddress, address || "");
+  }, [controllerId, collateralAddress, address]);
 
   const [{ data: vaultData }] = useQuery<VaultbyIdQuery>({
     query: VaultbyIdDocument,
@@ -68,6 +70,7 @@ export function useLoan(
       id: vaultId,
     },
   });
+
   const [{ data: recentLoanData }] = useQuery<MostRecentLoanByVaultQuery>({
     query: MostRecentLoanByVaultDocument,
     variables: {
@@ -94,7 +97,7 @@ export function useLoan(
   }, [recentLoanActivity]);
 
   const totalRepaymentQuote = usePoolQuote({
-    amount: borrowedFromSwap,
+    amount: vaultDebt,
     inputToken: underlying.id,
     outputToken: paprToken.id,
     tradeType: "exactOut",
@@ -139,17 +142,17 @@ export function useLoan(
 
   const formattedBorrowed = useMemo(() => {
     if (!borrowedFromSwap) return "...";
-    return formatBigNum(borrowedFromSwap, underlying.decimals) + " ETH";
+    return formatBigNum(borrowedFromSwap, underlying.decimals) + " WETH";
   }, [borrowedFromSwap, underlying.decimals]);
 
   const formattedInterest = useMemo(() => {
     if (!interest) return "...";
-    return formatBigNum(interest, underlying.decimals) + " ETH";
+    return formatBigNum(interest, underlying.decimals) + " WETH";
   }, [interest, underlying.decimals]);
 
   const formattedTotalRepayment = useMemo(() => {
     if (!totalRepayment) return "...";
-    return formatBigNum(totalRepayment, underlying.decimals) + " ETH";
+    return formatBigNum(totalRepayment, underlying.decimals) + " WETH";
   }, [totalRepayment, underlying.decimals]);
 
   const formattedCostPercentage = useMemo(() => {
@@ -157,17 +160,24 @@ export function useLoan(
     return formatPercent(costPercentage);
   }, [costPercentage]);
 
+  const vaultNFTs = useMemo(() => {
+    if (!vaultData?.vault) return [];
+    return vaultData.vault.collateral.map((c) => c.id);
+  }, [vaultData?.vault]);
+
   return {
     borrowedPapr: vaultDebt,
     borrowedUnderlying: borrowedFromSwap,
     formattedBorrowed,
     interest,
     formattedInterest,
+    repaymentQuote: totalRepaymentQuote,
     totalRepayment,
     formattedTotalRepayment,
     costPercentage,
     formattedCostPercentage,
     numDays,
+    vaultNFTs,
   };
 }
 
