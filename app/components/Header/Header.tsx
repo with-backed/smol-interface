@@ -28,8 +28,8 @@ export function Header() {
   );
 
   const className = useMemo(() => {
-    const justification = isConnected ? "between" : "center";
-    return `flex items-center bg-black text-white relative px-4 h-12 justify-${justification}`;
+    const justification = isConnected ? "justify-between" : "justify-center";
+    return `flex items-center bg-black text-white relative px-4 h-12 ${justification}`;
   }, [isConnected]);
 
   return (
