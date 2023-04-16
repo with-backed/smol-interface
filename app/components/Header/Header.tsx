@@ -10,6 +10,25 @@ import { useAccountNFTs } from "~/hooks/useAccountNFTs";
 import { usePaprController } from "~/hooks/usePaprController";
 import { Asset } from "@center-inc/react";
 import { useHeaderDisclosureState } from "~/hooks/useHeaderDisclosureState";
+import { create } from "zustand";
+
+export enum HeaderState {
+  Default,
+  NoNFTs,
+  ListEligibleCollections,
+  SelectNFTs,
+  HowMuchBorrow,
+}
+
+interface HeaderStore {
+  state: HeaderState;
+  setHeaderState: (newState: HeaderState) => void;
+}
+
+export const useHeaderStore = create<HeaderStore>((set) => ({
+  state: HeaderState.Default,
+  setHeaderState: (state) => set({ state }),
+}));
 
 export function Header() {
   const { address, isConnected } = useAccount();
@@ -23,6 +42,7 @@ export function Header() {
     address,
     collateralContractAddresses
   );
+  const { state } = useHeaderStore();
 
   const className = useMemo(() => {
     const justification = isConnected ? "justify-between" : "justify-center";
@@ -39,7 +59,24 @@ export function Header() {
         className="absolute top-12 left-0 w-full bg-black text-white p-4 pt-0 flex flex-col gap-3 items-center"
         {...disclosure}
       >
-        <SelectNFTsHeaderContent />
+        {(() => {
+          switch (state) {
+            case HeaderState.Default:
+              return <DefaultConnectedHeaderContent />;
+            case HeaderState.NoNFTs:
+              return <NoEligibleNFTsHeaderContent />;
+            case HeaderState.ListEligibleCollections:
+              return <SelectCollectionHeaderContent />;
+            case HeaderState.SelectNFTs:
+              return <SelectNFTsHeaderContent />;
+            case HeaderState.HowMuchBorrow:
+              // TODO: implement
+              return null;
+            default:
+              const exhaustiveCheck: never = state; // eslint-disable-line no-case-declarations
+              throw new Error(`Unhandled HeaderState case: ${exhaustiveCheck}`);
+          }
+        })()}
       </DisclosureContent>
     </header>
   );
