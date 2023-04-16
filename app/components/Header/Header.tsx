@@ -2,21 +2,18 @@ import { useMemo } from "react";
 import { useAccount } from "wagmi";
 import { ConnectWallet } from "~/components/Buttons/ConnectWallet";
 import type { DisclosureStateReturn } from "reakit/Disclosure";
-import {
-  useDisclosureState,
-  DisclosureContent,
-  Disclosure,
-} from "reakit/Disclosure";
+import { DisclosureContent, Disclosure } from "reakit/Disclosure";
 import { Caret } from "~/components/Caret";
 import { Link } from "@remix-run/react";
 import { TextButton } from "../Buttons/TextButton";
 import { useAccountNFTs } from "~/hooks/useAccountNFTs";
 import { usePaprController } from "~/hooks/usePaprController";
 import { Asset } from "@center-inc/react";
+import { useHeaderDisclosureState } from "~/hooks/useHeaderDisclosureState";
 
 export function Header() {
   const { address, isConnected } = useAccount();
-  const disclosure = useDisclosureState();
+  const disclosure = useHeaderDisclosureState();
   const { allowedCollateral } = usePaprController();
   const collateralContractAddresses = useMemo(
     () => allowedCollateral.map((c) => c.token.id),
