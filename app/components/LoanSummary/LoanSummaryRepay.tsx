@@ -58,7 +58,7 @@ export function LoanSummaryRepay({ vault, refresh }: LoanSummaryRepayProps) {
       <div className="my-4">
         <img src="/instrument.png" />
       </div>
-      <div className="graphPapr flex-auto flex flex-col justify-center items-center">
+      <div className="graph-papr flex-auto flex flex-col justify-center items-center">
         {!underlyingApproved && (
           <div className="my-2">
             <ApproveTokenButton

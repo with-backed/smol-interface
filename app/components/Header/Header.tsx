@@ -16,7 +16,7 @@ import { Asset } from "@center-inc/react";
 
 export function Header() {
   const { address, isConnected } = useAccount();
-  const disclosure = useDisclosureState({ visible: true });
+  const disclosure = useDisclosureState();
   const { allowedCollateral } = usePaprController();
   const collateralContractAddresses = useMemo(
     () => allowedCollateral.map((c) => c.token.id),
