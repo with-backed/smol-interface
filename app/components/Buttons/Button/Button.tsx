@@ -19,7 +19,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export function Button({
   children,
-  theme,
+  theme = "bg-fine",
   additionalClassNames = [],
   ...props
 }: ButtonProps) {
