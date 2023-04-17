@@ -4,28 +4,19 @@ import { useQuery } from "urql";
 import { graphql } from "~/gql";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
-import type { MostRecentLoanByVaultQuery, VaultbyIdQuery } from "~/gql/graphql";
-import {
-  MostRecentLoanByVaultDocument,
-  VaultbyIdDocument,
+import type {
+  MostRecentLoanByVaultQuery,
+  MostRecentRepaymentByVaultQuery,
 } from "~/gql/graphql";
 import { usePoolQuote } from "../usePoolQuote";
 import { usePaprController } from "../usePaprController";
 import { formatBigNum, formatPercent } from "~/lib/numberFormat";
 import { calculateSwapFee } from "~/lib/fees";
-import { useAccount } from "wagmi";
+import type { SubgraphVault } from "~/hooks/useVault";
 
 dayjs.extend(duration);
 
-const vaultByIdQuery = graphql(`
-  query vaultbyId($id: ID!) {
-    vault(id: $id) {
-      ...allVaultProperties
-    }
-  }
-`);
-
-const mostRecentLoanByVaultQuery = graphql(`
+const mostRecentLoanByVaultDocument = graphql(`
   query mostRecentLoanByVault($vaultId: String!) {
     activities(
       where: { and: [{ vault: $vaultId }, { amountBorrowed_not: null }] }
@@ -38,7 +29,20 @@ const mostRecentLoanByVaultQuery = graphql(`
   }
 `);
 
-type LoanDetails = {
+const mostRecentRepaymentByVaultDocument = graphql(`
+  query mostRecentRepaymentByVault($vaultId: String!) {
+    activities(
+      where: { and: [{ vault: $vaultId }, { amountRepaid_not: null }] }
+      orderBy: timestamp
+      orderDirection: desc
+      first: 1
+    ) {
+      ...allActivityProperties
+    }
+  }
+`);
+
+type Loan = {
   borrowedPapr: ethers.BigNumber | null;
   borrowedUnderlying: ethers.BigNumber | null;
   formattedBorrowed: string;
@@ -53,40 +57,42 @@ type LoanDetails = {
   vaultNFTs: string[];
 };
 
-export function useLoan(
-  controllerId: string,
-  collateralAddress: string
-): LoanDetails {
-  const { address } = useAccount();
+export function useLoan(vault: NonNullable<SubgraphVault>): Loan {
   const { paprToken, underlying } = usePaprController();
 
-  const vaultId = useMemo(() => {
-    return generateVaultId(controllerId, collateralAddress, address || "");
-  }, [controllerId, collateralAddress, address]);
+  const vaultDebt = useMemo(() => {
+    return ethers.BigNumber.from(vault.debt);
+  }, [vault.debt]);
 
-  const [{ data: vaultData }] = useQuery<VaultbyIdQuery>({
-    query: VaultbyIdDocument,
-    variables: {
-      id: vaultId,
-    },
-  });
+  const loanRepaid = useMemo(() => {
+    return vaultDebt.isZero();
+  }, [vaultDebt]);
 
   const [{ data: recentLoanData }] = useQuery<MostRecentLoanByVaultQuery>({
-    query: MostRecentLoanByVaultDocument,
+    query: mostRecentLoanByVaultDocument,
     variables: {
-      vaultId: vaultId,
+      vaultId: vault.id,
     },
   });
+
+  const [{ data: recentRepaymentData }] =
+    useQuery<MostRecentRepaymentByVaultQuery>({
+      query: mostRecentRepaymentByVaultDocument,
+      variables: {
+        vaultId: vault.id,
+      },
+      pause: !loanRepaid,
+    });
 
   const recentLoanActivity = useMemo(() => {
     if (!recentLoanData?.activities) return null;
     return recentLoanData.activities[0];
   }, [recentLoanData?.activities]);
 
-  const vaultDebt = useMemo(() => {
-    if (!vaultData?.vault) return null;
-    return ethers.BigNumber.from(vaultData.vault.debt);
-  }, [vaultData?.vault]);
+  const recentRepaymentActivity = useMemo(() => {
+    if (!recentRepaymentData?.activities) return null;
+    return recentRepaymentData.activities[0];
+  }, [recentRepaymentData?.activities]);
 
   const borrowedFromSwap = useMemo(() => {
     if (!recentLoanActivity) return null;
@@ -101,14 +107,24 @@ export function useLoan(
     inputToken: underlying.id,
     outputToken: paprToken.id,
     tradeType: "exactOut",
-    skip: !borrowedFromSwap,
+    skip: !borrowedFromSwap || loanRepaid, // save RPC call and do not fetch quote if loan is repaid
   });
 
   const totalRepayment = useMemo(() => {
-    if (!totalRepaymentQuote || !recentLoanActivity) return null;
+    if (loanRepaid) {
+      if (!recentRepaymentActivity) return null;
+      const amountIn = ethers.BigNumber.from(recentRepaymentActivity.amountIn);
+      return amountIn.add(calculateSwapFee(amountIn));
+    }
 
+    if (!totalRepaymentQuote || !recentLoanActivity) return null;
     return totalRepaymentQuote.add(calculateSwapFee(totalRepaymentQuote));
-  }, [totalRepaymentQuote, recentLoanActivity]);
+  }, [
+    totalRepaymentQuote,
+    recentLoanActivity,
+    loanRepaid,
+    recentRepaymentActivity,
+  ]);
 
   const interest = useMemo(() => {
     if (!borrowedFromSwap || !totalRepayment) return null;
@@ -116,9 +132,14 @@ export function useLoan(
   }, [borrowedFromSwap, totalRepayment]);
 
   const loanDuration = useMemo(() => {
+    if (loanRepaid) {
+      if (!recentRepaymentActivity || !recentLoanActivity) return null;
+      return recentRepaymentActivity.timestamp - recentLoanActivity.timestamp;
+    }
+
     if (!recentLoanActivity) return null;
     return new Date().getTime() / 1000 - recentLoanActivity.timestamp;
-  }, [recentLoanActivity]);
+  }, [recentLoanActivity, recentRepaymentActivity, loanRepaid]);
 
   const numDays = useMemo(() => {
     if (!loanDuration) return null;
@@ -132,13 +153,13 @@ export function useLoan(
   }, [loanDuration]);
 
   const costPercentage = useMemo(() => {
-    if (!interest || !borrowedFromSwap || !loanDuration) return null;
+    if (!interest || !borrowedFromSwap) return null;
     const interestNum = parseFloat(formatBigNum(interest, underlying.decimals));
     const principalNum = parseFloat(
       formatBigNum(borrowedFromSwap, underlying.decimals)
     );
     return interestNum / principalNum;
-  }, [interest, borrowedFromSwap, loanDuration, underlying.decimals]);
+  }, [interest, borrowedFromSwap, underlying.decimals]);
 
   const formattedBorrowed = useMemo(() => {
     if (!borrowedFromSwap) return "...";
@@ -161,9 +182,8 @@ export function useLoan(
   }, [costPercentage]);
 
   const vaultNFTs = useMemo(() => {
-    if (!vaultData?.vault) return [];
-    return vaultData.vault.collateral.map((c) => c.id);
-  }, [vaultData?.vault]);
+    return vault.collateral.map((c) => c.id);
+  }, [vault.collateral]);
 
   return {
     borrowedPapr: vaultDebt,
@@ -179,12 +199,4 @@ export function useLoan(
     numDays,
     vaultNFTs,
   };
-}
-
-function generateVaultId(
-  controllerId: string,
-  collateralAddress: string,
-  account: string
-) {
-  return `${controllerId.toLowerCase()}-${account.toLowerCase()}-${collateralAddress.toLowerCase()}`;
 }

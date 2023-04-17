@@ -1,7 +1,11 @@
 import type { ButtonHTMLAttributes } from "react";
 import { useMemo } from "react";
 
-export type ButtonBaseTheme = "bg-fine" | "bg-risky" | "bg-rekt";
+export type ButtonBaseTheme =
+  | "bg-fine"
+  | "bg-risky"
+  | "bg-rekt"
+  | "bg-completed-grey";
 export type ButtonFaintTheme =
   | "bg-fine-faint"
   | "bg-risky-faint"
