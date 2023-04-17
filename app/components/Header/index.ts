@@ -1,1 +1,3 @@
-export { Header, useHeaderStore, HeaderState } from "./Header";
+export { Header } from "./Header";
+export { HeaderState } from "./HeaderState";
+export { useHeaderStore } from "./headerStore";

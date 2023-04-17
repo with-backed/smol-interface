@@ -10,44 +10,12 @@ import { useAccountNFTs } from "~/hooks/useAccountNFTs";
 import { usePaprController } from "~/hooks/usePaprController";
 import { Asset } from "@center-inc/react";
 import { useHeaderDisclosureState } from "~/hooks/useHeaderDisclosureState";
-import { create } from "zustand";
 import { useCurrentVaults } from "~/hooks/useCurrentVaults";
 import { getAddress } from "ethers/lib/utils";
-import type { VaultsByOwnerForControllerQuery } from "~/gql/graphql";
 import { Button } from "reakit/Button";
-
-export enum HeaderState {
-  Default,
-  // NoNFTs may not need to be a distinct state but rather a conditional render
-  // in ListEligibleCollections
-  NoNFTs,
-  ListEligibleCollections,
-  SelectNFTs,
-  HowMuchBorrow,
-}
-
-interface HeaderStore {
-  state: HeaderState;
-  setHeaderState: (newState: HeaderState) => void;
-  currentVaults: VaultsByOwnerForControllerQuery["vaults"] | null;
-  setCurrentVaults: (
-    currentVaults: VaultsByOwnerForControllerQuery["vaults"]
-  ) => void;
-  selectedCollectionAddress: string | null;
-  setSelectedCollectionAddress: (
-    selectedCollectionAddress: string | null
-  ) => void;
-}
-
-export const useHeaderStore = create<HeaderStore>((set) => ({
-  state: HeaderState.Default,
-  setHeaderState: (state) => set({ state }),
-  currentVaults: null,
-  setCurrentVaults: (currentVaults) => set({ currentVaults }),
-  selectedCollectionAddress: null,
-  setSelectedCollectionAddress: (selectedCollectionAddress) =>
-    set({ selectedCollectionAddress }),
-}));
+import { useHeaderStore } from "./headerStore";
+import { HeaderState } from "./HeaderState";
+import { LoanBar } from "./LoanBar";
 
 export function Header() {
   const { address, isConnected } = useAccount();
@@ -63,6 +31,7 @@ export function Header() {
   );
   const state = useHeaderStore((s) => s.state);
   const setCurrentVaults = useHeaderStore((s) => s.setCurrentVaults);
+  const showHowMuchBorrow = useHeaderStore((s) => s.showHowMuchBorrow);
 
   const { currentVaults } = useCurrentVaults(address);
 
@@ -74,7 +43,7 @@ export function Header() {
 
   const className = useMemo(() => {
     const justification = isConnected ? "justify-between" : "justify-center";
-    return `flex items-center bg-black text-white relative px-4 h-12 ${justification}`;
+    return `flex items-center bg-black text-white relative px-4 min-h-[50px] ${justification}`;
   }, [isConnected]);
 
   return (
@@ -83,8 +52,15 @@ export function Header() {
         <ConnectWallet />
         {isConnected && <DropdownButton {...disclosure} />}
       </div>
+      {showHowMuchBorrow && (
+        <div className={className}>
+          <LoanBar />
+        </div>
+      )}
       <DisclosureContent
-        className="absolute top-12 left-0 w-full bg-black text-white p-4 pt-0 flex flex-col gap-3 items-center"
+        className={`absolute ${
+          showHowMuchBorrow ? "top-24" : "top-12"
+        } left-0 w-full bg-black text-white p-4 pt-0 flex flex-col gap-3 items-center`}
         {...disclosure}
       >
         {(() => {
@@ -97,9 +73,6 @@ export function Header() {
               return <SelectCollectionHeaderContent />;
             case HeaderState.SelectNFTs:
               return <SelectNFTsHeaderContent />;
-            case HeaderState.HowMuchBorrow:
-              // TODO: implement
-              return null;
             default:
               const exhaustiveCheck: never = state; // eslint-disable-line no-case-declarations
               throw new Error(`Unhandled HeaderState case: ${exhaustiveCheck}`);
@@ -265,21 +238,38 @@ function SelectNFTsHeaderContent() {
   const selectedCollectionAddress = useHeaderStore(
     (s) => s.selectedCollectionAddress
   );
+  const setSelectedTokenIdsInStore = useHeaderStore(
+    (s) => s.setSelectedTokenIds
+  );
+  const setShowHowMuchBorrow = useHeaderStore((s) => s.setShowHowMuchBorrow);
   const { address } = useAccount();
   const { userCollectionNFTs, nftsLoading } = useAccountNFTs(address, [
     // it should not be possible to get here without a selected collection.
-    // we'll want to look into enforcing that invariant
+    // we'll want to look into enforcing that invariant. We can have `setHeaderState`
+    // check that the state conforms to our expectations before advancing.
     selectedCollectionAddress || "",
   ]);
   const [selectedTokenIds, setSelectedTokenIds] = useState<{
     [tokenId: string]: boolean;
   }>({});
+
   const handleNFTClick = useCallback((tokenId: string) => {
     setSelectedTokenIds((prev) => ({
       ...prev,
       [tokenId]: !prev[tokenId],
     }));
   }, []);
+
+  const handleDoneClick = useCallback(() => {
+    // TODO: should probably disable this until at least one NFT is selected
+    const tokenIds = Object.entries(selectedTokenIds).reduce(
+      (acc, [id, include]) => (include ? [...acc, id] : acc),
+      [] as string[]
+    );
+    setSelectedTokenIdsInStore(tokenIds);
+    setShowHowMuchBorrow(true);
+    // TODO: close header
+  }, [selectedTokenIds, setSelectedTokenIdsInStore, setShowHowMuchBorrow]);
 
   return (
     <>
@@ -300,7 +290,7 @@ function SelectNFTsHeaderContent() {
           </Button>
         ))}
       </div>
-      <TextButton>Done</TextButton>
+      <TextButton onClick={handleDoneClick}>Done</TextButton>
     </>
   );
 }
@@ -357,12 +347,6 @@ const Checkmark = ({ visible }: CheckmarkProps) => {
 };
 
 function CancelButton() {
-  const setHeaderState = useHeaderStore((state) => state.setHeaderState);
-  const cancel = useCallback(
-    // TODO: clear any partial state
-    () => setHeaderState(HeaderState.Default),
-    [setHeaderState]
-  );
-
-  return <TextButton onClick={cancel}>cancel</TextButton>;
+  const clear = useHeaderStore((s) => s.clear);
+  return <TextButton onClick={clear}>cancel</TextButton>;
 }
