@@ -16,19 +16,16 @@ import { Button } from "reakit/Button";
 import { useGlobalStore } from "~/lib/globalStore";
 import { HeaderState } from "./HeaderState";
 import { LoanBar } from "./LoanBar";
+import { useMaxDebt } from "~/hooks/useMaxDebt";
+import { OraclePriceType } from "~/lib/reservoir";
+import { usePoolQuote } from "~/hooks/usePoolQuote";
+import { formatBigNum } from "~/lib/numberFormat";
+import type { ethers } from "ethers";
+import { useNFTSymbol } from "~/hooks/useNFTSymbol";
 
 export function Header() {
   const { address, isConnected } = useAccount();
   const disclosure = useHeaderDisclosureState();
-  const { allowedCollateral } = usePaprController();
-  const collateralContractAddresses = useMemo(
-    () => allowedCollateral.map((c) => c.token.id),
-    [allowedCollateral]
-  );
-  const { userCollectionNFTs, nftsLoading } = useAccountNFTs(
-    address,
-    collateralContractAddresses
-  );
   const state = useGlobalStore((s) => s.state);
   const setCurrentVaults = useGlobalStore((s) => s.setCurrentVaults);
   const showHowMuchBorrow = useGlobalStore((s) => s.showHowMuchBorrow);
@@ -166,9 +163,7 @@ function SelectCollectionHeaderContent() {
     [allowedCollateral]
   );
   const currentVaults = useGlobalStore((s) => s.currentVaults);
-  const setSelectedCollectionAddress = useGlobalStore(
-    (s) => s.setSelectedCollectionAddress
-  );
+  const setSelectedLoan = useGlobalStore((s) => s.setSelectedLoan);
   const setHeaderState = useGlobalStore((s) => s.setHeaderState);
   const { userCollectionNFTs, nftsLoading } = useAccountNFTs(
     address,
@@ -194,11 +189,15 @@ function SelectCollectionHeaderContent() {
   }, [userCollectionNFTs, currentVaults]);
 
   const handleClick = useCallback(
-    (selectedCollectionAddress: string) => {
-      setSelectedCollectionAddress(selectedCollectionAddress);
+    (selectedCollectionAddress: string, maxDebt: ethers.BigNumber) => {
+      setSelectedLoan((prev) => ({
+        ...prev,
+        collectionAddress: selectedCollectionAddress,
+        maxDebt,
+      }));
       setHeaderState(HeaderState.SelectNFTs);
     },
-    [setHeaderState, setSelectedCollectionAddress]
+    [setHeaderState, setSelectedLoan]
   );
 
   return (
@@ -208,24 +207,19 @@ function SelectCollectionHeaderContent() {
         Select collection (max loan)
         <ul className="list-[square] pl-6">
           {uniqueCollections.map((c) => (
-            <li key={c}>
-              <TextButton
-                disabled={collateralAddressesForExistingVaults.has(c)}
-                onClick={() => handleClick(c)}
-              >
-                <span
-                  className={
-                    collateralAddressesForExistingVaults.has(c)
-                      ? "line-through"
-                      : ""
-                  }
-                >
-                  {/* showing collection name and max loan left as exercise for reader */}
-                  {c.substring(0, 7)}...
-                </span>
-              </TextButton>{" "}
-              (max loan)
-            </li>
+            <SelectCollectionLineItem
+              key={c}
+              collateralAddress={c}
+              numCollateral={
+                userCollectionNFTs.filter(
+                  (nft) => getAddress(nft.address) === getAddress(c)
+                ).length
+              }
+              collateralAddressesForExistingVaults={
+                collateralAddressesForExistingVaults
+              }
+              handleClick={handleClick}
+            />
           ))}
         </ul>
       </p>
@@ -234,13 +228,85 @@ function SelectCollectionHeaderContent() {
   );
 }
 
+type LineItemProps = {
+  collateralAddressesForExistingVaults: Set<string>;
+  collateralAddress: string;
+  numCollateral: number;
+  handleClick: (
+    selectedCollectionAddress: string,
+    maxDebt: ethers.BigNumber
+  ) => void;
+};
+
+function SelectCollectionLineItem({
+  collateralAddressesForExistingVaults,
+  collateralAddress,
+  numCollateral,
+  handleClick,
+}: LineItemProps) {
+  const { underlying, paprToken } = usePaprController();
+  const nftSymbol = useNFTSymbol(collateralAddress);
+
+  const maxDebtInPaprPerCollateral = useMaxDebt(
+    collateralAddress,
+    OraclePriceType.lower
+  );
+  const maxDebtInPapr = useMemo(() => {
+    if (!maxDebtInPaprPerCollateral) return null;
+    return maxDebtInPaprPerCollateral.mul(numCollateral);
+  }, [maxDebtInPaprPerCollateral, numCollateral]);
+
+  const maxDebtInETH = usePoolQuote({
+    amount: maxDebtInPapr,
+    inputToken: paprToken.id,
+    outputToken: underlying.id,
+    tradeType: "exactIn",
+    skip: !maxDebtInPapr,
+  });
+
+  return (
+    <li>
+      <TextButton
+        disabled={
+          collateralAddressesForExistingVaults.has(collateralAddress) ||
+          !maxDebtInETH
+        }
+        onClick={() => handleClick(collateralAddress, maxDebtInETH!)}
+      >
+        <span
+          className={
+            collateralAddressesForExistingVaults.has(collateralAddress)
+              ? "line-through"
+              : ""
+          }
+        >
+          {nftSymbol}
+        </span>
+      </TextButton>{" "}
+      (
+      {maxDebtInETH
+        ? formatBigNum(maxDebtInETH, underlying.decimals, 3) +
+          ` ${underlying.symbol}`
+        : "..."}
+      )
+    </li>
+  );
+}
+
 function SelectNFTsHeaderContent() {
+  const { underlying } = usePaprController();
   const selectedCollectionAddress = useGlobalStore(
-    (s) => s.selectedCollectionAddress
+    (s) => s.selectedLoan.collectionAddress
   );
-  const setSelectedTokenIdsInStore = useGlobalStore(
-    (s) => s.setSelectedTokenIds
-  );
+  const selectedMaxDebt = useGlobalStore((s) => s.selectedLoan.maxDebt);
+  const formattedMaxDebt = useMemo(() => {
+    if (!selectedMaxDebt) return "...";
+    return `${formatBigNum(selectedMaxDebt, underlying.decimals, 3)} ${
+      underlying.symbol
+    }`;
+  }, [selectedMaxDebt, underlying.decimals, underlying.symbol]);
+
+  const setSelectedLoan = useGlobalStore((s) => s.setSelectedLoan);
   const setShowHowMuchBorrow = useGlobalStore((s) => s.setShowHowMuchBorrow);
   const { address } = useAccount();
   const { userCollectionNFTs, nftsLoading } = useAccountNFTs(address, [
@@ -259,6 +325,7 @@ function SelectNFTsHeaderContent() {
       [tokenId]: !prev[tokenId],
     }));
   }, []);
+  const { toggle } = useHeaderDisclosureState();
 
   const handleDoneClick = useCallback(() => {
     // TODO: should probably disable this until at least one NFT is selected
@@ -266,15 +333,18 @@ function SelectNFTsHeaderContent() {
       (acc, [id, include]) => (include ? [...acc, id] : acc),
       [] as string[]
     );
-    setSelectedTokenIdsInStore(tokenIds);
+    setSelectedLoan((prev) => ({
+      ...prev,
+      tokenIds: [...prev.tokenIds, ...tokenIds],
+    }));
     setShowHowMuchBorrow(true);
-    // TODO: close header
-  }, [selectedTokenIds, setSelectedTokenIdsInStore, setShowHowMuchBorrow]);
+    toggle();
+  }, [selectedTokenIds, setSelectedLoan, setShowHowMuchBorrow, toggle]);
 
   return (
     <>
       <NewLoan />
-      <p>Select items (Max Loan: 3.23 ETH)</p>
+      <p>Select items (Max: {formattedMaxDebt})</p>
       <div className="flex flex-wrap gap-2">
         {userCollectionNFTs.map(({ address, tokenId }, i) => (
           <Button

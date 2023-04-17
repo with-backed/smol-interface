@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "urql";
 import { graphql } from "~/gql";
 import type { VaultsByOwnerForControllerQuery } from "~/gql/graphql";
+import { ethers } from "ethers";
 
 const vaultsDocument = graphql(`
   query vaultsByOwnerForController($owner: Bytes, $controller: String) {
@@ -39,7 +40,9 @@ export function useCurrentVaults(user: string | undefined) {
     if ((vaultsFetching && !prevData) || !vaultsDataToUse?.vaults) return null;
     if (vaultsDataToUse.vaults.length === 0) return null;
 
-    return vaultsDataToUse.vaults;
+    return vaultsDataToUse.vaults.filter(
+      (v) => v.collateral.length > 0 && !ethers.BigNumber.from(v.debt).isZero()
+    );
   }, [prevData, vaultsFetching, vaultsDataToUse]);
 
   return {

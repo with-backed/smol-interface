@@ -38,6 +38,7 @@ import { useMemo } from "react";
 import { TimestampProvider } from "./hooks/useTimestamp";
 import { useDisclosureState } from "reakit/Disclosure";
 import { HeaderDisclosureContextProvider } from "./hooks/useHeaderDisclosureState/useHeaderDisclosureState";
+import { TargetProvider } from "./hooks/useTarget";
 
 declare global {
   interface Window {
@@ -154,36 +155,38 @@ export default function App() {
           <WagmiConfig client={wagmiClient}>
             <RainbowKitProvider chains={chains}>
               <TimestampProvider>
-                <OracleInfoProvider collections={allowedCollateral}>
-                  <ControllerContextProvider
-                    value={serverSideData.paprSubgraphData as PaprController}
-                  >
-                    <CenterProvider
-                      apiKey={centerKey}
-                      network={centerNetwork as any}
+                <TargetProvider>
+                  <OracleInfoProvider collections={allowedCollateral}>
+                    <ControllerContextProvider
+                      value={serverSideData.paprSubgraphData as PaprController}
                     >
-                      <HeaderDisclosureContextProvider
-                        value={headerDisclosureState}
+                      <CenterProvider
+                        apiKey={centerKey}
+                        network={centerNetwork as any}
                       >
-                        <Header />
-                        <div className="wrapper">
-                          <Outlet />
-                        </div>
-                        <ScrollRestoration />
-                        <script
-                          dangerouslySetInnerHTML={{
-                            __html: `window.ENV = ${JSON.stringify(
-                              serverSideData.env
-                            )}`,
-                          }}
-                        />
-                        <Scripts />
-                        <LiveReload />
-                        <Footer />
-                      </HeaderDisclosureContextProvider>
-                    </CenterProvider>
-                  </ControllerContextProvider>
-                </OracleInfoProvider>
+                        <HeaderDisclosureContextProvider
+                          value={headerDisclosureState}
+                        >
+                          <Header />
+                          <div className="wrapper">
+                            <Outlet />
+                          </div>
+                          <ScrollRestoration />
+                          <script
+                            dangerouslySetInnerHTML={{
+                              __html: `window.ENV = ${JSON.stringify(
+                                serverSideData.env
+                              )}`,
+                            }}
+                          />
+                          <Scripts />
+                          <LiveReload />
+                          <Footer />
+                        </HeaderDisclosureContextProvider>
+                      </CenterProvider>
+                    </ControllerContextProvider>
+                  </OracleInfoProvider>
+                </TargetProvider>
               </TimestampProvider>
             </RainbowKitProvider>
           </WagmiConfig>

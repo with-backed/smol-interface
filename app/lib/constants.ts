@@ -12,3 +12,7 @@ export const oracleInfoArgEncoded =
   "tuple(tuple(bytes32 id, bytes payload, uint256 timestamp, bytes signature) message, tuple(uint8 v, bytes32 r, bytes32 s) sig) oracleInfo";
 
 export const swapParamsArgEncoded = `tuple(uint256 amount, uint256 minOut, uint160 sqrtPriceLimitX96, address swapFeeTo, uint256 swapFeeBips, uint256 deadline) swapParams`;
+
+// Assuming 12s per block, one day ago is current block number
+// minus 7200.
+export const BLOCKS_IN_A_DAY = 7200;
