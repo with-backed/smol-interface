@@ -12,6 +12,7 @@ module.exports = {
         "rekt-faint": "#FFE0EC",
         grey: "#999999",
         "unclickable-grey": "#EEEEEE",
+        "completed-grey": "#404040",
       },
     },
   },
