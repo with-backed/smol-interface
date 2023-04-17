@@ -1,10 +1,16 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import useResizeObserver from "@react-hook/resize-observer";
 
 const LOOK = "👀";
 const THINK = "🤔";
 
 export function FrogDemo() {
-  const [componentHeight, setComponentHeight] = useState(0);
   const [thinkValue, setThinkValue] = useState(0);
   const handleThinkChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,18 +27,6 @@ export function FrogDemo() {
     []
   );
 
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (ref.current) {
-      // A production quality implementation would use ResizeObserver
-      // to measure the height after the window resizes in case anything changes.
-      const height = ref.current.clientHeight;
-      setComponentHeight(height);
-    }
-  });
-
-  console.log({ componentHeight });
-
   return (
     <>
       <Input id="think" handleChange={handleThinkChange} value={thinkValue}>
@@ -41,7 +35,7 @@ export function FrogDemo() {
       <Input id="look" handleChange={handleLookChange} value={lookValue}>
         {LOOK}
       </Input>
-      <div ref={ref} className="flex flex-col relative">
+      <div className="pointer-wrapper flex flex-col relative">
         <div className="flex">
           <div className="w-2 h-12 bg-rekt rounded-lg"></div>
         </div>
@@ -51,23 +45,42 @@ export function FrogDemo() {
         <div className="flex">
           <div className="w-2 h-24 bg-fine rounded-lg"></div>
         </div>
-        <Pointer bottom={xPercentOfHeight(componentHeight, thinkValue)}>
-          {THINK}
-        </Pointer>
-        <Pointer bottom={xPercentOfHeight(componentHeight, lookValue)}>
-          {LOOK}
-        </Pointer>
+        <Pointer percentagePoints={thinkValue}>{THINK}</Pointer>
+        <Pointer percentagePoints={lookValue}>{LOOK}</Pointer>
       </div>
     </>
   );
 }
 
 type PointerProps = React.PropsWithChildren & {
-  bottom: number;
+  percentagePoints: number;
 };
-function Pointer({ children, bottom }: PointerProps) {
+function Pointer({ children, percentagePoints }: PointerProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [top, setTop] = useState<number | null>(null);
+  const style = useMemo(
+    () => (top !== null ? { top } : { display: "none" }),
+    [top]
+  );
+
+  const position = useCallback(() => {
+    if (ref.current) {
+      const parent = ref.current.closest(`.pointer-wrapper`);
+      const parentHeight = parent?.clientHeight;
+      if (parentHeight !== undefined) {
+        setTop(xPercentOfHeight(parentHeight, percentagePoints));
+      }
+    }
+  }, [percentagePoints]);
+
+  useLayoutEffect(() => position(), [position]);
+  useResizeObserver(
+    (ref.current?.closest(`.pointer-wrapper`) || null) as HTMLElement | null,
+    position
+  );
+
   return (
-    <div className="absolute -translate-y-2" style={{ top: bottom }}>
+    <div ref={ref} className="absolute -translate-y-2" style={style}>
       <span>{children}</span>
     </div>
   );
