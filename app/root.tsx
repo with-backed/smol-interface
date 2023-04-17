@@ -36,6 +36,8 @@ import { Footer } from "~/components/Footer";
 import { OracleInfoProvider } from "./hooks/useOracleInfo";
 import { useMemo } from "react";
 import { TimestampProvider } from "./hooks/useTimestamp";
+import { useDisclosureState } from "reakit/Disclosure";
+import { HeaderDisclosureContextProvider } from "./hooks/useHeaderDisclosureState/useHeaderDisclosureState";
 
 declare global {
   interface Window {
@@ -123,6 +125,7 @@ export const loader = async () => {
 
 export default function App() {
   const serverSideData = useLoaderData<typeof loader>();
+  const headerDisclosureState = useDisclosureState();
 
   const allowedCollateral = useMemo(() => {
     return serverSideData.paprSubgraphData.allowedCollateral.map(
@@ -159,21 +162,25 @@ export default function App() {
                       apiKey={centerKey}
                       network={centerNetwork as any}
                     >
-                      <Header />
-                      <div className="wrapper">
-                        <Outlet />
-                      </div>
-                      <ScrollRestoration />
-                      <script
-                        dangerouslySetInnerHTML={{
-                          __html: `window.ENV = ${JSON.stringify(
-                            serverSideData.env
-                          )}`,
-                        }}
-                      />
-                      <Scripts />
-                      <LiveReload />
-                      <Footer />
+                      <HeaderDisclosureContextProvider
+                        value={headerDisclosureState}
+                      >
+                        <Header />
+                        <div className="wrapper">
+                          <Outlet />
+                        </div>
+                        <ScrollRestoration />
+                        <script
+                          dangerouslySetInnerHTML={{
+                            __html: `window.ENV = ${JSON.stringify(
+                              serverSideData.env
+                            )}`,
+                          }}
+                        />
+                        <Scripts />
+                        <LiveReload />
+                        <Footer />
+                      </HeaderDisclosureContextProvider>
                     </CenterProvider>
                   </ControllerContextProvider>
                 </OracleInfoProvider>
