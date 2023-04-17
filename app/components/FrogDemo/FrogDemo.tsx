@@ -28,14 +28,16 @@ export function FrogDemo() {
   );
 
   return (
-    <>
-      <Input id="think" handleChange={handleThinkChange} value={thinkValue}>
-        {THINK}
-      </Input>
-      <Input id="look" handleChange={handleLookChange} value={lookValue}>
-        {LOOK}
-      </Input>
-      <div className="pointer-wrapper flex flex-col relative">
+    <div className="flex flex-col h-full">
+      <div>
+        <Input id="think" handleChange={handleThinkChange} value={thinkValue}>
+          {THINK}
+        </Input>
+        <Input id="look" handleChange={handleLookChange} value={lookValue}>
+          {LOOK}
+        </Input>
+      </div>
+      <div className="pointer-wrapper flex flex-col relative my-auto">
         <div className="flex">
           <div className="w-2 h-12 bg-rekt rounded-lg"></div>
         </div>
@@ -48,7 +50,7 @@ export function FrogDemo() {
         <Pointer percentagePoints={thinkValue}>{THINK}</Pointer>
         <Pointer percentagePoints={lookValue}>{LOOK}</Pointer>
       </div>
-    </>
+    </div>
   );
 }
 
