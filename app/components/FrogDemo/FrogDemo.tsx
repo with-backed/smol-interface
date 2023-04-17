@@ -50,6 +50,7 @@ export function FrogDemo() {
         <Pointer percentagePoints={thinkValue}>{THINK}</Pointer>
         <Pointer percentagePoints={lookValue}>{LOOK}</Pointer>
       </div>
+      <div>Additional bottom static content</div>
     </div>
   );
 }
