@@ -1,11 +1,12 @@
 import { useCallback } from "react";
 import { Button } from "~/components/Buttons/Button";
-import { useHeaderStore, HeaderState } from "~/components/Header";
+import { HeaderState } from "~/components/Header";
 import { useHeaderDisclosureState } from "~/hooks/useHeaderDisclosureState";
+import { useGlobalStore } from "~/lib/globalStore";
 
 export default function Intro() {
   const { toggle } = useHeaderDisclosureState();
-  const { state, setHeaderState } = useHeaderStore();
+  const { state, setHeaderState } = useGlobalStore();
 
   const handleClick = useCallback(() => {
     if (state !== HeaderState.Default) {

@@ -13,7 +13,7 @@ import { useHeaderDisclosureState } from "~/hooks/useHeaderDisclosureState";
 import { useCurrentVaults } from "~/hooks/useCurrentVaults";
 import { getAddress } from "ethers/lib/utils";
 import { Button } from "reakit/Button";
-import { useHeaderStore } from "./headerStore";
+import { useGlobalStore } from "~/lib/globalStore";
 import { HeaderState } from "./HeaderState";
 import { LoanBar } from "./LoanBar";
 
@@ -29,9 +29,9 @@ export function Header() {
     address,
     collateralContractAddresses
   );
-  const state = useHeaderStore((s) => s.state);
-  const setCurrentVaults = useHeaderStore((s) => s.setCurrentVaults);
-  const showHowMuchBorrow = useHeaderStore((s) => s.showHowMuchBorrow);
+  const state = useGlobalStore((s) => s.state);
+  const setCurrentVaults = useGlobalStore((s) => s.setCurrentVaults);
+  const showHowMuchBorrow = useGlobalStore((s) => s.showHowMuchBorrow);
 
   const { currentVaults } = useCurrentVaults(address);
 
@@ -165,11 +165,11 @@ function SelectCollectionHeaderContent() {
     () => allowedCollateral.map((c) => c.token.id),
     [allowedCollateral]
   );
-  const currentVaults = useHeaderStore((s) => s.currentVaults);
-  const setSelectedCollectionAddress = useHeaderStore(
+  const currentVaults = useGlobalStore((s) => s.currentVaults);
+  const setSelectedCollectionAddress = useGlobalStore(
     (s) => s.setSelectedCollectionAddress
   );
-  const setHeaderState = useHeaderStore((s) => s.setHeaderState);
+  const setHeaderState = useGlobalStore((s) => s.setHeaderState);
   const { userCollectionNFTs, nftsLoading } = useAccountNFTs(
     address,
     collateralContractAddresses
@@ -235,13 +235,13 @@ function SelectCollectionHeaderContent() {
 }
 
 function SelectNFTsHeaderContent() {
-  const selectedCollectionAddress = useHeaderStore(
+  const selectedCollectionAddress = useGlobalStore(
     (s) => s.selectedCollectionAddress
   );
-  const setSelectedTokenIdsInStore = useHeaderStore(
+  const setSelectedTokenIdsInStore = useGlobalStore(
     (s) => s.setSelectedTokenIds
   );
-  const setShowHowMuchBorrow = useHeaderStore((s) => s.setShowHowMuchBorrow);
+  const setShowHowMuchBorrow = useGlobalStore((s) => s.setShowHowMuchBorrow);
   const { address } = useAccount();
   const { userCollectionNFTs, nftsLoading } = useAccountNFTs(address, [
     // it should not be possible to get here without a selected collection.
@@ -347,6 +347,6 @@ const Checkmark = ({ visible }: CheckmarkProps) => {
 };
 
 function CancelButton() {
-  const clear = useHeaderStore((s) => s.clear);
+  const clear = useGlobalStore((s) => s.clear);
   return <TextButton onClick={clear}>cancel</TextButton>;
 }

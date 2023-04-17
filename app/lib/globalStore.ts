@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import type { VaultsByOwnerForControllerQuery } from "~/gql/graphql";
-import { HeaderState } from "./HeaderState";
+import { HeaderState } from "~/components/Header/HeaderState";
 
-interface HeaderStore {
+interface GlobalStore {
   state: HeaderState;
   setHeaderState: (newState: HeaderState) => void;
   currentVaults: VaultsByOwnerForControllerQuery["vaults"] | null;
@@ -20,7 +20,7 @@ interface HeaderStore {
   clear: () => void;
 }
 
-export const useHeaderStore = create<HeaderStore>((set) => ({
+export const useGlobalStore = create<GlobalStore>((set) => ({
   state: HeaderState.Default,
   setHeaderState: (state) => set({ state }),
   currentVaults: null,
