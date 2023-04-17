@@ -7,17 +7,17 @@ import { VaultWriteType } from "~/hooks/useVaultWrite/helpers";
 import { TransactionButton } from "~/components/Buttons/TransactionButton";
 import { useOracleSynced } from "~/hooks/useOracleSynced";
 import { OraclePriceType } from "~/lib/reservoir";
+import type { SubgraphVault } from "~/hooks/useVault";
+import { LoanDetails } from "./LoanDetails";
 
-type LoanSummaryProps = {
-  collateralAddress: string;
+type LoanSummaryRepayProps = {
+  vault: NonNullable<SubgraphVault>;
+  refresh: () => void;
 };
 
-export function LoanSummary({ collateralAddress }: LoanSummaryProps) {
-  const { id, underlying } = usePaprController();
-  const oracleSynced = useOracleSynced(
-    collateralAddress,
-    OraclePriceType.lower
-  );
+export function LoanSummaryRepay({ vault, refresh }: LoanSummaryRepayProps) {
+  const { underlying } = usePaprController();
+  const oracleSynced = useOracleSynced(vault.token.id, OraclePriceType.lower);
   const [underlyingApproved, setUnderlyingApproved] = useState<boolean>(false);
   const repayDisabled = useMemo(() => {
     return !underlyingApproved || !oracleSynced;
@@ -32,56 +32,29 @@ export function LoanSummary({ collateralAddress }: LoanSummaryProps) {
     formattedCostPercentage,
     numDays,
     vaultNFTs,
-  } = useLoan(id, collateralAddress);
+  } = useLoan(vault);
 
   const { data, write, error } = useVaultWrite({
     writeType: VaultWriteType.RepayWithSwap,
-    collateralContractAddress: collateralAddress,
+    collateralContractAddress: vault.token.id,
     depositNFTs: [],
     withdrawNFTs: vaultNFTs,
     amount: repaymentQuote,
     quote: borrowedPapr,
     usingSafeTransferFrom: false,
     disabled: repayDisabled,
-    refresh: () => null,
+    refresh,
   });
 
   return (
-    <div className="w-full flex flex-col">
-      <div className="flex-initial flex flex-col p-6">
-        <div className="flex flex-row justify-between py-1">
-          <div>
-            <p>Borrowed:</p>
-          </div>
-          <div>
-            <p>{formattedBorrowed}</p>
-          </div>
-        </div>
-        <div className="flex flex-row justify-between py-1">
-          <div>
-            <p>Cost:</p>
-          </div>
-          <div>
-            <p>{formattedInterest}</p>
-          </div>
-        </div>
-        <div className="flex flex-row justify-between py-1">
-          <div>
-            <p>Total Repayment:</p>
-          </div>
-          <div>
-            <p>{formattedTotalRepayment}</p>
-          </div>
-        </div>
-        <div className="flex flex-row justify-between py-1">
-          <div>
-            <p>({numDays} day) cost as %: </p>
-          </div>
-          <div>
-            <p>{formattedCostPercentage}</p>
-          </div>
-        </div>
-      </div>
+    <>
+      <LoanDetails
+        borrowed={formattedBorrowed}
+        interest={formattedInterest}
+        totalRepayment={formattedTotalRepayment}
+        numDays={numDays}
+        costPercentage={formattedCostPercentage}
+      />
       <div className="my-4">
         <img src="/instrument.png" />
       </div>
@@ -111,6 +84,6 @@ export function LoanSummary({ collateralAddress }: LoanSummaryProps) {
           />
         </div>
       </div>
-    </div>
+    </>
   );
 }
