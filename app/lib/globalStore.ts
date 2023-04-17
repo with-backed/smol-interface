@@ -1,6 +1,23 @@
 import { create } from "zustand";
 import type { VaultsByOwnerForControllerQuery } from "~/gql/graphql";
 import { HeaderState } from "~/components/Header/HeaderState";
+import type { ethers } from "ethers";
+
+interface SelectedLoan {
+  collectionAddress: string | null;
+  tokenIds: string[];
+  maxDebt: ethers.BigNumber | null;
+  amountBorrow: ethers.BigNumber | null;
+  amountRepay: ethers.BigNumber | null;
+}
+
+const emptySelectedLoan = {
+  collectionAddress: null,
+  tokenIds: [],
+  maxDebt: null,
+  amountBorrow: null,
+  amountRepay: null,
+};
 
 interface GlobalStore {
   state: HeaderState;
@@ -9,12 +26,8 @@ interface GlobalStore {
   setCurrentVaults: (
     currentVaults: VaultsByOwnerForControllerQuery["vaults"]
   ) => void;
-  selectedCollectionAddress: string | null;
-  setSelectedCollectionAddress: (
-    selectedCollectionAddress: string | null
-  ) => void;
-  selectedTokenIds: string[];
-  setSelectedTokenIds: (selectedTokenIds: string[]) => void;
+  selectedLoan: SelectedLoan;
+  setSelectedLoan: (fn: (prev: SelectedLoan) => SelectedLoan) => void;
   showHowMuchBorrow: boolean;
   setShowHowMuchBorrow: (showHowMuchBorrow: boolean) => void;
   clear: () => void;
@@ -25,19 +38,16 @@ export const useGlobalStore = create<GlobalStore>((set) => ({
   setHeaderState: (state) => set({ state }),
   currentVaults: null,
   setCurrentVaults: (currentVaults) => set({ currentVaults }),
-  selectedCollectionAddress: null,
-  setSelectedCollectionAddress: (selectedCollectionAddress) =>
-    set({ selectedCollectionAddress }),
-  selectedTokenIds: [],
-  setSelectedTokenIds: (selectedTokenIds) => set({ selectedTokenIds }),
+  selectedLoan: emptySelectedLoan,
+  setSelectedLoan: (fn: (prev: SelectedLoan) => SelectedLoan) =>
+    set((state) => ({ selectedLoan: fn(state.selectedLoan) })),
   showHowMuchBorrow: false,
   setShowHowMuchBorrow: (showHowMuchBorrow: boolean) =>
     set({ showHowMuchBorrow }),
   clear: () =>
     set({
       state: HeaderState.Default,
-      selectedCollectionAddress: null,
-      selectedTokenIds: [],
+      selectedLoan: emptySelectedLoan,
       showHowMuchBorrow: false,
     }),
 }));

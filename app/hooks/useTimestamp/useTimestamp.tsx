@@ -20,7 +20,7 @@ type TimestampResult = {
  */
 export const TimestampContext = createContext<TimestampResult | null>(null);
 
-export function TimestampProvider({ children }: PropsWithChildren<{}>) {
+export function TimestampProvider({ children }: PropsWithChildren<object>) {
   const { jsonRpcProvider, chainId } = useConfig();
   const webSocketProvider = useWebSocketProvider({ chainId });
   const [result, setResult] = useState<TimestampResult | null>(null);
