@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { Back } from "~/components/Back";
 import { Forward } from "~/components/Forward";
 
-const PAGES = ["/", "/intro", "/pick"];
+const PAGES = ["/", "/intro", "/pick", "/frogdemo"];
 
 interface PageIndex {
   index: number;
