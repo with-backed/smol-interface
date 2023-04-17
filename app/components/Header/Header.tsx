@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 import { ConnectWallet } from "~/components/Buttons/ConnectWallet";
 import type { DisclosureStateReturn } from "reakit/Disclosure";
@@ -11,9 +11,15 @@ import { usePaprController } from "~/hooks/usePaprController";
 import { Asset } from "@center-inc/react";
 import { useHeaderDisclosureState } from "~/hooks/useHeaderDisclosureState";
 import { create } from "zustand";
+import { useCurrentVaults } from "~/hooks/useCurrentVaults";
+import { getAddress } from "ethers/lib/utils";
+import type { VaultsByOwnerForControllerQuery } from "~/gql/graphql";
+import { Button } from "reakit/Button";
 
 export enum HeaderState {
   Default,
+  // NoNFTs may not need to be a distinct state but rather a conditional render
+  // in ListEligibleCollections
   NoNFTs,
   ListEligibleCollections,
   SelectNFTs,
@@ -23,11 +29,24 @@ export enum HeaderState {
 interface HeaderStore {
   state: HeaderState;
   setHeaderState: (newState: HeaderState) => void;
+  currentVaults: VaultsByOwnerForControllerQuery["vaults"] | null;
+  setCurrentVaults: (
+    currentVaults: VaultsByOwnerForControllerQuery["vaults"]
+  ) => void;
+  selectedCollectionAddress: string | null;
+  setSelectedCollectionAddress: (
+    selectedCollectionAddress: string | null
+  ) => void;
 }
 
 export const useHeaderStore = create<HeaderStore>((set) => ({
   state: HeaderState.Default,
   setHeaderState: (state) => set({ state }),
+  currentVaults: null,
+  setCurrentVaults: (currentVaults) => set({ currentVaults }),
+  selectedCollectionAddress: null,
+  setSelectedCollectionAddress: (selectedCollectionAddress) =>
+    set({ selectedCollectionAddress }),
 }));
 
 export function Header() {
@@ -42,7 +61,16 @@ export function Header() {
     address,
     collateralContractAddresses
   );
-  const { state } = useHeaderStore();
+  const state = useHeaderStore((s) => s.state);
+  const setCurrentVaults = useHeaderStore((s) => s.setCurrentVaults);
+
+  const { currentVaults } = useCurrentVaults(address);
+
+  useEffect(() => {
+    if (currentVaults) {
+      setCurrentVaults(currentVaults);
+    }
+  }, [currentVaults, setCurrentVaults]);
 
   const className = useMemo(() => {
     const justification = isConnected ? "justify-between" : "justify-center";
@@ -152,56 +180,124 @@ function NoEligibleNFTsHeaderContent() {
           {allowedCollateral.length} collections
         </Link>
       </p>
-      <TextButton>Cancel</TextButton>
+      <CancelButton />
     </>
   );
 }
 
 function SelectCollectionHeaderContent() {
-  return (
-    <>
-      <NewLoan />
-      <p className="self-start">
-        Select collection (max loan)
-        <ul className="list-[square] pl-6">
-          <li>
-            <TextButton>mfers</TextButton> (3.23 ETH)
-          </li>
-          <li>
-            <TextButton>tubby cats</TextButton> (0.98 ETH)
-          </li>
-          <li>
-            <TextButton>LOOT</TextButton> (0.77 ETH)
-          </li>
-        </ul>
-      </p>
-      <TextButton>Cancel</TextButton>
-    </>
-  );
-}
-
-function SelectNFTsHeaderContent() {
   const { address } = useAccount();
   const { allowedCollateral } = usePaprController();
   const collateralContractAddresses = useMemo(
     () => allowedCollateral.map((c) => c.token.id),
     [allowedCollateral]
   );
+  const currentVaults = useHeaderStore((s) => s.currentVaults);
+  const setSelectedCollectionAddress = useHeaderStore(
+    (s) => s.setSelectedCollectionAddress
+  );
+  const setHeaderState = useHeaderStore((s) => s.setHeaderState);
+  const { userCollectionNFTs, nftsLoading } = useAccountNFTs(
+    address,
+    collateralContractAddresses
+  );
+
+  const collateralAddressesForExistingVaults = useMemo(() => {
+    return new Set(currentVaults?.map((v) => v.collateral[0].id));
+  }, [currentVaults]);
+
+  const uniqueCollections = useMemo(() => {
+    const userCollectionCollateral = userCollectionNFTs.map((nft) =>
+      getAddress(nft.address)
+    );
+
+    if (!currentVaults) return Array.from(new Set(userCollectionCollateral));
+
+    const userAndVaultCollateral = currentVaults
+      .map((v) => getAddress(v.token.id))
+      .concat(userCollectionCollateral);
+
+    return Array.from(new Set(userAndVaultCollateral));
+  }, [userCollectionNFTs, currentVaults]);
+
+  const handleClick = useCallback(
+    (selectedCollectionAddress: string) => {
+      setSelectedCollectionAddress(selectedCollectionAddress);
+      setHeaderState(HeaderState.SelectNFTs);
+    },
+    [setHeaderState, setSelectedCollectionAddress]
+  );
+
+  return (
+    <>
+      <NewLoan />
+      <p className="self-start">
+        Select collection (max loan)
+        <ul className="list-[square] pl-6">
+          {uniqueCollections.map((c) => (
+            <li key={c}>
+              <TextButton
+                disabled={collateralAddressesForExistingVaults.has(c)}
+                onClick={() => handleClick(c)}
+              >
+                <span
+                  className={
+                    collateralAddressesForExistingVaults.has(c)
+                      ? "line-through"
+                      : ""
+                  }
+                >
+                  {/* showing collection name and max loan left as exercise for reader */}
+                  {c.substring(0, 7)}...
+                </span>
+              </TextButton>{" "}
+              (max loan)
+            </li>
+          ))}
+        </ul>
+      </p>
+      <CancelButton />
+    </>
+  );
+}
+
+function SelectNFTsHeaderContent() {
+  const selectedCollectionAddress = useHeaderStore(
+    (s) => s.selectedCollectionAddress
+  );
+  const { address } = useAccount();
   const { userCollectionNFTs, nftsLoading } = useAccountNFTs(address, [
-    collateralContractAddresses[0],
+    // it should not be possible to get here without a selected collection.
+    // we'll want to look into enforcing that invariant
+    selectedCollectionAddress || "",
   ]);
+  const [selectedTokenIds, setSelectedTokenIds] = useState<{
+    [tokenId: string]: boolean;
+  }>({});
+  const handleNFTClick = useCallback((tokenId: string) => {
+    setSelectedTokenIds((prev) => ({
+      ...prev,
+      [tokenId]: !prev[tokenId],
+    }));
+  }, []);
+
   return (
     <>
       <NewLoan />
       <p>Select items (Max Loan: 3.23 ETH)</p>
       <div className="flex flex-wrap gap-2">
         {userCollectionNFTs.map(({ address, tokenId }, i) => (
-          <NFT
+          <Button
             key={address + tokenId}
-            address={address}
-            tokenId={tokenId}
-            selected={i % 2 === 0}
-          />
+            onClick={() => handleNFTClick(tokenId)}
+            as="div"
+          >
+            <NFT
+              address={address}
+              tokenId={tokenId}
+              selected={!!selectedTokenIds[tokenId]}
+            />
+          </Button>
         ))}
       </div>
       <TextButton>Done</TextButton>
@@ -259,3 +355,14 @@ const Checkmark = ({ visible }: CheckmarkProps) => {
     </svg>
   );
 };
+
+function CancelButton() {
+  const setHeaderState = useHeaderStore((state) => state.setHeaderState);
+  const cancel = useCallback(
+    // TODO: clear any partial state
+    () => setHeaderState(HeaderState.Default),
+    [setHeaderState]
+  );
+
+  return <TextButton onClick={cancel}>cancel</TextButton>;
+}
