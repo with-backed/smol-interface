@@ -15,14 +15,13 @@ import { getAddress } from "ethers/lib/utils";
 import { Button } from "reakit/Button";
 import { useGlobalStore } from "~/lib/globalStore";
 import { HeaderState } from "./HeaderState";
-import { LoanBar } from "./LoanBar";
+import { HeaderBar, ExistingLoans } from "./";
 import { useMaxDebt } from "~/hooks/useMaxDebt";
 import { OraclePriceType } from "~/lib/reservoir";
 import { usePoolQuote } from "~/hooks/usePoolQuote";
 import { formatBigNum } from "~/lib/numberFormat";
 import type { ethers } from "ethers";
 import { useNFTSymbol } from "~/hooks/useNFTSymbol";
-import { useDefaultVault } from "~/hooks/useDefaultVault";
 
 export function Header() {
   const { address, isConnected } = useAccount();
@@ -46,8 +45,6 @@ export function Header() {
     }
   }, [currentVaults, setCurrentVaults, refreshVaults, setRefreshCurrentVaults]);
 
-  useDefaultVault(currentVaults);
-
   const className = useMemo(() => {
     const justification = isConnected ? "justify-between" : "justify-center";
     return `flex items-center bg-black text-white relative px-4 min-h-[50px] ${justification}`;
@@ -59,7 +56,7 @@ export function Header() {
         <ConnectWallet />
         {isConnected && <DropdownButton {...disclosure} />}
       </div>
-      <LoanBar />
+      <HeaderBar />
       <DisclosureContent
         className={`absolute ${
           showHowMuchBorrow ? "top-24" : "top-12"
@@ -138,6 +135,7 @@ function Links() {
 function DefaultConnectedHeaderContent() {
   return (
     <>
+      <ExistingLoans />
       <NewLoan />
       <Info />
       <Links />
