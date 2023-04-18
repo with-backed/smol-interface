@@ -5,6 +5,7 @@ import { useHeaderDisclosureState } from "~/hooks/useHeaderDisclosureState";
 import { useGlobalStore } from "~/lib/globalStore";
 
 export default function Intro() {
+  const clear = useGlobalStore((s) => s.clear);
   const { toggle } = useHeaderDisclosureState();
   const { state, setHeaderState } = useGlobalStore();
 
@@ -14,9 +15,10 @@ export default function Intro() {
       return;
     }
 
+    clear();
     setHeaderState(HeaderState.ListEligibleCollections);
     toggle();
-  }, [setHeaderState, state, toggle]);
+  }, [clear, setHeaderState, state, toggle]);
 
   return (
     <div className="flex flex-col items-center p-4 gap-4 justify-center h-full grow graph-papr">

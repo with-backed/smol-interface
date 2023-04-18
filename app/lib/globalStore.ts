@@ -16,6 +16,7 @@ interface SelectedLoan {
   riskLevel: RiskLevel;
   amountBorrow: ethers.BigNumber | null; // in papr
   amountRepay: ethers.BigNumber | null; // in papr
+  isExistingLoan: boolean;
 }
 
 const emptySelectedLoan: SelectedLoan = {
@@ -26,6 +27,7 @@ const emptySelectedLoan: SelectedLoan = {
   riskLevel: "fine",
   amountBorrow: null,
   amountRepay: null,
+  isExistingLoan: false,
 };
 
 interface GlobalStore {
@@ -35,6 +37,8 @@ interface GlobalStore {
   setCurrentVaults: (
     currentVaults: VaultsByOwnerForControllerQuery["vaults"]
   ) => void;
+  refreshCurrentVaults: () => void;
+  setRefreshCurrentVaults: (refreshCurrentVaults: () => void) => void;
   selectedLoan: SelectedLoan;
   setSelectedLoan: (fn: (prev: SelectedLoan) => SelectedLoan) => void;
   showHowMuchBorrow: boolean;
@@ -47,6 +51,9 @@ export const useGlobalStore = create<GlobalStore>((set) => ({
   setHeaderState: (state) => set({ state }),
   currentVaults: null,
   setCurrentVaults: (currentVaults) => set({ currentVaults }),
+  refreshCurrentVaults: () => null,
+  setRefreshCurrentVaults: (refreshCurrentVaults) =>
+    set({ refreshCurrentVaults }),
   selectedLoan: emptySelectedLoan,
   setSelectedLoan: (fn: (prev: SelectedLoan) => SelectedLoan) =>
     set((state) => ({ selectedLoan: fn(state.selectedLoan) })),
