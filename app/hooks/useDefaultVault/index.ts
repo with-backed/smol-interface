@@ -1,0 +1,1 @@
+export { useDefaultVault } from "./useDefaultVault";

@@ -4,19 +4,35 @@ import { usePaprController } from "~/hooks/usePaprController";
 import { useVaultWrite } from "~/hooks/useVaultWrite";
 import { VaultWriteType } from "~/hooks/useVaultWrite/helpers";
 import { getUniqueNFTId } from "~/lib/utils";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { OraclePriceType } from "~/lib/reservoir";
 import { useOracleSynced } from "~/hooks/useOracleSynced";
 import { formatBigNum } from "~/lib/numberFormat";
 import { TransactionButton } from "../Buttons/TransactionButton";
 
+type BorrowContentProps = {
+  collateralContractAddress: string;
+  refresh: () => void;
+};
+
 export function BorrowContent({
   collateralContractAddress,
-}: {
-  collateralContractAddress: string;
-}) {
+  refresh,
+}: BorrowContentProps) {
   const { paprToken, underlying } = usePaprController();
   const selectedLoan = useGlobalStore((s) => s.selectedLoan);
+  const setSelectedLoan = useGlobalStore((s) => s.setSelectedLoan);
+
+  const refreshWithStateUpdate = useCallback(() => {
+    setSelectedLoan((prev) => ({
+      ...prev,
+      amountBorrow: null,
+      amountRepay: prev.amountBorrow,
+      isExistingLoan: true,
+    }));
+    refresh();
+  }, [setSelectedLoan, refresh]);
+
   const depositNFTs = useMemo(() => {
     return selectedLoan.tokenIds.map((tokenId) =>
       getUniqueNFTId(collateralContractAddress, tokenId)
@@ -54,7 +70,7 @@ export function BorrowContent({
     quote: amountBorrowInEth,
     usingSafeTransferFrom,
     disabled: !oracleSynced,
-    refresh: () => null,
+    refresh: refreshWithStateUpdate,
   });
 
   return (

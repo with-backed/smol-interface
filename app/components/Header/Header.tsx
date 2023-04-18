@@ -22,21 +22,31 @@ import { usePoolQuote } from "~/hooks/usePoolQuote";
 import { formatBigNum } from "~/lib/numberFormat";
 import type { ethers } from "ethers";
 import { useNFTSymbol } from "~/hooks/useNFTSymbol";
+import { useDefaultVault } from "~/hooks/useDefaultVault";
 
 export function Header() {
   const { address, isConnected } = useAccount();
   const disclosure = useHeaderDisclosureState();
   const state = useGlobalStore((s) => s.state);
   const setCurrentVaults = useGlobalStore((s) => s.setCurrentVaults);
+  const setRefreshCurrentVaults = useGlobalStore(
+    (s) => s.setRefreshCurrentVaults
+  );
   const showHowMuchBorrow = useGlobalStore((s) => s.showHowMuchBorrow);
 
-  const { currentVaults } = useCurrentVaults(address);
+  const { currentVaults, reexecuteQuery } = useCurrentVaults(address);
+  const refreshVaults = useCallback(() => {
+    reexecuteQuery({ requestPolicy: "cache-and-network" });
+  }, [reexecuteQuery]);
 
   useEffect(() => {
     if (currentVaults) {
       setCurrentVaults(currentVaults);
+      setRefreshCurrentVaults(refreshVaults);
     }
-  }, [currentVaults, setCurrentVaults]);
+  }, [currentVaults, setCurrentVaults, refreshVaults, setRefreshCurrentVaults]);
+
+  useDefaultVault(currentVaults);
 
   const className = useMemo(() => {
     const justification = isConnected ? "justify-between" : "justify-center";
@@ -190,6 +200,7 @@ function SelectCollectionHeaderContent() {
         ...prev,
         collectionAddress: selectedCollectionAddress,
         maxDebtForCollection: maxDebt,
+        isExistingLoan: false,
       }));
       setHeaderState(HeaderState.SelectNFTs);
     },
@@ -258,11 +269,6 @@ function SelectCollectionLineItem({
     outputToken: underlying.id,
     tradeType: "exactIn",
     skip: !maxDebtInPapr,
-  });
-
-  console.log({
-    collateralAddress,
-    collateralAddressesForExistingVaults,
   });
 
   return (

@@ -30,11 +30,23 @@ export function LoanBar() {
     skip: !selectedLoan.amountBorrow,
   });
 
+  const amountRepayInEth = usePoolQuote({
+    amount: selectedLoan.amountRepay,
+    inputToken: underlying.id,
+    outputToken: paprToken.id,
+    tradeType: "exactOut",
+    skip: !selectedLoan.amountRepay,
+  });
+
   if (!hasSelectedNFTs) {
     return <></>;
   }
 
-  if (hasSelectedNFTs && !selectedLoan.amountBorrow) {
+  if (
+    hasSelectedNFTs &&
+    !selectedLoan.amountBorrow &&
+    !selectedLoan.amountRepay
+  ) {
     return (
       <div className={className}>
         <div className="flex items-center justify-center w-full bg-white text-black h-7 rounded-lg">
@@ -53,6 +65,20 @@ export function LoanBar() {
           riskLevel={selectedLoan.riskLevel!}
           type="borrow"
           amount={amountBorrowInEth}
+        />
+      </div>
+    );
+  }
+
+  if (hasSelectedNFTs && selectedLoan.amountRepay) {
+    return (
+      <div className={className}>
+        <LoanDetailsBar
+          collectionAddress={selectedLoan.collectionAddress!}
+          tokenIds={selectedLoan.tokenIds}
+          riskLevel={selectedLoan.riskLevel!}
+          type="repay"
+          amount={amountRepayInEth}
         />
       </div>
     );

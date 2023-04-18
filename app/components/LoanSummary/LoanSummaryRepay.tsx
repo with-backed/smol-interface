@@ -1,7 +1,7 @@
 import { useLoan } from "~/hooks/useLoan";
 import { usePaprController } from "~/hooks/usePaprController";
 import { ApproveTokenButton } from "~/components/ApproveButtons";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useVaultWrite } from "~/hooks/useVaultWrite";
 import { VaultWriteType } from "~/hooks/useVaultWrite/helpers";
 import { TransactionButton } from "~/components/Buttons/TransactionButton";
@@ -9,6 +9,7 @@ import { useOracleSynced } from "~/hooks/useOracleSynced";
 import { OraclePriceType } from "~/lib/reservoir";
 import type { SubgraphVault } from "~/hooks/useVault";
 import { LoanDetails } from "./LoanDetails";
+import { useGlobalStore } from "~/lib/globalStore";
 
 type LoanSummaryRepayProps = {
   vault: NonNullable<SubgraphVault>;
@@ -18,6 +19,7 @@ type LoanSummaryRepayProps = {
 export function LoanSummaryRepay({ vault, refresh }: LoanSummaryRepayProps) {
   const { underlying } = usePaprController();
   const oracleSynced = useOracleSynced(vault.token.id, OraclePriceType.lower);
+  const riskLevel = useGlobalStore((s) => s.selectedLoan.riskLevel);
   const [underlyingApproved, setUnderlyingApproved] = useState<boolean>(false);
   const repayDisabled = useMemo(() => {
     return !underlyingApproved || !oracleSynced;
@@ -76,7 +78,7 @@ export function LoanSummaryRepay({ vault, refresh }: LoanSummaryRepayProps) {
                 ? "Waiting for oracle..."
                 : `Repay ${formattedTotalRepayment}`
             }
-            theme="bg-rekt"
+            theme={`bg-${riskLevel}`}
             onClick={write!}
             transactionData={data}
             disabled={!underlyingApproved || !oracleSynced}

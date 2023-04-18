@@ -24,7 +24,7 @@ export function LoanSummaryContent({
 
   if (fetching || !vaultData?.vault)
     return (
-      <div className="w-full flex flex-col">
+      <div className="h-full w-full flex flex-col">
         <LoanDetails
           borrowed="..."
           costPercentage="..."
@@ -36,7 +36,7 @@ export function LoanSummaryContent({
     );
 
   return (
-    <div className="w-full flex flex-col">
+    <div className="h-full w-full flex flex-col">
       {vaultHasDebt && (
         <LoanSummaryRepay vault={vaultData.vault} refresh={refresh} />
       )}
