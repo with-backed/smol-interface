@@ -3,18 +3,27 @@ import type { VaultsByOwnerForControllerQuery } from "~/gql/graphql";
 import { HeaderState } from "~/components/Header/HeaderState";
 import type { ethers } from "ethers";
 
+export type RiskLevel = "fine" | "risky" | "rekt";
+
 interface SelectedLoan {
   collectionAddress: string | null;
   tokenIds: string[];
-  maxDebt: ethers.BigNumber | null;
-  amountBorrow: ethers.BigNumber | null;
-  amountRepay: ethers.BigNumber | null;
+  // maximum debt they can take for the collection based on how many of that NFT they have, in papr
+  maxDebtForCollection: ethers.BigNumber | null;
+  // maximum debt they can take for the # of tokenIds chosen, in papr
+  // this cannot be derived, since we need to know the total # of tokenIds they have
+  maxDebtForChosen: ethers.BigNumber | null; // in papr
+  riskLevel: RiskLevel;
+  amountBorrow: ethers.BigNumber | null; // in papr
+  amountRepay: ethers.BigNumber | null; // in papr
 }
 
-const emptySelectedLoan = {
+const emptySelectedLoan: SelectedLoan = {
   collectionAddress: null,
   tokenIds: [],
-  maxDebt: null,
+  maxDebtForCollection: null,
+  maxDebtForChosen: null,
+  riskLevel: "fine",
   amountBorrow: null,
   amountRepay: null,
 };

@@ -49,11 +49,7 @@ export function Header() {
         <ConnectWallet />
         {isConnected && <DropdownButton {...disclosure} />}
       </div>
-      {showHowMuchBorrow && (
-        <div className={className}>
-          <LoanBar />
-        </div>
-      )}
+      <LoanBar />
       <DisclosureContent
         className={`absolute ${
           showHowMuchBorrow ? "top-24" : "top-12"
@@ -171,7 +167,7 @@ function SelectCollectionHeaderContent() {
   );
 
   const collateralAddressesForExistingVaults = useMemo(() => {
-    return new Set(currentVaults?.map((v) => v.collateral[0].id));
+    return new Set(currentVaults?.map((v) => getAddress(v.token.id)));
   }, [currentVaults]);
 
   const uniqueCollections = useMemo(() => {
@@ -193,7 +189,7 @@ function SelectCollectionHeaderContent() {
       setSelectedLoan((prev) => ({
         ...prev,
         collectionAddress: selectedCollectionAddress,
-        maxDebt,
+        maxDebtForCollection: maxDebt,
       }));
       setHeaderState(HeaderState.SelectNFTs);
     },
@@ -264,14 +260,19 @@ function SelectCollectionLineItem({
     skip: !maxDebtInPapr,
   });
 
+  console.log({
+    collateralAddress,
+    collateralAddressesForExistingVaults,
+  });
+
   return (
     <li>
       <TextButton
         disabled={
           collateralAddressesForExistingVaults.has(collateralAddress) ||
-          !maxDebtInETH
+          !maxDebtInPapr
         }
-        onClick={() => handleClick(collateralAddress, maxDebtInETH!)}
+        onClick={() => handleClick(collateralAddress, maxDebtInPapr!)}
       >
         <span
           className={
@@ -294,17 +295,30 @@ function SelectCollectionLineItem({
 }
 
 function SelectNFTsHeaderContent() {
-  const { underlying } = usePaprController();
+  const { paprToken, underlying } = usePaprController();
   const selectedCollectionAddress = useGlobalStore(
     (s) => s.selectedLoan.collectionAddress
   );
-  const selectedMaxDebt = useGlobalStore((s) => s.selectedLoan.maxDebt);
+  const maxDebtForCollection = useGlobalStore(
+    (s) => s.selectedLoan.maxDebtForCollection
+  );
+  const maxDebtForChosen = useGlobalStore(
+    (s) => s.selectedLoan.maxDebtForChosen
+  );
+  const maxDebtChosenInETH = usePoolQuote({
+    amount: maxDebtForChosen,
+    inputToken: paprToken.id,
+    outputToken: underlying.id,
+    tradeType: "exactIn",
+    skip: !maxDebtForChosen,
+  });
+
   const formattedMaxDebt = useMemo(() => {
-    if (!selectedMaxDebt) return "...";
-    return `${formatBigNum(selectedMaxDebt, underlying.decimals, 3)} ${
+    if (!maxDebtChosenInETH) return "...";
+    return `${formatBigNum(maxDebtChosenInETH, underlying.decimals, 3)} ${
       underlying.symbol
     }`;
-  }, [selectedMaxDebt, underlying.decimals, underlying.symbol]);
+  }, [maxDebtChosenInETH, underlying.decimals, underlying.symbol]);
 
   const setSelectedLoan = useGlobalStore((s) => s.setSelectedLoan);
   const setShowHowMuchBorrow = useGlobalStore((s) => s.setShowHowMuchBorrow);
@@ -325,6 +339,26 @@ function SelectNFTsHeaderContent() {
       [tokenId]: !prev[tokenId],
     }));
   }, []);
+  useEffect(() => {
+    const tokenIds = Object.entries(selectedTokenIds).reduce(
+      (acc, [id, include]) => (include ? [...acc, id] : acc),
+      [] as string[]
+    );
+    if (!maxDebtForCollection || tokenIds.length === 0) return;
+
+    setSelectedLoan((prev) => ({
+      ...prev,
+      maxDebtForChosen: maxDebtForCollection
+        .mul(tokenIds.length)
+        .div(userCollectionNFTs.length),
+    }));
+  }, [
+    maxDebtForCollection,
+    selectedTokenIds,
+    setSelectedLoan,
+    userCollectionNFTs.length,
+  ]);
+
   const { toggle } = useHeaderDisclosureState();
 
   const handleDoneClick = useCallback(() => {
