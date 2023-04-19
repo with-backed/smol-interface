@@ -4,6 +4,7 @@ import { useQuery } from "urql";
 import { graphql } from "~/gql";
 import type { VaultsByOwnerForControllerQuery } from "~/gql/graphql";
 import { ethers } from "ethers";
+import { erc20ABI, useAccount, useContractRead } from "wagmi";
 
 const vaultsDocument = graphql(`
   query vaultsByOwnerForController($owner: Bytes, $controller: String) {
@@ -14,7 +15,8 @@ const vaultsDocument = graphql(`
 `);
 
 export function useCurrentVaults(user: string | undefined) {
-  const { id } = usePaprController();
+  const { id, paprToken } = usePaprController();
+  const { address } = useAccount();
   const [prevData, setPrevData] = useState<
     VaultsByOwnerForControllerQuery | undefined
   >(undefined);
@@ -27,6 +29,12 @@ export function useCurrentVaults(user: string | undefined) {
       },
       pause: !user,
     });
+  const { data: paprBalance } = useContractRead({
+    address: paprToken.id as `0x${string}`,
+    abi: erc20ABI,
+    functionName: "balanceOf",
+    args: [address as `0x${string}`],
+  });
 
   useEffect(() => {
     if (vaultsData) {
@@ -37,17 +45,27 @@ export function useCurrentVaults(user: string | undefined) {
   const vaultsDataToUse = vaultsData ?? prevData;
 
   const currentVaults = useMemo(() => {
-    if ((vaultsFetching && !prevData) || !vaultsDataToUse?.vaults) return null;
+    if (
+      (vaultsFetching && !prevData) ||
+      !vaultsDataToUse?.vaults ||
+      !paprBalance
+    )
+      return null;
     if (vaultsDataToUse.vaults.length === 0) return null;
 
-    return vaultsDataToUse.vaults.filter(
-      (v) =>
+    return vaultsDataToUse.vaults.filter((v) => {
+      const hasAuctionProceedsToClaim =
+        paprBalance.gt(0) && v.pastAuctions.length > 0;
+      const hasOngoingAuctions = v.ongoingAuctions.length > 0;
+
+      return (
         v.collateral.length > 0 ||
         !ethers.BigNumber.from(v.debt).isZero() ||
-        v.pastAuctions.length > 0 ||
-        v.ongoingAuctions.length > 0
-    );
-  }, [prevData, vaultsFetching, vaultsDataToUse]);
+        hasAuctionProceedsToClaim ||
+        hasOngoingAuctions
+      );
+    });
+  }, [prevData, vaultsFetching, vaultsDataToUse, paprBalance]);
 
   return {
     currentVaults,
