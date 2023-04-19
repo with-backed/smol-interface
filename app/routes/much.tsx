@@ -5,20 +5,20 @@ import { useGlobalStore } from "~/lib/globalStore";
 import { riskLevelToLTV } from "~/lib/utils";
 
 export default function HowMuchBorrow() {
-  const maxDebt = useGlobalStore((s) => s.selectedLoan.maxDebtForChosen);
-  const setSelectedLoan = useGlobalStore((s) => s.setSelectedLoan);
+  const maxDebt = useGlobalStore((s) => s.inProgressLoan.maxDebtForChosen);
+  const setInProgressLoan = useGlobalStore((s) => s.setInProgressLoan);
 
   const setSelectedBorrow = useCallback(
     (riskLevel: RiskLevel) => {
       if (!maxDebt) return;
       const multiplier = riskLevelToLTV[riskLevel].start;
-      setSelectedLoan((prev) => ({
+      setInProgressLoan((prev) => ({
         ...prev,
-        amountBorrow: maxDebt.mul(multiplier).div(100),
+        amount: maxDebt.mul(multiplier).div(100),
         riskLevel,
       }));
     },
-    [maxDebt, setSelectedLoan]
+    [maxDebt, setInProgressLoan]
   );
 
   return (

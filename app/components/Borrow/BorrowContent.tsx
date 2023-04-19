@@ -4,50 +4,65 @@ import { usePaprController } from "~/hooks/usePaprController";
 import { useVaultWrite } from "~/hooks/useVaultWrite";
 import { VaultWriteType } from "~/hooks/useVaultWrite/helpers";
 import { getUniqueNFTId } from "~/lib/utils";
-import { useCallback, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { OraclePriceType } from "~/lib/reservoir";
 import { useOracleSynced } from "~/hooks/useOracleSynced";
 import { formatBigNum } from "~/lib/numberFormat";
 import { TransactionButton } from "../Buttons/TransactionButton";
+import { getAddress } from "ethers/lib/utils.js";
 
 type BorrowContentProps = {
   collateralContractAddress: string;
-  refresh: () => void;
 };
 
 export function BorrowContent({
   collateralContractAddress,
-  refresh,
 }: BorrowContentProps) {
-  const { paprToken, underlying } = usePaprController();
-  const selectedLoan = useGlobalStore((s) => s.selectedLoan);
-  const setSelectedLoan = useGlobalStore((s) => s.setSelectedLoan);
+  const inProgressLoan = useGlobalStore((s) => s.inProgressLoan);
+  const clearInProgressLoan = useGlobalStore((s) => s.clear);
+  const currentVaults = useGlobalStore((s) => s.currentVaults);
+  const refresh = useGlobalStore((s) => s.refreshCurrentVaults);
+  const setSelectedVault = useGlobalStore((s) => s.setSelectedVault);
 
-  const refreshWithStateUpdate = useCallback(() => {
-    setSelectedLoan((prev) => ({
-      ...prev,
-      amountBorrow: null,
-      amountRepay: prev.amountBorrow,
-      isExistingLoan: true,
-    }));
-    refresh();
-  }, [setSelectedLoan, refresh]);
+  // when the user has borrowed, update the selected vault to be the fresh one that comes
+  // in from the subgraph refresh
+  useEffect(() => {
+    if (!currentVaults) return;
+    const vaultForBorrow = currentVaults.find(
+      (v) => getAddress(v.token.id) === getAddress(collateralContractAddress)
+    );
+    if (vaultForBorrow) {
+      setSelectedVault({
+        ...vaultForBorrow,
+        riskLevel: inProgressLoan.riskLevel,
+      });
+      clearInProgressLoan();
+    }
+  }, [
+    currentVaults,
+    collateralContractAddress,
+    inProgressLoan.riskLevel,
+    setSelectedVault,
+    clearInProgressLoan,
+  ]);
+
+  const { paprToken, underlying } = usePaprController();
 
   const depositNFTs = useMemo(() => {
-    return selectedLoan.tokenIds.map((tokenId) =>
+    return inProgressLoan.tokenIds.map((tokenId) =>
       getUniqueNFTId(collateralContractAddress, tokenId)
     );
-  }, [selectedLoan.tokenIds, collateralContractAddress]);
+  }, [inProgressLoan.tokenIds, collateralContractAddress]);
   const usingSafeTransferFrom = useMemo(() => {
     return depositNFTs.length === 1;
   }, [depositNFTs]);
 
   const amountBorrowInEth = usePoolQuote({
-    amount: selectedLoan.amountBorrow,
+    amount: inProgressLoan.amount,
     inputToken: paprToken.id,
     outputToken: underlying.id,
     tradeType: "exactIn",
-    skip: !selectedLoan.amountBorrow,
+    skip: !inProgressLoan.amount,
   });
   const formattedBorrow = useMemo(() => {
     if (!amountBorrowInEth) return "...";
@@ -66,11 +81,11 @@ export function BorrowContent({
     collateralContractAddress: collateralContractAddress,
     depositNFTs: depositNFTs,
     withdrawNFTs: [],
-    amount: selectedLoan.amountBorrow,
+    amount: inProgressLoan.amount,
     quote: amountBorrowInEth,
     usingSafeTransferFrom,
     disabled: !oracleSynced,
-    refresh: refreshWithStateUpdate,
+    refresh,
   });
 
   return (
@@ -90,7 +105,7 @@ export function BorrowContent({
               ? "Waiting for oracle..."
               : `Borrow ${formattedBorrow}`
           }
-          theme={`bg-${selectedLoan.riskLevel}`}
+          theme={`bg-${inProgressLoan.riskLevel}`}
           onClick={write!}
           transactionData={data}
           disabled={!oracleSynced}
