@@ -97,6 +97,7 @@ const wagmiClient = createClient({
 });
 
 export const loader = async () => {
+  console.log("loader ran");
   const { controllerAddress, paprSubgraph } =
     configs[process.env.TOKEN as SupportedToken];
   const paprClient = createUrqlClient({
@@ -108,6 +109,8 @@ export const loader = async () => {
       id: controllerAddress,
     })
     .toPromise();
+
+  console.log({ queryResult });
   if (!queryResult.data?.paprController) {
     throw new Error(
       `Unable to find subgraph data for controller ${controllerAddress}`
