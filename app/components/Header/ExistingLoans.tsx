@@ -31,24 +31,15 @@ type ExistingLoanProps = {
 };
 
 function ExistingLoan({ vault, index }: ExistingLoanProps) {
-  const setSelectedLoan = useGlobalStore((s) => s.setSelectedLoan);
+  const setSelectedVault = useGlobalStore((s) => s.setSelectedVault);
   const state = useGlobalStore((s) => s.state);
   const riskLevel = useRiskLevel(vault);
 
   const selectVaultAsCurrent = useCallback(
     (vault: NonNullable<SubgraphVault>, riskLevel: RiskLevel) => {
-      setSelectedLoan((_prev) => ({
-        collectionAddress: getAddress(vault.token.id),
-        tokenIds: vault.collateral.map((c) => c.tokenId),
-        amountRepay: ethers.BigNumber.from(vault.debt),
-        amountBorrow: null,
-        riskLevel,
-        maxDebtForCollection: null,
-        maxDebtForChosen: null,
-        isExistingLoan: true,
-      }));
+      setSelectedVault({ ...vault, riskLevel });
     },
-    [setSelectedLoan]
+    [setSelectedVault]
   );
 
   useEffect(() => {

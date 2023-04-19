@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useAccount } from "wagmi";
 import { useGlobalStore } from "~/lib/globalStore";
 import { LoanDetails } from "./";
+import { ethers } from "ethers";
 
 export function HeaderBar() {
   const { isConnected } = useAccount();
@@ -10,21 +11,15 @@ export function HeaderBar() {
     return `flex items-center bg-black text-white relative px-4 min-h-[50px] ${justification}`;
   }, [isConnected]);
 
-  const selectedLoan = useGlobalStore((s) => s.selectedLoan);
+  const selectedVault = useGlobalStore((s) => s.selectedVault);
+  const inProgressLoan = useGlobalStore((s) => s.inProgressLoan);
+  const hasSelectedNFTs = useMemo(
+    () =>
+      !!inProgressLoan.collectionAddress && inProgressLoan.tokenIds.length > 0,
+    [inProgressLoan]
+  );
 
-  const hasSelectedNFTs = useMemo(() => {
-    return !!selectedLoan.collectionAddress && selectedLoan.tokenIds.length > 0;
-  }, [selectedLoan.collectionAddress, selectedLoan.tokenIds.length]);
-
-  if (!hasSelectedNFTs) {
-    return <></>;
-  }
-
-  if (
-    hasSelectedNFTs &&
-    !selectedLoan.amountBorrow &&
-    !selectedLoan.amountRepay
-  ) {
+  if (hasSelectedNFTs && !inProgressLoan.amount) {
     return (
       <div className={className}>
         <div className="flex items-center justify-center w-full bg-white text-black h-7 rounded-lg">
@@ -34,33 +29,32 @@ export function HeaderBar() {
     );
   }
 
-  if (hasSelectedNFTs && selectedLoan.amountBorrow) {
+  if (hasSelectedNFTs && inProgressLoan.amount) {
     return (
       <div className={className}>
         <LoanDetails
-          collectionAddress={selectedLoan.collectionAddress!}
-          tokenIds={selectedLoan.tokenIds}
-          riskLevel={selectedLoan.riskLevel!}
+          collectionAddress={inProgressLoan.collectionAddress!}
+          tokenIds={inProgressLoan.tokenIds}
+          riskLevel={inProgressLoan.riskLevel!}
           type="borrow"
-          amountToBorrowOrRepay={selectedLoan.amountBorrow}
+          amountToBorrowOrRepay={inProgressLoan.amount}
         />
       </div>
     );
   }
 
-  if (hasSelectedNFTs && selectedLoan.amountRepay) {
+  if (selectedVault)
     return (
       <div className={className}>
         <LoanDetails
-          collectionAddress={selectedLoan.collectionAddress!}
-          tokenIds={selectedLoan.tokenIds}
-          riskLevel={selectedLoan.riskLevel!}
+          collectionAddress={selectedVault.token.id}
+          tokenIds={selectedVault.collateral.map((c) => c.tokenId)}
+          riskLevel={selectedVault.riskLevel}
           type="repay"
-          amountToBorrowOrRepay={selectedLoan.amountRepay}
+          amountToBorrowOrRepay={ethers.BigNumber.from(selectedVault.debt)}
         />
       </div>
     );
-  }
 
   return <></>;
 }

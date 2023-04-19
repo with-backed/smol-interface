@@ -1,5 +1,5 @@
 import { useAsset } from "@center-inc/react";
-import type { ethers } from "ethers";
+import { ethers } from "ethers";
 import { useMemo } from "react";
 import { usePaprController } from "~/hooks/usePaprController";
 import { usePoolQuote } from "~/hooks/usePoolQuote";

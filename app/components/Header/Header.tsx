@@ -25,13 +25,18 @@ import { useNFTSymbol } from "~/hooks/useNFTSymbol";
 
 export function Header() {
   const { address, isConnected } = useAccount();
-  const disclosure = useHeaderDisclosureState();
+  const disclosure = useHeaderDisclosureState(); // TODO: cnasc/adamgobes: this disclosure state is causing the entire header to re-render when opening/closing, which refetches quotes and is inefficient
   const state = useGlobalStore((s) => s.state);
   const setCurrentVaults = useGlobalStore((s) => s.setCurrentVaults);
   const setRefreshCurrentVaults = useGlobalStore(
     (s) => s.setRefreshCurrentVaults
   );
-  const showHowMuchBorrow = useGlobalStore((s) => s.showHowMuchBorrow);
+
+  const showHowMuchBorrow = useGlobalStore(
+    (s) =>
+      !!s.inProgressLoan.collectionAddress &&
+      s.inProgressLoan.tokenIds.length > 0
+  );
 
   const { currentVaults, reexecuteQuery } = useCurrentVaults(address);
   const refreshVaults = useCallback(() => {
@@ -167,7 +172,7 @@ function SelectCollectionHeaderContent() {
     [allowedCollateral]
   );
   const currentVaults = useGlobalStore((s) => s.currentVaults);
-  const setSelectedLoan = useGlobalStore((s) => s.setSelectedLoan);
+  const setInProgressLoan = useGlobalStore((s) => s.setInProgressLoan);
   const setHeaderState = useGlobalStore((s) => s.setHeaderState);
   const { userCollectionNFTs, nftsLoading } = useAccountNFTs(
     address,
@@ -194,7 +199,7 @@ function SelectCollectionHeaderContent() {
 
   const handleClick = useCallback(
     (selectedCollectionAddress: string, maxDebt: ethers.BigNumber) => {
-      setSelectedLoan((prev) => ({
+      setInProgressLoan((prev) => ({
         ...prev,
         collectionAddress: selectedCollectionAddress,
         maxDebtForCollection: maxDebt,
@@ -202,7 +207,7 @@ function SelectCollectionHeaderContent() {
       }));
       setHeaderState(HeaderState.SelectNFTs);
     },
-    [setHeaderState, setSelectedLoan]
+    [setHeaderState, setInProgressLoan]
   );
 
   return (
@@ -301,13 +306,13 @@ function SelectCollectionLineItem({
 function SelectNFTsHeaderContent() {
   const { paprToken, underlying } = usePaprController();
   const selectedCollectionAddress = useGlobalStore(
-    (s) => s.selectedLoan.collectionAddress
+    (s) => s.inProgressLoan.collectionAddress
   );
   const maxDebtForCollection = useGlobalStore(
-    (s) => s.selectedLoan.maxDebtForCollection
+    (s) => s.inProgressLoan.maxDebtForCollection
   );
   const maxDebtForChosen = useGlobalStore(
-    (s) => s.selectedLoan.maxDebtForChosen
+    (s) => s.inProgressLoan.maxDebtForChosen
   );
   const maxDebtChosenInETH = usePoolQuote({
     amount: maxDebtForChosen,
@@ -324,8 +329,7 @@ function SelectNFTsHeaderContent() {
     }`;
   }, [maxDebtChosenInETH, underlying.decimals, underlying.symbol]);
 
-  const setSelectedLoan = useGlobalStore((s) => s.setSelectedLoan);
-  const setShowHowMuchBorrow = useGlobalStore((s) => s.setShowHowMuchBorrow);
+  const setInProgressLoan = useGlobalStore((s) => s.setInProgressLoan);
   const { address } = useAccount();
   const { userCollectionNFTs, nftsLoading } = useAccountNFTs(address, [
     // it should not be possible to get here without a selected collection.
@@ -350,7 +354,7 @@ function SelectNFTsHeaderContent() {
     );
     if (!maxDebtForCollection || tokenIds.length === 0) return;
 
-    setSelectedLoan((prev) => ({
+    setInProgressLoan((prev) => ({
       ...prev,
       maxDebtForChosen: maxDebtForCollection
         .mul(tokenIds.length)
@@ -359,7 +363,7 @@ function SelectNFTsHeaderContent() {
   }, [
     maxDebtForCollection,
     selectedTokenIds,
-    setSelectedLoan,
+    setInProgressLoan,
     userCollectionNFTs.length,
   ]);
 
@@ -371,13 +375,12 @@ function SelectNFTsHeaderContent() {
       (acc, [id, include]) => (include ? [...acc, id] : acc),
       [] as string[]
     );
-    setSelectedLoan((prev) => ({
+    setInProgressLoan((prev) => ({
       ...prev,
       tokenIds: [...prev.tokenIds, ...tokenIds],
     }));
-    setShowHowMuchBorrow(true);
     toggle();
-  }, [selectedTokenIds, setSelectedLoan, setShowHowMuchBorrow, toggle]);
+  }, [selectedTokenIds, setInProgressLoan, toggle]);
 
   return (
     <>
