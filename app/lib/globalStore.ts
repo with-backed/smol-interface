@@ -7,25 +7,26 @@ import { SubgraphVault } from "~/hooks/useVault";
 export type RiskLevel = "fine" | "risky" | "rekt";
 
 interface InProgressLoan {
-  collectionAddress: string | null;
+  collectionAddress: string;
   tokenIds: string[];
   // maximum debt they can take for the collection based on how many of that NFT they have, in papr
-  maxDebtForCollection: ethers.BigNumber | null;
+  maxDebtForCollection: ethers.BigNumber;
   // maximum debt they can take for the # of tokenIds chosen, in papr
   // this cannot be derived, since we need to know the total # of tokenIds they have
-  maxDebtForChosen: ethers.BigNumber | null; // in papr
-  riskLevel: RiskLevel;
-  amount: ethers.BigNumber | null; // in papr
+  maxDebtForChosen: ethers.BigNumber | undefined; // in papr
+  amount: ethers.BigNumber | undefined; // in papr
+  riskLevel: RiskLevel | undefined;
 }
 
-const emptyInProgressLoan: InProgressLoan = {
-  collectionAddress: null,
-  tokenIds: [],
-  maxDebtForCollection: null,
-  maxDebtForChosen: null,
-  riskLevel: "fine",
-  amount: null,
-};
+export function inProgressLoanFilledOut(
+  inProgressLoan: InProgressLoan
+): boolean {
+  return (
+    !!inProgressLoan.collectionAddress &&
+    inProgressLoan.tokenIds.length > 0 &&
+    !!inProgressLoan.amount
+  );
+}
 
 export type VaultWithRiskLevel =
   | (SubgraphVault & { riskLevel: RiskLevel })
@@ -42,8 +43,10 @@ interface GlobalStore {
   setRefreshCurrentVaults: (refreshCurrentVaults: () => void) => void;
   selectedVault: VaultWithRiskLevel;
   setSelectedVault: (selectedVault: VaultWithRiskLevel) => void;
-  inProgressLoan: InProgressLoan;
-  setInProgressLoan: (fn: (prev: InProgressLoan) => InProgressLoan) => void;
+  inProgressLoan: InProgressLoan | null;
+  setInProgressLoan: (
+    fn: (prev: InProgressLoan | null) => InProgressLoan | null
+  ) => void;
   clear: () => void;
 }
 
@@ -57,12 +60,12 @@ export const useGlobalStore = create<GlobalStore>((set) => ({
     set({ refreshCurrentVaults }),
   selectedVault: null,
   setSelectedVault: (selectedVault) => set({ selectedVault }),
-  inProgressLoan: emptyInProgressLoan,
+  inProgressLoan: null,
   setInProgressLoan: (fn) =>
     set((state) => ({ inProgressLoan: fn(state.inProgressLoan) })),
   clear: () =>
     set({
       state: HeaderState.Default,
-      inProgressLoan: emptyInProgressLoan,
+      inProgressLoan: null,
     }),
 }));

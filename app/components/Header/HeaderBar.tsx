@@ -14,10 +14,26 @@ export function HeaderBar() {
   const selectedVault = useGlobalStore((s) => s.selectedVault);
   const inProgressLoan = useGlobalStore((s) => s.inProgressLoan);
   const hasSelectedNFTs = useMemo(
-    () =>
-      !!inProgressLoan.collectionAddress && inProgressLoan.tokenIds.length > 0,
+    () => inProgressLoan && inProgressLoan.tokenIds.length > 0,
     [inProgressLoan]
   );
+
+  if (!inProgressLoan) {
+    if (selectedVault) {
+      return (
+        <div className={className}>
+          <LoanDetails
+            collectionAddress={selectedVault.token.id}
+            tokenIds={selectedVault.collateral.map((c) => c.tokenId)}
+            riskLevel={selectedVault.riskLevel}
+            type="repay"
+            amountToBorrowOrRepay={ethers.BigNumber.from(selectedVault.debt)}
+          />
+        </div>
+      );
+    }
+    return <></>;
+  }
 
   if (hasSelectedNFTs && !inProgressLoan.amount) {
     return (
@@ -33,28 +49,15 @@ export function HeaderBar() {
     return (
       <div className={className}>
         <LoanDetails
-          collectionAddress={inProgressLoan.collectionAddress!}
+          collectionAddress={inProgressLoan.collectionAddress}
           tokenIds={inProgressLoan.tokenIds}
-          riskLevel={inProgressLoan.riskLevel!}
+          riskLevel={inProgressLoan.riskLevel!} // amount and risk level get updated in lock step
           type="borrow"
           amountToBorrowOrRepay={inProgressLoan.amount}
         />
       </div>
     );
   }
-
-  if (selectedVault)
-    return (
-      <div className={className}>
-        <LoanDetails
-          collectionAddress={selectedVault.token.id}
-          tokenIds={selectedVault.collateral.map((c) => c.tokenId)}
-          riskLevel={selectedVault.riskLevel}
-          type="repay"
-          amountToBorrowOrRepay={ethers.BigNumber.from(selectedVault.debt)}
-        />
-      </div>
-    );
 
   return <></>;
 }
