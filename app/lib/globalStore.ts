@@ -24,6 +24,7 @@ export function inProgressLoanFilledOut(
   return (
     !!inProgressLoan.collectionAddress &&
     inProgressLoan.tokenIds.length > 0 &&
+    !!inProgressLoan.riskLevel &&
     !!inProgressLoan.amount
   );
 }

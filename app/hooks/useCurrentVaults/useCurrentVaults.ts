@@ -41,7 +41,11 @@ export function useCurrentVaults(user: string | undefined) {
     if (vaultsDataToUse.vaults.length === 0) return null;
 
     return vaultsDataToUse.vaults.filter(
-      (v) => v.collateral.length > 0 && !ethers.BigNumber.from(v.debt).isZero()
+      (v) =>
+        v.collateral.length > 0 ||
+        !ethers.BigNumber.from(v.debt).isZero() ||
+        v.pastAuctions.length > 0 ||
+        v.ongoingAuctions.length > 0
     );
   }, [prevData, vaultsFetching, vaultsDataToUse]);
 

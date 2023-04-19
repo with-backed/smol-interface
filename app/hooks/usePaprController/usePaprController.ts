@@ -48,6 +48,32 @@ const allERC20Properties = graphql(`
   }
 `);
 
+const allAuctionProperties = graphql(`
+  fragment allAuctionProperties on Auction {
+    id
+    auctionAssetID
+    auctionAssetContract {
+      ...allERC721Properties
+    }
+    startedBy
+    startPrice
+    endPrice
+    paymentAsset {
+      ...allERC20Properties
+    }
+    secondsInPeriod
+    perPeriodDecayPercentWad
+    start {
+      timestamp
+    }
+    end {
+      timestamp
+      # id in this case is transaction hash
+      id
+    }
+  }
+`);
+
 const allVaultProperties = graphql(`
   fragment allVaultProperties on Vault {
     id
@@ -61,6 +87,12 @@ const allVaultProperties = graphql(`
       tokenId
     }
     collateralCount
+    ongoingAuctions: auctions(where: { endPrice: null }) {
+      ...allAuctionProperties
+    }
+    pastAuctions: auctions(where: { endPrice_not: null }) {
+      ...allAuctionProperties
+    }
   }
 `);
 
