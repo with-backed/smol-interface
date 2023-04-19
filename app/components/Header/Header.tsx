@@ -60,7 +60,7 @@ export function Header() {
       <DisclosureContent
         className={`absolute ${
           showHowMuchBorrow ? "top-24" : "top-12"
-        } left-0 w-full bg-black text-white p-4 pt-0 flex flex-col gap-3 items-center`}
+        } left-0 w-full bg-black text-white p-4 pt-0 flex flex-col gap-3 items-center z-10`}
         {...disclosure}
       >
         {(() => {

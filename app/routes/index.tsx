@@ -1,10 +1,15 @@
-import { LoanSummaryContent } from "~/components/LoanSummary/LoanSummaryContent";
-
 export default function Index() {
   return (
-    <div className="wrapper flex flex-col bg-white">
-      <div className="content flex h-full justify-center">
-        <LoanSummaryContent collateralAddress="0x79ab709dadc05cd2c0f7322bc7e3d70d2550942c" />
+    <div className="graph-papr h-full w-full flex flex-col items-center">
+      <div className="my-14">
+        <img src="/title.svg" alt="Title" />
+      </div>
+      <div className="w-4/5 overflow-hidden rounded-full bg-white mb-16">
+        <img src="/toad-1-thrillin.svg" alt="Toad" />
+      </div>
+      <div className="flex flex-col items-center">
+        <p className="w-44 text-center">Send ur meme on a thrillin adventure</p>
+        <img className="absolute" src="/whiskers.svg" alt="Whiskers" />
       </div>
     </div>
   );
