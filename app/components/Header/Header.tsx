@@ -34,7 +34,7 @@ export function Header() {
 
   const showHowMuchBorrow = useGlobalStore(
     (s) =>
-      !!s.inProgressLoan.collectionAddress &&
+      !!s.inProgressLoan?.collectionAddress &&
       s.inProgressLoan.tokenIds.length > 0
   );
 
@@ -199,12 +199,16 @@ function SelectCollectionHeaderContent() {
 
   const handleClick = useCallback(
     (selectedCollectionAddress: string, maxDebt: ethers.BigNumber) => {
-      setInProgressLoan((prev) => ({
-        ...prev,
-        collectionAddress: selectedCollectionAddress,
-        maxDebtForCollection: maxDebt,
-        isExistingLoan: false,
-      }));
+      setInProgressLoan((_prev) => {
+        return {
+          collectionAddress: selectedCollectionAddress,
+          tokenIds: [],
+          maxDebtForCollection: maxDebt,
+          maxDebtForChosen: undefined,
+          amount: undefined,
+          riskLevel: undefined,
+        };
+      });
       setHeaderState(HeaderState.SelectNFTs);
     },
     [setHeaderState, setInProgressLoan]
@@ -306,13 +310,13 @@ function SelectCollectionLineItem({
 function SelectNFTsHeaderContent() {
   const { paprToken, underlying } = usePaprController();
   const selectedCollectionAddress = useGlobalStore(
-    (s) => s.inProgressLoan.collectionAddress
+    (s) => s.inProgressLoan?.collectionAddress
   );
   const maxDebtForCollection = useGlobalStore(
-    (s) => s.inProgressLoan.maxDebtForCollection
+    (s) => s.inProgressLoan?.maxDebtForCollection
   );
   const maxDebtForChosen = useGlobalStore(
-    (s) => s.inProgressLoan.maxDebtForChosen
+    (s) => s.inProgressLoan?.maxDebtForChosen || null
   );
   const maxDebtChosenInETH = usePoolQuote({
     amount: maxDebtForChosen,
@@ -354,12 +358,17 @@ function SelectNFTsHeaderContent() {
     );
     if (!maxDebtForCollection || tokenIds.length === 0) return;
 
-    setInProgressLoan((prev) => ({
-      ...prev,
-      maxDebtForChosen: maxDebtForCollection
-        .mul(tokenIds.length)
-        .div(userCollectionNFTs.length),
-    }));
+    setInProgressLoan((prev) => {
+      if (prev) {
+        return {
+          ...prev,
+          maxDebtForChosen: maxDebtForCollection
+            .mul(tokenIds.length)
+            .div(userCollectionNFTs.length),
+        };
+      }
+      return null;
+    });
   }, [
     maxDebtForCollection,
     selectedTokenIds,
@@ -375,10 +384,15 @@ function SelectNFTsHeaderContent() {
       (acc, [id, include]) => (include ? [...acc, id] : acc),
       [] as string[]
     );
-    setInProgressLoan((prev) => ({
-      ...prev,
-      tokenIds: [...prev.tokenIds, ...tokenIds],
-    }));
+    setInProgressLoan((prev) => {
+      if (prev) {
+        return {
+          ...prev,
+          tokenIds: [...prev.tokenIds, ...tokenIds],
+        };
+      }
+      return null;
+    });
     toggle();
   }, [selectedTokenIds, setInProgressLoan, toggle]);
 

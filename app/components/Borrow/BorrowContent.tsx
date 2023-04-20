@@ -1,3 +1,4 @@
+import type { RiskLevel } from "~/lib/globalStore";
 import { useGlobalStore } from "~/lib/globalStore";
 import { usePoolQuote } from "~/hooks/usePoolQuote";
 import { usePaprController } from "~/hooks/usePaprController";
@@ -10,15 +11,21 @@ import { useOracleSynced } from "~/hooks/useOracleSynced";
 import { formatBigNum } from "~/lib/numberFormat";
 import { TransactionButton } from "../Buttons/TransactionButton";
 import { getAddress } from "ethers/lib/utils.js";
+import type { ethers } from "ethers";
 
 type BorrowContentProps = {
   collateralContractAddress: string;
+  tokenIds: string[];
+  riskLevel: RiskLevel;
+  amount: ethers.BigNumber;
 };
 
 export function BorrowContent({
   collateralContractAddress,
+  tokenIds,
+  riskLevel,
+  amount,
 }: BorrowContentProps) {
-  const inProgressLoan = useGlobalStore((s) => s.inProgressLoan);
   const clearInProgressLoan = useGlobalStore((s) => s.clear);
   const currentVaults = useGlobalStore((s) => s.currentVaults);
   const refresh = useGlobalStore((s) => s.refreshCurrentVaults);
@@ -34,14 +41,14 @@ export function BorrowContent({
     if (vaultForBorrow) {
       setSelectedVault({
         ...vaultForBorrow,
-        riskLevel: inProgressLoan.riskLevel,
+        riskLevel,
       });
       clearInProgressLoan();
     }
   }, [
     currentVaults,
     collateralContractAddress,
-    inProgressLoan.riskLevel,
+    riskLevel,
     setSelectedVault,
     clearInProgressLoan,
   ]);
@@ -49,20 +56,20 @@ export function BorrowContent({
   const { paprToken, underlying } = usePaprController();
 
   const depositNFTs = useMemo(() => {
-    return inProgressLoan.tokenIds.map((tokenId) =>
+    return tokenIds.map((tokenId) =>
       getUniqueNFTId(collateralContractAddress, tokenId)
     );
-  }, [inProgressLoan.tokenIds, collateralContractAddress]);
+  }, [tokenIds, collateralContractAddress]);
   const usingSafeTransferFrom = useMemo(() => {
     return depositNFTs.length === 1;
   }, [depositNFTs]);
 
   const amountBorrowInEth = usePoolQuote({
-    amount: inProgressLoan.amount,
+    amount: amount,
     inputToken: paprToken.id,
     outputToken: underlying.id,
     tradeType: "exactIn",
-    skip: !inProgressLoan.amount,
+    skip: !amount,
   });
   const formattedBorrow = useMemo(() => {
     if (!amountBorrowInEth) return "...";
@@ -81,7 +88,7 @@ export function BorrowContent({
     collateralContractAddress: collateralContractAddress,
     depositNFTs: depositNFTs,
     withdrawNFTs: [],
-    amount: inProgressLoan.amount,
+    amount: amount,
     quote: amountBorrowInEth,
     usingSafeTransferFrom,
     disabled: !oracleSynced,
@@ -105,7 +112,7 @@ export function BorrowContent({
               ? "Waiting for oracle..."
               : `Borrow ${formattedBorrow}`
           }
-          theme={`bg-${inProgressLoan.riskLevel}`}
+          theme={`bg-${riskLevel}`}
           onClick={write!}
           transactionData={data}
           disabled={!oracleSynced}

@@ -42,7 +42,7 @@ const mostRecentRepaymentByVaultDocument = graphql(`
   }
 `);
 
-type Loan = {
+export type LoanDetails = {
   borrowedPapr: ethers.BigNumber | null;
   borrowedUnderlying: ethers.BigNumber | null;
   formattedBorrowed: string;
@@ -57,7 +57,7 @@ type Loan = {
   vaultNFTs: string[];
 };
 
-export function useLoan(vault: NonNullable<SubgraphVault>): Loan {
+export function useLoan(vault: NonNullable<SubgraphVault>): LoanDetails {
   const { paprToken, underlying } = usePaprController();
 
   const vaultDebt = useMemo(() => {
