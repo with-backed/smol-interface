@@ -67,7 +67,7 @@ describe("auction state helpers", () => {
         ).toBe(false);
       });
 
-      it("returns false for a vault with a past auction that has debt (this means there is no claim", () => {
+      it("returns false for a vault with a past auction that has debt (this means there is no claim)", () => {
         expect(
           isPastAuctionWithClaim(
             vaultWithDebtAndCollateralAndPastAuction as NonNullable<SubgraphVault>,
