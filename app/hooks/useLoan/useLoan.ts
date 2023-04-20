@@ -45,6 +45,7 @@ const mostRecentRepaymentByVaultDocument = graphql(`
 export type LoanDetails = {
   borrowedPapr: ethers.BigNumber | null;
   borrowedUnderlying: ethers.BigNumber | null;
+  vaultDebt: ethers.BigNumber | null; // different from borrowedPapr in the case of an auction
   formattedBorrowed: string;
   interest: ethers.BigNumber | null;
   formattedInterest: string;
@@ -93,6 +94,11 @@ export function useLoan(vault: NonNullable<SubgraphVault>): LoanDetails {
     if (!recentRepaymentData?.activities) return null;
     return recentRepaymentData.activities[0];
   }, [recentRepaymentData?.activities]);
+
+  const borrowedPapr = useMemo(() => {
+    if (!recentLoanActivity) return null;
+    return ethers.BigNumber.from(recentLoanActivity.amountBorrowed);
+  }, [recentLoanActivity]);
 
   const borrowedFromSwap = useMemo(() => {
     if (!recentLoanActivity) return null;
@@ -186,8 +192,9 @@ export function useLoan(vault: NonNullable<SubgraphVault>): LoanDetails {
   }, [vault.collateral]);
 
   return {
-    borrowedPapr: vaultDebt,
+    borrowedPapr,
     borrowedUnderlying: borrowedFromSwap,
+    vaultDebt: vaultDebt,
     formattedBorrowed,
     interest,
     formattedInterest,

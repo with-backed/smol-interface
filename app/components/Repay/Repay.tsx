@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { LoanDetails } from "~/hooks/useLoan/useLoan";
 import { useOracleSynced } from "~/hooks/useOracleSynced";
-import { SubgraphVault } from "~/hooks/useVault";
 import { useVaultWrite } from "~/hooks/useVaultWrite";
 import { VaultWriteType } from "~/hooks/useVaultWrite/helpers";
 import { VaultWithRiskLevel } from "~/lib/globalStore";
@@ -14,15 +13,21 @@ type RepayProps = {
   vault: NonNullable<VaultWithRiskLevel>;
   loanDetails: LoanDetails;
   refresh: () => void;
+  disabled?: boolean;
 };
 
-export function Repay({ vault, loanDetails, refresh }: RepayProps) {
+export function Repay({
+  vault,
+  loanDetails,
+  refresh,
+  disabled = false,
+}: RepayProps) {
   const { underlying } = usePaprController();
   const oracleSynced = useOracleSynced(vault.token.id, OraclePriceType.lower);
   const [underlyingApproved, setUnderlyingApproved] = useState<boolean>(false);
   const repayDisabled = useMemo(() => {
-    return !underlyingApproved || !oracleSynced;
-  }, [underlyingApproved, oracleSynced]);
+    return !underlyingApproved || !oracleSynced || disabled;
+  }, [underlyingApproved, oracleSynced, disabled]);
 
   const vaultNFTs = useMemo(() => {
     return loanDetails.vaultNFTs;
@@ -30,9 +35,9 @@ export function Repay({ vault, loanDetails, refresh }: RepayProps) {
   const repaymentQuote = useMemo(() => {
     return loanDetails.repaymentQuote;
   }, [loanDetails.repaymentQuote]);
-  const borrowedPapr = useMemo(() => {
-    return loanDetails.borrowedPapr;
-  }, [loanDetails.borrowedPapr]);
+  const vaultDebt = useMemo(() => {
+    return loanDetails.vaultDebt;
+  }, [loanDetails.vaultDebt]);
 
   const { data, write, error } = useVaultWrite({
     writeType: VaultWriteType.RepayWithSwap,
@@ -40,7 +45,7 @@ export function Repay({ vault, loanDetails, refresh }: RepayProps) {
     depositNFTs: [],
     withdrawNFTs: vaultNFTs,
     amount: repaymentQuote,
-    quote: borrowedPapr,
+    quote: vaultDebt,
     usingSafeTransferFrom: false,
     disabled: repayDisabled,
     refresh,
