@@ -1,18 +1,19 @@
 import { useMemo } from "react";
-import type { Auction } from "~/gql/graphql";
 import { useLoan } from "~/hooks/useLoan";
 import { Repay } from "../Repay";
 import type { VaultWithRiskLevel } from "~/lib/globalStore";
 
 type OngoingAuctionWithRepayProps = {
-  auction: Auction;
   vault: NonNullable<VaultWithRiskLevel>;
 };
 
 export function OngoingAuctionWithRepay({
-  auction,
   vault,
 }: OngoingAuctionWithRepayProps) {
+  const auction = useMemo(() => {
+    return vault.ongoingAuctions[0];
+  }, [vault.ongoingAuctions]);
+
   const vaultHasCollateral = useMemo(() => {
     return vault.collateral.length > 0;
   }, [vault.collateral]);
@@ -54,9 +55,12 @@ export function OngoingAuctionWithRepay({
           will receive any excess.
         </p>
       </div>
-      {vaultHasCollateral && (
-        <Repay vault={vault} loanDetails={loanDetails} refresh={() => null} />
-      )}
+      <Repay
+        vault={vault}
+        loanDetails={loanDetails}
+        refresh={() => null}
+        disabled={!vaultHasCollateral}
+      />
     </div>
   );
 }

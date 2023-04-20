@@ -1,6 +1,8 @@
 import { ethers } from "ethers";
 import { useMemo } from "react";
 import { erc20ABI, useAccount, useContractRead } from "wagmi";
+import { OngoingAuctionWithRepay } from "~/components/AuctionScreens";
+import { PastAuctionWithRepay } from "~/components/AuctionScreens";
 import { BorrowContent } from "~/components/Borrow";
 import { LoanSummaryContent } from "~/components/LoanSummary";
 import { usePaprController } from "~/hooks/usePaprController";
@@ -73,7 +75,11 @@ export default function Five() {
     if (!paprBalance) return <></>; // papr balance data loading
 
     if (showCurrentAuctionWithRepay) {
-      // show current auction with repay
+      <OngoingAuctionWithRepay vault={selectedVault} />;
+    }
+
+    if (showPastAuctionWithRepay) {
+      <PastAuctionWithRepay vault={selectedVault} />;
     }
 
     if (showPastAuctionWithClaim) {
