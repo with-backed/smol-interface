@@ -28,7 +28,24 @@ export default function Five() {
     );
   }, [selectedVault]);
 
-  const showSuccessfulAuctionWithClaim = useMemo(() => {
+  const showPastAuctionWithRepay = useMemo(() => {
+    if (!selectedVault) return false;
+    if (selectedVault.pastAuctions.length === 0) return false;
+
+    const latestAuctionEndTime = selectedVault.pastAuctions.sort(
+      (a, b) => b.end!.timestamp - a.end!.timestamp
+    )[0].end!.timestamp;
+
+    const latestBorrowBeforeAuction =
+      selectedVault.latestIncreaseDebt < latestAuctionEndTime;
+
+    return (
+      latestBorrowBeforeAuction &&
+      !ethers.BigNumber.from(selectedVault.debt).isZero()
+    );
+  }, [selectedVault]);
+
+  const showPastAuctionWithClaim = useMemo(() => {
     if (!selectedVault || !paprBalance) return false;
     return (
       selectedVault.pastAuctions.length > 0 &&
@@ -59,7 +76,7 @@ export default function Five() {
       // show current auction with repay
     }
 
-    if (showSuccessfulAuctionWithClaim) {
+    if (showPastAuctionWithClaim) {
       // show successful auction with claim
     }
 

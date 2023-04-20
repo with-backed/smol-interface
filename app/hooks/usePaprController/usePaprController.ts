@@ -87,6 +87,7 @@ const allVaultProperties = graphql(`
       tokenId
     }
     collateralCount
+    latestIncreaseDebt
     ongoingAuctions: auctions(where: { endPrice: null }) {
       ...allAuctionProperties
     }
