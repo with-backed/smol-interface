@@ -194,7 +194,7 @@ export function useLoan(vault: NonNullable<SubgraphVault>): LoanDetails {
   return {
     borrowedPapr,
     borrowedUnderlying: borrowedFromSwap,
-    vaultDebt: vaultDebt,
+    vaultDebt,
     formattedBorrowed,
     interest,
     formattedInterest,
