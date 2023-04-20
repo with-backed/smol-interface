@@ -24,6 +24,7 @@ export function PastAuctionWithRepay({ vault }: PastAuctionWithRepayProps) {
   const auctionProceedsInETH = useMemo(() => {
     if (!loanDetails.vaultDebt || !loanDetails.borrowedPapr) return null;
     const auctionProceeds = loanDetails.borrowedPapr.sub(loanDetails.vaultDebt);
+    // convert the proceeds in papr to the eth naively using the latest market price (although this is not a true quote, its a fine approximation)
     return ethers.utils.parseUnits(
       (
         parseFloat(
@@ -45,6 +46,8 @@ export function PastAuctionWithRepay({ vault }: PastAuctionWithRepayProps) {
     }`;
   }, [auctionProceedsInETH, underlying]);
 
+  // compute interest manually by doing repayment + proceeds - borrowed
+  // interest is the cost of what they would have to repay compared to what they borrowed while factoring in their auction proceeds
   const interest = useMemo(() => {
     if (
       !loanDetails.repaymentQuote ||
