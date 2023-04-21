@@ -1,16 +1,19 @@
 import { useAsset } from "@center-inc/react";
 import { ethers } from "ethers";
 import { useMemo } from "react";
+import { erc20ABI, useAccount, useContractRead } from "wagmi";
 import { usePaprController } from "~/hooks/usePaprController";
 import { usePoolQuote } from "~/hooks/usePoolQuote";
 import type { RiskLevel } from "~/lib/globalStore";
 import { formatBigNum } from "~/lib/numberFormat";
 
+type LoanDetailsAction = "borrow" | "repay" | "liquidating" | "liquidated";
+
 type LoanDetailsBarProps = {
   collectionAddress: string;
   tokenIds: string[];
   riskLevel: RiskLevel;
-  type: "borrow" | "repay";
+  action: LoanDetailsAction;
   amountToBorrowOrRepay: ethers.BigNumber | null;
 };
 
@@ -18,19 +21,26 @@ export function LoanDetails({
   collectionAddress,
   tokenIds,
   riskLevel,
-  type,
+  action,
   amountToBorrowOrRepay,
 }: LoanDetailsBarProps) {
   const { underlying, paprToken } = usePaprController();
 
-  const isBorrowing = useMemo(() => type === "borrow", [type]);
+  const liquidationAction = useMemo(() => {
+    return action === "liquidating" || action === "liquidated";
+  }, [action]);
+  const isBorrowing = useMemo(() => action === "borrow", [action]);
+  const backgroundColor = useMemo(() => {
+    if (liquidationAction) return "bg-liquidate-red";
+    return `bg-${riskLevel}`;
+  }, [liquidationAction, riskLevel]);
 
   const quote = usePoolQuote({
     amount: amountToBorrowOrRepay,
     inputToken: isBorrowing ? paprToken.id : underlying.id,
     outputToken: isBorrowing ? underlying.id : paprToken.id,
     tradeType: isBorrowing ? "exactIn" : "exactOut",
-    skip: !amountToBorrowOrRepay,
+    skip: !amountToBorrowOrRepay || amountToBorrowOrRepay.isZero(),
   });
 
   const formattedAmount = useMemo(() => {
@@ -50,7 +60,7 @@ export function LoanDetails({
 
   return (
     <div
-      className={`w-full rounded-lg flex flex-row justify-between items-center bg-${riskLevel} text-black`}
+      className={`w-full rounded-lg flex flex-row justify-between items-center ${backgroundColor} text-black`}
     >
       <div className="flex flex-row items-center">
         <div className="w-7 h-7">
@@ -65,12 +75,39 @@ export function LoanDetails({
           <p>{riskLevel}!</p>
         </div>
       </div>
+      <RightText action={action} formattedAmount={formattedAmount} />
+    </div>
+  );
+}
+
+function RightText({
+  action,
+  formattedAmount,
+}: {
+  action: LoanDetailsAction;
+  formattedAmount: string;
+}) {
+  if (action === "liquidating") {
+    return (
       <div className="mr-2">
-        <p>
-          {type === "borrow" ? "Borrow" : "Repay"} {formattedAmount}
-          {type === "borrow" && "?"}
-        </p>
+        <p>Liquidating!</p>
       </div>
+    );
+  }
+  if (action === "liquidated") {
+    return (
+      <div className="mr-2">
+        <p>Liquidated!</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mr-2">
+      <p>
+        {action === "borrow" ? "Borrow" : "Repay"} {formattedAmount}
+        {action === "borrow" && "?"}
+      </p>
     </div>
   );
 }

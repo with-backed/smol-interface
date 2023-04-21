@@ -2,10 +2,11 @@ import { useMemo } from "react";
 import { useAccount } from "wagmi";
 import { useGlobalStore } from "~/lib/globalStore";
 import { LoanDetails } from "./";
-import { ethers } from "ethers";
+import { LoanDetailsForExistingLoan } from "./LoanDetailsForExistingLoan";
 
 export function HeaderBar() {
   const { isConnected } = useAccount();
+
   const className = useMemo(() => {
     const justification = isConnected ? "justify-between" : "justify-center";
     return `flex items-center bg-black text-white relative px-4 min-h-[50px] ${justification}`;
@@ -22,13 +23,7 @@ export function HeaderBar() {
     if (selectedVault) {
       return (
         <div className={className}>
-          <LoanDetails
-            collectionAddress={selectedVault.token.id}
-            tokenIds={selectedVault.collateral.map((c) => c.tokenId)}
-            riskLevel={selectedVault.riskLevel}
-            type="repay"
-            amountToBorrowOrRepay={ethers.BigNumber.from(selectedVault.debt)}
-          />
+          <LoanDetailsForExistingLoan vault={selectedVault} />
         </div>
       );
     }
@@ -52,7 +47,7 @@ export function HeaderBar() {
           collectionAddress={inProgressLoan.collectionAddress}
           tokenIds={inProgressLoan.tokenIds}
           riskLevel={inProgressLoan.riskLevel!} // amount and risk level get updated in lock step
-          type="borrow"
+          action="borrow"
           amountToBorrowOrRepay={inProgressLoan.amount}
         />
       </div>

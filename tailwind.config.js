@@ -13,6 +13,7 @@ module.exports = {
         grey: "#999999",
         "unclickable-grey": "#EEEEEE",
         "completed-grey": "#404040",
+        "liquidate-red": "#FF3131",
       },
     },
   },
