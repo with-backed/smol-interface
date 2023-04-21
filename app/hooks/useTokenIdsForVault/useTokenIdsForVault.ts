@@ -8,7 +8,10 @@ export function useTokenIdsForVault(vault: SubgraphVault) {
     const ongoingAuctionTokenIds = vault.ongoingAuctions.map(
       (a) => a.auctionAssetID
     );
-    return vaultTokenIds.concat(ongoingAuctionTokenIds);
+    const pastAuctionTokenIds = vault.pastAuctions.map((a) => a.auctionAssetID);
+    return vaultTokenIds
+      .concat(ongoingAuctionTokenIds)
+      .concat(pastAuctionTokenIds);
   }, [vault]);
 
   return tokenIds;
