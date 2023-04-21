@@ -73,7 +73,7 @@ export function Repay({
           theme={`bg-${vault.riskLevel}`}
           onClick={write!}
           transactionData={data}
-          disabled={!underlyingApproved || !oracleSynced}
+          disabled={repayDisabled}
           error={error?.message}
         />
       </div>

@@ -22,7 +22,7 @@ export function OngoingAuctionWithRepay({
 
   return (
     <div className="h-full w-full flex flex-col">
-      <div className="flex-initial flex flex-col p-6">
+      <div className="flex-initial flex flex-col px-6 py-4">
         <div className="flex flex-row justify-between py-1">
           <div>
             <p>Borrowed:</p>
@@ -48,8 +48,8 @@ export function OngoingAuctionWithRepay({
           </div>
         </div>
       </div>
-      <div>
-        <p>
+      <div className="px-6 py-4">
+        <p className="leading-loose">
           You waited too long and your loan has started a liquidation on tokenID{" "}
           #{auction.auctionAssetID}! The proceeds will pay down debt and you
           will receive any excess.

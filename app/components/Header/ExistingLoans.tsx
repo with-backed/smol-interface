@@ -1,11 +1,10 @@
 import { useCallback, useEffect } from "react";
-import { getAddress } from "ethers/lib/utils";
 import type { RiskLevel } from "~/lib/globalStore";
 import { useGlobalStore } from "~/lib/globalStore";
-import { HeaderState, LoanDetails } from "./";
-import { ethers } from "ethers";
+import { HeaderState } from "./";
 import type { SubgraphVault } from "~/hooks/useVault";
 import { useRiskLevel } from "~/hooks/useRiskLevel";
+import { LoanDetailsForExistingLoan } from "./LoanDetailsForExistingLoan";
 
 export function ExistingLoans() {
   const currentVaults = useGlobalStore((s) => s.currentVaults);
@@ -55,13 +54,7 @@ function ExistingLoan({ vault, index }: ExistingLoanProps) {
       key={vault.id}
       onClick={() => selectVaultAsCurrent(vault, riskLevel)}
     >
-      <LoanDetails
-        collectionAddress={vault.token.id}
-        tokenIds={vault.collateral.map((c) => c.tokenId)}
-        riskLevel={riskLevel}
-        type="repay"
-        amountToBorrowOrRepay={ethers.BigNumber.from(vault.debt)}
-      />
+      <LoanDetailsForExistingLoan vault={{ ...vault, riskLevel }} />
     </div>
   );
 }

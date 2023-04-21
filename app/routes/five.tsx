@@ -6,6 +6,9 @@ import { PastAuctionWithRepay } from "~/components/AuctionScreens";
 import { BorrowContent } from "~/components/Borrow";
 import { LoanSummaryContent } from "~/components/LoanSummary";
 import { usePaprController } from "~/hooks/usePaprController";
+import { isPastAuctionWithClaim } from "~/lib/auctionStates";
+import { isPastAuctionWithRepay } from "~/lib/auctionStates";
+import { isCurrentAuctionWithRepay } from "~/lib/auctionStates";
 import { inProgressLoanFilledOut, useGlobalStore } from "~/lib/globalStore";
 
 export default function Five() {
@@ -24,36 +27,18 @@ export default function Five() {
 
   const showCurrentAuctionWithRepay = useMemo(() => {
     if (!selectedVault) return false;
-    return (
-      selectedVault.ongoingAuctions.length > 0 &&
-      !ethers.BigNumber.from(selectedVault.debt).isZero()
-    );
+    return isCurrentAuctionWithRepay(selectedVault);
   }, [selectedVault]);
 
   const showPastAuctionWithRepay = useMemo(() => {
     if (!selectedVault) return false;
-    if (selectedVault.pastAuctions.length === 0) return false;
 
-    const latestAuctionEndTime = selectedVault.pastAuctions.sort(
-      (a, b) => b.end!.timestamp - a.end!.timestamp
-    )[0].end!.timestamp;
-
-    const latestBorrowBeforeAuction =
-      selectedVault.latestIncreaseDebt < latestAuctionEndTime;
-
-    return (
-      latestBorrowBeforeAuction &&
-      !ethers.BigNumber.from(selectedVault.debt).isZero()
-    );
+    return isPastAuctionWithRepay(selectedVault);
   }, [selectedVault]);
 
   const showPastAuctionWithClaim = useMemo(() => {
     if (!selectedVault || !paprBalance) return false;
-    return (
-      selectedVault.pastAuctions.length > 0 &&
-      ethers.BigNumber.from(selectedVault.debt).isZero() &&
-      paprBalance.gt(0)
-    );
+    return isPastAuctionWithClaim(selectedVault, paprBalance);
   }, [selectedVault, paprBalance]);
 
   if (inProgressLoan) {
@@ -75,11 +60,11 @@ export default function Five() {
     if (!paprBalance) return <></>; // papr balance data loading
 
     if (showCurrentAuctionWithRepay) {
-      <OngoingAuctionWithRepay vault={selectedVault} />;
+      return <OngoingAuctionWithRepay vault={selectedVault} />;
     }
 
     if (showPastAuctionWithRepay) {
-      <PastAuctionWithRepay vault={selectedVault} />;
+      return <PastAuctionWithRepay vault={selectedVault} />;
     }
 
     if (showPastAuctionWithClaim) {
