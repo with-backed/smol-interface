@@ -12,13 +12,7 @@ const EtherscanLink: FunctionComponent<EtherscanLinkProps> = ({
   const { etherscanUrl } = useConfig();
   const href = `${etherscanUrl}${path}`;
   return (
-    <a
-      target="_blank"
-      rel="noreferrer"
-      {...props}
-      href={href}
-      className="text-black"
-    >
+    <a target="_blank" rel="noreferrer" {...props} href={href}>
       {children}
     </a>
   );

@@ -15,6 +15,7 @@ import type { ButtonTheme } from "~/components/Buttons/Button";
 type ApproveTokenButtonProps = {
   theme: ButtonTheme;
   token: Erc20Token;
+  spender: string;
   tokenApproved: boolean;
   setTokenApproved: (val: boolean) => void;
 };
@@ -22,6 +23,7 @@ type ApproveTokenButtonProps = {
 export function ApproveTokenButton({
   theme,
   token,
+  spender,
   tokenApproved,
   setTokenApproved,
 }: ApproveTokenButtonProps) {
@@ -34,7 +36,7 @@ export function ApproveTokenButton({
     address: token.id as `0x${string}`,
     abi: erc20ABI,
     functionName: "allowance",
-    args: [address as `0x${string}`, controller.id as `0x${string}`],
+    args: [address as `0x${string}`, spender as `0x${string}`],
   });
 
   useEffect(() => {
@@ -50,7 +52,7 @@ export function ApproveTokenButton({
     address: token.id as `0x${string}`,
     abi: erc20ABI,
     functionName: "approve",
-    args: [controller.id as `0x${string}`, ethers.constants.MaxInt256],
+    args: [spender as `0x${string}`, ethers.constants.MaxInt256],
   });
   const {
     data: writeData,
