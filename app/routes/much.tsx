@@ -35,8 +35,8 @@ export default function HowMuchBorrow() {
         <Button theme="bg-risky" onClick={() => setSelectedBorrow("risky")}>
           Risky
         </Button>
-        <Button theme="bg-rekt" onClick={() => setSelectedBorrow("rekt")}>
-          Rekt
+        <Button theme="bg-yikes" onClick={() => setSelectedBorrow("yikes")}>
+          Yikes
         </Button>
       </div>
     </div>

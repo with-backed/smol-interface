@@ -4,7 +4,7 @@ import { HeaderState } from "~/components/Header/HeaderState";
 import type { ethers } from "ethers";
 import { SubgraphVault } from "~/hooks/useVault";
 
-export type RiskLevel = "fine" | "risky" | "rekt";
+export type RiskLevel = "fine" | "risky" | "yikes";
 
 interface InProgressLoan {
   collectionAddress: string;
