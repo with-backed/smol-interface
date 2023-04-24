@@ -8,7 +8,7 @@ export const Forward = () => (
   >
     <path
       d="M30.4986 50.8701L43.9336 37.435L30.4986 24"
-      stroke="white"
+      stroke="black"
       stroke-width="6"
       stroke-linecap="round"
       stroke-linejoin="round"

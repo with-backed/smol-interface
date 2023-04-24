@@ -35,7 +35,6 @@ a {
 }
 
 .graph-papr {
-  background: url("/graph-square.png"),
-    linear-gradient(120deg, #00cdfa50 0, #0064fa50 100%);
+  background: url("/graph-square.png"), #e4e4e4;
   width: 100%;
 }
