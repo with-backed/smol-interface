@@ -12,6 +12,10 @@ export default defineConfig({
           address: "0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6",
         },
         {
+          name: "SwapRouter",
+          address: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
+        },
+        {
           name: "PaprController",
           address: {
             1: "0x3b29c19ff2fcea0ff98d0ef5b184354d74ea74b0",

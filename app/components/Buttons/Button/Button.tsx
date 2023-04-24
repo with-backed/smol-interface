@@ -5,7 +5,8 @@ export type ButtonBaseTheme =
   | "bg-fine"
   | "bg-risky"
   | "bg-rekt"
-  | "bg-completed-grey";
+  | "bg-completed-grey"
+  | "bg-black";
 export type ButtonFaintTheme =
   | "bg-fine-faint"
   | "bg-risky-faint"
@@ -27,6 +28,7 @@ export function Button({
     () =>
       [
         `p-2 rounded-lg w-56 text-base leading-7 ${theme}`,
+        `${theme === "bg-black" ? "text-white" : ""}`,
         ...additionalClassNames,
       ].join(" "),
     [theme, additionalClassNames]

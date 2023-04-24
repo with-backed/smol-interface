@@ -22,7 +22,7 @@ export function Repay({
   refresh,
   disabled = false,
 }: RepayProps) {
-  const { underlying } = usePaprController();
+  const { id, underlying } = usePaprController();
   const oracleSynced = useOracleSynced(vault.token.id, OraclePriceType.lower);
   const [underlyingApproved, setUnderlyingApproved] = useState<boolean>(false);
   const repayDisabled = useMemo(() => {
@@ -57,6 +57,7 @@ export function Repay({
         <div className="my-2">
           <ApproveTokenButton
             token={underlying}
+            spender={id}
             theme="bg-rekt-faint"
             tokenApproved={underlyingApproved}
             setTokenApproved={setUnderlyingApproved}

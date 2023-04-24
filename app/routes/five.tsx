@@ -1,7 +1,10 @@
 import { ethers } from "ethers";
 import { useMemo } from "react";
 import { erc20ABI, useAccount, useContractRead } from "wagmi";
-import { OngoingAuctionWithRepay } from "~/components/AuctionScreens";
+import {
+  OngoingAuctionWithRepay,
+  PastAuctionWithClaim,
+} from "~/components/AuctionScreens";
 import { PastAuctionWithRepay } from "~/components/AuctionScreens";
 import { BorrowContent } from "~/components/Borrow";
 import { LoanSummaryContent } from "~/components/LoanSummary";
@@ -68,7 +71,7 @@ export default function Five() {
     }
 
     if (showPastAuctionWithClaim) {
-      // show successful auction with claim
+      return <PastAuctionWithClaim vault={selectedVault} />;
     }
 
     return <LoanSummaryContent collateralAddress={selectedVault.token.id} />;
