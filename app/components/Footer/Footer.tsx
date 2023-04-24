@@ -38,22 +38,24 @@ function ArrowLink({ direction, to }: ArrowLinkProps) {
   const Arrow = direction === "forward" ? Forward : Back;
   if (!to) {
     return (
-      <div className="opacity-25 cursor-not-allowed">
+      <div className="cursor-not-allowed opacity-30 m-[10px]">
         <Arrow />
       </div>
     );
   }
   return (
-    <Link to={to}>
-      <Arrow />
-    </Link>
+    <div className="m-[10px] bg-completed-grey rounded-lg hover:bg-[#7e7e7e]">
+      <Link to={to}>
+        <Arrow />
+      </Link>
+    </div>
   );
 }
 
 export function Footer() {
   const { index, nextPath, prevPath } = useCurrentPageIndex();
   return (
-    <footer className="flex justify-between items-center bg-black text-white">
+    <footer className="flex justify-between items-center bg-black text-white h-[90px]">
       <ArrowLink to={prevPath} direction="back" />
       <span>
         {index + 1} of {PAGES.length}

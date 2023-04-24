@@ -14,7 +14,7 @@ export const riskLevelToLTV: {
     start: 70,
     border: 90,
   },
-  rekt: {
+  yikes: {
     start: 96,
     border: 100,
   },
@@ -40,5 +40,5 @@ export function riskLevelFromDebts(
   const ratio = (debtNumber / maxDebtNumber) * 100;
   if (ratio < riskLevelToLTV.fine.border) return "fine";
   else if (ratio < riskLevelToLTV.risky.border) return "risky";
-  else return "rekt";
+  else return "yikes";
 }

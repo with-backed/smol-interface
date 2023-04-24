@@ -60,7 +60,7 @@ export function LoanDetails({
 
   return (
     <div
-      className={`w-full rounded-lg flex flex-row justify-between items-center ${backgroundColor} text-black`}
+      className={`w-full rounded-lg flex flex-row justify-between items-center ${backgroundColor} text-black leading-8`}
     >
       <div className="flex flex-row items-center">
         <div className="w-7 h-7">

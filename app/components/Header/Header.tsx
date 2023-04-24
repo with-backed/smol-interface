@@ -100,19 +100,18 @@ function DropdownButton({ visible, ...props }: DropdownButtonProps) {
 
 function NewLoan() {
   return (
-    <button
-      className="bg-neutral-700 rounded-lg h-7 w-full"
-      onClick={() => alert("This will eventually do somethhing")}
-    >
-      New Loan
+    <button className="bg-neutral-700 rounded-lg h-7 w-full">
+      <Link to="/pick" className="no-underline">
+        New Loan
+      </Link>
     </button>
   );
 }
 
 function Info() {
   return (
-    <span className="flex items-center gap-4">
-      built by <img className="w-12" src="/bunn.png" alt="" aria-hidden />{" "}
+    <span className="flex items-center gap-4 mt-4">
+      built by <img className="w-12 pb-4" src="/bunn.png" alt="" aria-hidden />{" "}
       backed
     </span>
   );
@@ -362,6 +361,7 @@ function SelectNFTsHeaderContent() {
       if (prev) {
         return {
           ...prev,
+          amount: undefined,
           maxDebtForChosen: maxDebtForCollection
             .mul(tokenIds.length)
             .div(userCollectionNFTs.length),

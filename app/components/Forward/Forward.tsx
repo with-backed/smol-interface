@@ -1,11 +1,17 @@
 export const Forward = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={72} height={60} fill="none">
+  <svg
+    width="70"
+    height="71"
+    viewBox="0 0 70 71"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <path
-      stroke="#fff"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={3}
-      d="m35.072 39.142 9.07-9.071L35.073 21"
+      d="M30.4986 50.8701L43.9336 37.435L30.4986 24"
+      stroke="white"
+      stroke-width="6"
+      stroke-linecap="round"
+      stroke-linejoin="round"
     />
   </svg>
 );

@@ -4,13 +4,13 @@ import { useMemo } from "react";
 export type ButtonBaseTheme =
   | "bg-fine"
   | "bg-risky"
-  | "bg-rekt"
+  | "bg-yikes"
   | "bg-completed-grey"
   | "bg-black";
 export type ButtonFaintTheme =
   | "bg-fine-faint"
   | "bg-risky-faint"
-  | "bg-rekt-faint";
+  | "bg-yikes-faint";
 export type ButtonTheme = ButtonBaseTheme | ButtonFaintTheme;
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

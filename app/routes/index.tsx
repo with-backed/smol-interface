@@ -5,7 +5,7 @@ export default function Index() {
         <img src="/title.svg" alt="Title" />
       </div>
       <div className="w-4/5 overflow-hidden rounded-full bg-white mb-16">
-        <img src="/toad-1-thrillin.svg" alt="Toad" />
+        <img src="/toad-1-thrillin.svg" alt="Toad" className="p-4" />
       </div>
       <div className="flex flex-col items-center">
         <p className="w-44 text-center">Send ur meme on a thrillin adventure</p>
