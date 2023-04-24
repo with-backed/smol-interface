@@ -46,7 +46,7 @@ export function PastAuctionWithClaim({ vault }: PastAuctionWithClaimProps) {
       underlying.symbol
     }`;
   }, [quoteForClaimable, underlying.decimals, underlying.symbol]);
-  const { loanDetails, formattedInterest, formattedProceeds } =
+  const { auction, loanDetails, formattedInterest, formattedProceeds } =
     useAuctionDetails(vault);
 
   const { config } = usePrepareContractWrite({
@@ -110,9 +110,9 @@ export function PastAuctionWithClaim({ vault }: PastAuctionWithClaimProps) {
       </div>
       <div className="py-2 px-6">
         <p>
-          You waited too long and tokenID #123 was sold at a liquidation
-          auction! The excess has been credited to you in paprMEME, click here
-          to swap it for ETH.
+          You waited too long and tokenID {auction.auctionAssetID} was sold at a
+          liquidation auction! The excess has been credited to you in paprMEME,
+          click here to swap it for ETH.
         </p>
       </div>
       <div className="graph-papr flex-auto flex flex-col justify-center items-center">
