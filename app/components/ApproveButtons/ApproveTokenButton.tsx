@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import { usePaprController } from "~/hooks/usePaprController";
 import { useEffect, useState } from "react";
 import {
+  Address,
   erc20ABI,
   useAccount,
   useContractRead,
@@ -52,7 +53,7 @@ export function ApproveTokenButton({
     address: token.id as `0x${string}`,
     abi: erc20ABI,
     functionName: "approve",
-    args: [spender as `0x${string}`, ethers.constants.MaxInt256],
+    args: [spender as Address, ethers.constants.MaxInt256],
   });
   const {
     data: writeData,
