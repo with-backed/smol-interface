@@ -5,6 +5,7 @@ export type ButtonBaseTheme =
   | "bg-fine"
   | "bg-risky"
   | "bg-yikes"
+  | "bg-unclickable-grey"
   | "bg-completed-grey"
   | "bg-black";
 export type ButtonFaintTheme =

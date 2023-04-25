@@ -6,7 +6,7 @@ import {
   PastAuctionWithClaim,
 } from "~/components/AuctionScreens";
 import { PastAuctionWithRepay } from "~/components/AuctionScreens";
-import { BorrowContent } from "~/components/Borrow";
+import { BorrowConnected, BorrowUnconnected } from "~/components/Borrow";
 import { LoanSummaryContent } from "~/components/LoanSummary";
 import { usePaprController } from "~/hooks/usePaprController";
 import { isPastAuctionWithClaim } from "~/lib/auctionStates";
@@ -15,7 +15,7 @@ import { isCurrentAuctionWithRepay } from "~/lib/auctionStates";
 import { inProgressLoanFilledOut, useGlobalStore } from "~/lib/globalStore";
 
 export default function Five() {
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
   const { paprToken } = usePaprController();
 
   const inProgressLoan = useGlobalStore((s) => s.inProgressLoan);
@@ -44,10 +44,14 @@ export default function Five() {
     return isPastAuctionWithClaim(selectedVault, paprBalance);
   }, [selectedVault, paprBalance]);
 
+  if (!isConnected) {
+    return <BorrowUnconnected />;
+  }
+
   if (inProgressLoan) {
     if (inProgressLoanFilledOut(inProgressLoan)) {
       return (
-        <BorrowContent
+        <BorrowConnected
           collateralContractAddress={inProgressLoan.collectionAddress}
           tokenIds={inProgressLoan.tokenIds}
           riskLevel={inProgressLoan.riskLevel!} // guaranteed to be filled out if inProgressLoanFilledOut is true
