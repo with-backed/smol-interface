@@ -9,7 +9,7 @@ export default function Two() {
       </div>
       <img src="/toad-2-money.svg" alt="Toad Money" />
       <div className="relative">
-        <div className="relative bottom-[128px] right-[86px]">
+        <div className="relative bottom-[102px] right-[86px]">
           <div className="w-[7.5rem] relative left-[18px] top-[136px]">
             <p className="text-center">Put that ETH to work</p>
             <div className="flex flex-row justify-evenly items-center">
@@ -29,7 +29,7 @@ export default function Two() {
 
           <img src="/2-bubble-2.svg" alt="Bubble 2" />
         </div>
-        <div className="relative bottom-[312px] left-[84px]">
+        <div className="relative bottom-[256px] left-[70px]">
           <p className="w-[8.5rem] text-center relative left-[17px] top-[134px]">
             Then come back 2 rescue me
           </p>

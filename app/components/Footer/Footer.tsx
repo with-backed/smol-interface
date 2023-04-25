@@ -44,7 +44,7 @@ function ArrowLink({ direction, to }: ArrowLinkProps) {
     );
   }
   return (
-    <div className="m-[10px] bg-completed-grey rounded-lg hover:bg-[#7e7e7e]">
+    <div className="m-[10px] bg-medium-grey rounded-lg hover:bg-[#CCCCCC]">
       <Link to={to}>
         <Arrow />
       </Link>
@@ -55,7 +55,7 @@ function ArrowLink({ direction, to }: ArrowLinkProps) {
 export function Footer() {
   const { index, nextPath, prevPath } = useCurrentPageIndex();
   return (
-    <footer className="flex justify-between items-center bg-black text-white h-[90px]">
+    <footer className="flex justify-between items-center bg-light-grey text-black h-[90px]">
       <ArrowLink to={prevPath} direction="back" />
       <span>
         {index + 1} of {PAGES.length}

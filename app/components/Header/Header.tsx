@@ -52,7 +52,7 @@ export function Header() {
 
   const className = useMemo(() => {
     const justification = isConnected ? "justify-between" : "justify-center";
-    return `flex items-center bg-black text-white relative px-4 min-h-[50px] ${justification}`;
+    return `flex items-center bg-light-grey text-black relative px-4 min-h-[50px] ${justification}`;
   }, [isConnected]);
 
   return (
@@ -65,7 +65,7 @@ export function Header() {
       <DisclosureContent
         className={`absolute ${
           showHowMuchBorrow ? "top-24" : "top-12"
-        } left-0 w-full bg-black text-white p-4 pt-0 flex flex-col gap-3 items-center z-10`}
+        } left-0 w-full bg-light-grey text-black p-4 pt-0 flex flex-col gap-3 items-center z-10`}
         {...disclosure}
       >
         {(() => {
@@ -100,9 +100,9 @@ function DropdownButton({ visible, ...props }: DropdownButtonProps) {
 
 function NewLoan() {
   return (
-    <button className="bg-neutral-700 rounded-lg h-7 w-full">
-      <Link to="/pick" className="no-underline">
-        New Loan
+    <button className="bg-medium-grey rounded-lg h-7 w-full text-black">
+      <Link to="/pick" className="no-underline text-black">
+        Create new Loan
       </Link>
     </button>
   );
@@ -111,7 +111,7 @@ function NewLoan() {
 function Info() {
   return (
     <span className="flex items-center gap-4 mt-4">
-      built by <img className="w-12 pb-4" src="/bunn.png" alt="" aria-hidden />{" "}
+      built by <img className="w-12 pb-4" src="/bunn.svg" alt="" aria-hidden />{" "}
       backed
     </span>
   );
@@ -121,16 +121,27 @@ function Links() {
   return (
     <ul className="flex gap-4 whitespace-nowrap flex-wrap items-center justify-center">
       <li>
-        <Link to="https://papr.wtf/legal/privacy-policy.pdf">privacy</Link>
+        <Link
+          to="https://papr.wtf/legal/privacy-policy.pdf"
+          className="text-link-text"
+        >
+          privacy
+        </Link>
       </li>
       <li>
-        <Link to="https://discord.gg/ZCxGuE6Ytk">discord</Link>
+        <Link to="https://discord.gg/ZCxGuE6Ytk" className="text-link-text">
+          discord
+        </Link>
       </li>
       <li>
-        <Link to="https://twitter.com/backed_xyz">twitter</Link>
+        <Link to="https://twitter.com/backed_xyz" className="text-link-text">
+          twitter
+        </Link>
       </li>
       <li>
-        <Link to="https://www.papr.wtf">powered by papr.wtf</Link>
+        <Link to="https://www.papr.wtf" className="text-link-text">
+          powered by papr.wtf
+        </Link>
       </li>
     </ul>
   );

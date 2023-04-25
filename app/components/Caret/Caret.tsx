@@ -10,9 +10,9 @@ export const Caret = ({ orientation = "down" }: CaretProps) => (
     fill="none"
     className={orientation === "down" ? "" : "rotate-180"}
   >
-    <rect width={30} height={30} fill="#404040" rx={10} />
+    <rect width={30} height={30} className="fill-medium-grey" rx={10} />
     <path
-      stroke="#fff"
+      stroke="black"
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={3}
