@@ -1,11 +1,10 @@
-import { useAsset } from "@center-inc/react";
-import { ethers } from "ethers";
+import type { ethers } from "ethers";
 import { useMemo } from "react";
-import { erc20ABI, useAccount, useContractRead } from "wagmi";
 import { usePaprController } from "~/hooks/usePaprController";
 import { usePoolQuote } from "~/hooks/usePoolQuote";
 import type { RiskLevel } from "~/lib/globalStore";
 import { formatBigNum } from "~/lib/numberFormat";
+import { NFTs } from "./NFTs";
 
 type LoanDetailsAction = "borrow" | "repay" | "liquidating" | "liquidated";
 
@@ -50,27 +49,12 @@ export function LoanDetails({
     );
   }, [quote, underlying.decimals, underlying.symbol]);
 
-  const assets = useAsset({
-    address: collectionAddress,
-    tokenId: tokenIds[0],
-  });
-  const assetUrl = useMemo(() => {
-    return assets[0].mediaUrl;
-  }, [assets]);
-
   return (
     <div
       className={`w-full rounded-lg flex flex-row justify-between items-center ${backgroundColor} text-black leading-8`}
     >
       <div className="flex flex-row items-center">
-        <div className="w-7 h-7">
-          <div className="w-full h-full">
-            {!assetUrl && <span>...</span>}
-            {assetUrl && (
-              <img src={assetUrl} alt="nft" className="rounded-lg" />
-            )}
-          </div>
-        </div>
+        <NFTs collectionAddress={collectionAddress} tokenIds={tokenIds} />
         <div className="ml-2">
           <p>{riskLevel}!</p>
         </div>

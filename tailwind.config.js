@@ -10,7 +10,7 @@ module.exports = {
         "fine-faint": "#F6FFDE",
         "risky-faint": "#FFF5DD",
         "yikes-faint": "#FFE0EC",
-        "light-grey": "#F8F8F8",
+        "light-grey": "#F3F3F3",
         "medium-grey": "#E2e2e2",
         grey: "#999999",
         "unclickable-grey": "#EEEEEE",
