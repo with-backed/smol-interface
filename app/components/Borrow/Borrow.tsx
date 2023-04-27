@@ -12,20 +12,21 @@ import { formatBigNum } from "~/lib/numberFormat";
 import { TransactionButton } from "../Buttons/TransactionButton";
 import { getAddress } from "ethers/lib/utils.js";
 import type { ethers } from "ethers";
+import { Button } from "../Buttons/Button";
 
-type BorrowContentProps = {
+type BorrowConnectedProps = {
   collateralContractAddress: string;
   tokenIds: string[];
   riskLevel: RiskLevel;
   amount: ethers.BigNumber;
 };
 
-export function BorrowContent({
+export function BorrowConnected({
   collateralContractAddress,
   tokenIds,
   riskLevel,
   amount,
-}: BorrowContentProps) {
+}: BorrowConnectedProps) {
   const clearInProgressLoan = useGlobalStore((s) => s.clear);
   const currentVaults = useGlobalStore((s) => s.currentVaults);
   const refresh = useGlobalStore((s) => s.refreshCurrentVaults);
@@ -97,14 +98,7 @@ export function BorrowContent({
 
   return (
     <div className="flex flex-col h-full justify-center">
-      <div className="w-full flex flex-col items-center p-8">
-        <div className="w-4/6 text-center">
-          <p>GET ETH NOW RESCUE TOAD LATER</p>
-        </div>
-        <div className="my-4 mt-16">
-          <img src="/instrument.png" />
-        </div>
-      </div>
+      <BorrowBase />
       <div className="graph-papr flex-auto flex flex-col justify-center items-center">
         <TransactionButton
           text={
@@ -118,6 +112,35 @@ export function BorrowContent({
           disabled={!oracleSynced}
           error={error?.message}
         />
+      </div>
+    </div>
+  );
+}
+
+export function BorrowUnconnected() {
+  return (
+    <div className="flex flex-col h-full justify-center">
+      <BorrowBase />
+      <div className="graph-papr flex-auto flex flex-col justify-center items-center">
+        <Button
+          theme="bg-unclickable-grey"
+          additionalClassNames={["text-[#969696]"]}
+        >
+          Borrow $$$
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function BorrowBase() {
+  return (
+    <div className="w-full flex flex-col items-center p-8">
+      <div className="w-4/6 text-center">
+        <p>GET ETH NOW RESCUE TOAD LATER</p>
+      </div>
+      <div className="my-4 mt-16">
+        <img src="/instrument.png" />
       </div>
     </div>
   );

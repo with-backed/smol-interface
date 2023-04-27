@@ -4,3 +4,4 @@ export { HeaderBar } from "./HeaderBar";
 export { LoanDetails } from "./LoanDetails";
 export { ExistingLoans } from "./ExistingLoans";
 export { LoanDetailsForExistingLoan } from "./LoanDetailsForExistingLoan";
+export { NFTs } from "./NFTs";

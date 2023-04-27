@@ -99,12 +99,20 @@ function DropdownButton({ visible, ...props }: DropdownButtonProps) {
 }
 
 function NewLoan() {
+  const { isConnected } = useAccount();
   return (
-    <button className="bg-medium-grey rounded-lg h-7 w-full text-black">
-      <Link to="/pick" className="no-underline text-black">
-        Create new Loan
-      </Link>
-    </button>
+    <>
+      <button className="bg-medium-grey rounded-lg h-7 w-full text-black">
+        <Link to="/pick" className="no-underline text-black">
+          Create new Loan
+        </Link>
+      </button>
+      {!isConnected && (
+        <div className="my-1">
+          <p>You must connect a wallet</p>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -175,7 +183,7 @@ function NoEligibleNFTsHeaderContent() {
 }
 
 function SelectCollectionHeaderContent() {
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
   const { allowedCollateral } = usePaprController();
   const collateralContractAddresses = useMemo(
     () => allowedCollateral.map((c) => c.token.id),
@@ -227,26 +235,28 @@ function SelectCollectionHeaderContent() {
   return (
     <>
       <NewLoan />
-      <p className="self-start">
-        Select collection (max loan)
-        <ul className="list-[square] pl-6">
-          {uniqueCollections.map((c) => (
-            <SelectCollectionLineItem
-              key={c}
-              collateralAddress={c}
-              numCollateral={
-                userCollectionNFTs.filter(
-                  (nft) => getAddress(nft.address) === getAddress(c)
-                ).length
-              }
-              collateralAddressesForExistingVaults={
-                collateralAddressesForExistingVaults
-              }
-              handleClick={handleClick}
-            />
-          ))}
-        </ul>
-      </p>
+      {isConnected && (
+        <p className="self-start">
+          Select collection (max loan)
+          <ul className="list-[square] pl-6">
+            {uniqueCollections.map((c) => (
+              <SelectCollectionLineItem
+                key={c}
+                collateralAddress={c}
+                numCollateral={
+                  userCollectionNFTs.filter(
+                    (nft) => getAddress(nft.address) === getAddress(c)
+                  ).length
+                }
+                collateralAddressesForExistingVaults={
+                  collateralAddressesForExistingVaults
+                }
+                handleClick={handleClick}
+              />
+            ))}
+          </ul>
+        </p>
+      )}
       <CancelButton />
     </>
   );
@@ -354,6 +364,17 @@ function SelectNFTsHeaderContent() {
   const [selectedTokenIds, setSelectedTokenIds] = useState<{
     [tokenId: string]: boolean;
   }>({});
+
+  useEffect(() => {
+    if (userCollectionNFTs.length > 0) {
+      setSelectedTokenIds(
+        userCollectionNFTs.reduce(
+          (acc, nft) => ({ ...acc, [nft.tokenId]: true }),
+          {} as { [tokenId: string]: boolean }
+        )
+      );
+    }
+  }, [userCollectionNFTs]);
 
   const handleNFTClick = useCallback((tokenId: string) => {
     setSelectedTokenIds((prev) => ({
@@ -483,6 +504,16 @@ const Checkmark = ({ visible }: CheckmarkProps) => {
 };
 
 function CancelButton() {
+  const { isConnected } = useAccount();
+  const { toggle } = useHeaderDisclosureState();
   const clear = useGlobalStore((s) => s.clear);
-  return <TextButton onClick={clear}>cancel</TextButton>;
+  const handleClick = useCallback(() => {
+    if (isConnected) {
+      clear();
+    } else {
+      clear();
+      toggle();
+    }
+  }, [isConnected, toggle, clear]);
+  return <TextButton onClick={handleClick}>cancel</TextButton>;
 }
