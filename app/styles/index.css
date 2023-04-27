@@ -20,13 +20,9 @@ body {
       min-height: 100svh;
     }
     .wrapper {
-      height: calc(100svh - 108px);
+      height: calc(100svh - 140px);
     }
   }
-}
-
-footer {
-  height: 60px;
 }
 
 a {
