@@ -43,22 +43,22 @@ type CustomRadioProps = RadioStateReturn & {
 };
 
 const colorLookup: {
-  [key in RiskLevel]: { background: string; border: string };
+  [key in RiskLevel]: { backgroundColor: string; borderColor: string };
 } = {
-  fine: { background: "bg-fine", border: "border-fine" },
-  risky: { background: "bg-risky", border: "border-risky" },
-  yikes: { background: "bg-yikes", border: "border-yikes" },
+  fine: { backgroundColor: "bg-fine", borderColor: "border-fine" },
+  risky: { backgroundColor: "bg-risky", borderColor: "border-risky" },
+  yikes: { backgroundColor: "bg-yikes", borderColor: "border-yikes" },
 };
 
 function CustomRadio({ disabled, value, ...radio }: CustomRadioProps) {
   const className = useMemo(() => {
     const isSelected = radio.state === value;
-    const { background, border } = colorLookup[value];
+    const { backgroundColor, borderColor } = colorLookup[value];
     const base = "border-2 rounded-lg px-8 py-2";
     if (isSelected) {
-      return `${base} ${background} ${border} text-[#000000]`;
+      return `${base} ${backgroundColor} ${borderColor}`;
     }
-    return `${base} bg-[#FFFFFF] ${border}`;
+    return `${base} bg-[#FFFFFF] ${borderColor}`;
   }, [radio.state, value]);
   return (
     <Radio
