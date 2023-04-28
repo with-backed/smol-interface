@@ -26,7 +26,7 @@ export function RiskRadio({
 
   return (
     <RadioGroup
-      className="flex justify-center gap-1"
+      className="flex justify-center gap-4"
       {...radio}
       aria-label="fruits"
     >
@@ -54,7 +54,7 @@ function CustomRadio({ disabled, value, ...radio }: CustomRadioProps) {
   const className = useMemo(() => {
     const isSelected = radio.state === value;
     const { backgroundColor, borderColor } = colorLookup[value];
-    const base = "border-2 rounded-lg px-8 py-2";
+    const base = "border-2 rounded-lg px-4 py-2";
     if (isSelected) {
       return `${base} ${backgroundColor} ${borderColor}`;
     }
