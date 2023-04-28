@@ -20,7 +20,6 @@ export function RiskRadio({
 
   useEffect(() => {
     if (radio.state !== riskLevel) {
-      // do things here
       handleChange(radio.state as RiskLevel);
     }
   }, [handleChange, radio.state, riskLevel]);
@@ -32,7 +31,7 @@ export function RiskRadio({
       aria-label="fruits"
     >
       {levels.map((level) => (
-        <CustomRadio key={level} {...radio} value={level} disabled={false} />
+        <CustomRadio key={level} {...radio} value={level} disabled={disabled} />
       ))}
     </RadioGroup>
   );
