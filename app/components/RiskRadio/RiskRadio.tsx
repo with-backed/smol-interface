@@ -6,16 +6,11 @@ import type { RiskLevel } from "~/lib/globalStore";
 type RiskRadioProps = {
   riskLevel?: RiskLevel;
   handleChange: (riskLevel: RiskLevel) => void;
-  disabled?: boolean;
 };
 
 const levels: RiskLevel[] = ["fine", "risky", "yikes"];
 
-export function RiskRadio({
-  disabled,
-  handleChange,
-  riskLevel,
-}: RiskRadioProps) {
+export function RiskRadio({ handleChange, riskLevel }: RiskRadioProps) {
   const radio = useRadioState({ state: riskLevel });
 
   useEffect(() => {
@@ -31,7 +26,7 @@ export function RiskRadio({
       aria-label="fruits"
     >
       {levels.map((level) => (
-        <CustomRadio key={level} {...radio} value={level} disabled={disabled} />
+        <CustomRadio key={level} {...radio} value={level} />
       ))}
     </RadioGroup>
   );
@@ -39,7 +34,6 @@ export function RiskRadio({
 
 type CustomRadioProps = RadioStateReturn & {
   value: RiskLevel;
-  disabled?: boolean;
 };
 
 const colorLookup: {
@@ -50,7 +44,7 @@ const colorLookup: {
   yikes: { backgroundColor: "bg-yikes", borderColor: "border-yikes" },
 };
 
-function CustomRadio({ disabled, value, ...radio }: CustomRadioProps) {
+function CustomRadio({ value, ...radio }: CustomRadioProps) {
   const className = useMemo(() => {
     const isSelected = radio.state === value;
     const { backgroundColor, borderColor } = colorLookup[value];
@@ -61,13 +55,7 @@ function CustomRadio({ disabled, value, ...radio }: CustomRadioProps) {
     return `${base} bg-[#FFFFFF] ${borderColor}`;
   }, [radio.state, value]);
   return (
-    <Radio
-      as="div"
-      className={className}
-      {...radio}
-      value={value}
-      disabled={disabled}
-    >
+    <Radio as="div" className={className} {...radio} value={value}>
       {value}
     </Radio>
   );
