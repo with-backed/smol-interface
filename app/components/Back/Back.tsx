@@ -9,9 +9,9 @@ export const Back = () => (
     <path
       d="M39.5014 20L26.0664 33.435L39.5014 46.8701"
       stroke="black"
-      stroke-width="6"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth="6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </svg>
 );
