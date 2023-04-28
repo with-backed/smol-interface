@@ -34,3 +34,9 @@ a {
   background: url("/graph-square.png"), #e4e4e4;
   width: 100%;
 }
+
+.left-pointing-triangle {
+  clip-path: polygon(100% 0, 0 50%, 100% 100%);
+  width: 16px;
+  height: 16px;
+}

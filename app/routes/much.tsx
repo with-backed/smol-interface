@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { RektScale } from "~/components/RektScale";
 import { RiskRadio } from "~/components/RiskRadio";
 import type { RiskLevel } from "~/lib/globalStore";
 import { useGlobalStore } from "~/lib/globalStore";
@@ -28,12 +29,15 @@ export default function HowMuchBorrow() {
   );
 
   return (
-    <div className="flex flex-col">
-      <RiskRadio
-        riskLevel={riskLevel}
-        handleChange={setSelectedBorrow}
-        disabled={!maxDebt}
-      />
+    <div className="flex h-full">
+      <RektScale />
+      <div className="flex justify-center w-full grow-0">
+        <RiskRadio
+          riskLevel={riskLevel}
+          handleChange={setSelectedBorrow}
+          disabled={!maxDebt}
+        />
+      </div>
     </div>
   );
 }
