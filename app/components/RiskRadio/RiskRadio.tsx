@@ -54,7 +54,7 @@ function CustomRadio({ disabled, value, ...radio }: CustomRadioProps) {
   const className = useMemo(() => {
     const isSelected = radio.state === value;
     const { backgroundColor, borderColor } = colorLookup[value];
-    const base = "border-2 rounded-lg px-4 py-2";
+    const base = "border-2 rounded-lg px-4 py-2 h-9 flex items-center";
     if (isSelected) {
       return `${base} ${backgroundColor} ${borderColor}`;
     }
