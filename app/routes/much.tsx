@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { Button } from "~/components/Buttons/Button";
+import { RiskRadio } from "~/components/RiskRadio";
 import type { RiskLevel } from "~/lib/globalStore";
 import { useGlobalStore } from "~/lib/globalStore";
 import { riskLevelToLTV } from "~/lib/utils";
@@ -7,6 +7,7 @@ import { riskLevelToLTV } from "~/lib/utils";
 export default function HowMuchBorrow() {
   const maxDebt = useGlobalStore((s) => s.inProgressLoan?.maxDebtForChosen);
   const setInProgressLoan = useGlobalStore((s) => s.setInProgressLoan);
+  const riskLevel = useGlobalStore((s) => s.inProgressLoan?.riskLevel);
 
   const setSelectedBorrow = useCallback(
     (riskLevel: RiskLevel) => {
@@ -28,17 +29,11 @@ export default function HowMuchBorrow() {
 
   return (
     <div className="flex flex-col">
-      <div className="flex flex-row">
-        <Button theme="bg-fine" onClick={() => setSelectedBorrow("fine")}>
-          Fine
-        </Button>
-        <Button theme="bg-risky" onClick={() => setSelectedBorrow("risky")}>
-          Risky
-        </Button>
-        <Button theme="bg-yikes" onClick={() => setSelectedBorrow("yikes")}>
-          Yikes
-        </Button>
-      </div>
+      <RiskRadio
+        riskLevel={riskLevel}
+        handleChange={setSelectedBorrow}
+        disabled={!maxDebt}
+      />
     </div>
   );
 }
