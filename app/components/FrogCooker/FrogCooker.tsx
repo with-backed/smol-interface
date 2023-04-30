@@ -1,8 +1,11 @@
 import { useMemo } from "react";
-import { useGlobalStore } from "~/lib/globalStore";
+import { type RiskLevel } from "~/lib/globalStore";
 
-export function FrogCooker() {
-  const riskLevel = useGlobalStore((s) => s.inProgressLoan?.riskLevel);
+type FrogCookerProps = {
+  riskLevel: RiskLevel | undefined;
+};
+
+export function FrogCooker({ riskLevel }: FrogCookerProps) {
   const image = useMemo(() => {
     switch (riskLevel) {
       case "risky":

@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { FrogCooker } from "~/components/FrogCooker";
 import { RektScale } from "~/components/RektScale";
 import { RiskRadio } from "~/components/RiskRadio";
@@ -10,9 +10,17 @@ export default function HowMuchBorrow() {
   const maxDebt = useGlobalStore((s) => s.inProgressLoan?.maxDebtForChosen);
   const setInProgressLoan = useGlobalStore((s) => s.setInProgressLoan);
   const riskLevel = useGlobalStore((s) => s.inProgressLoan?.riskLevel);
+  const [loggedOutRiskLevel, setLoggedOutRiskLevel] = useState<
+    RiskLevel | undefined
+  >(undefined);
 
   const setSelectedBorrow = useCallback(
     (riskLevel: RiskLevel) => {
+      // If the user is logged out, we need to store the risk level so we can
+      // respond to changes to simulate the logged in experience.
+      // We want to keep this state local rather than global because nothing
+      // other than this screen should care about it.
+      setLoggedOutRiskLevel(riskLevel);
       if (!maxDebt) return;
       const multiplier = riskLevelToLTV[riskLevel].start;
       setInProgressLoan((prev) => {
@@ -32,9 +40,9 @@ export default function HowMuchBorrow() {
   return (
     <div className="flex h-full">
       <RektScale />
-      <div className="flex flex-col items-center w-full grow-0 mt-12">
+      <div className="flex flex-col items-center w-full grow-0 mt-12'">
         <RiskRadio riskLevel={riskLevel} handleChange={setSelectedBorrow} />
-        <FrogCooker />
+        <FrogCooker riskLevel={riskLevel || loggedOutRiskLevel} />
       </div>
     </div>
   );
