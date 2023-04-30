@@ -8,38 +8,60 @@ type RektScaleProps = {
 
 export function RektScale({ riskLevel }: RektScaleProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [top, setTop] = useState<number | null>(null);
-  const position = useCallback(() => {
+  const [riskTop, setRiskTop] = useState<number | null>(null);
+  const [valueTop, setValueTop] = useState<number | null>(null);
+
+  const positionValue = useCallback(() => {
+    if (ref.current) {
+      const elem = ref.current.querySelector(`.bg-yikes`);
+      const bodyRect = ref.current.closest(".wrapper")?.getBoundingClientRect();
+      if (!elem || !bodyRect) return;
+      const elemRect = elem.getBoundingClientRect();
+      const offset = elemRect.top - bodyRect.top;
+      setValueTop(offset);
+    }
+  }, []);
+
+  const positionRisk = useCallback(() => {
     if (ref.current) {
       const elem = ref.current.querySelector(`.bg-${riskLevel}`);
-      if (!elem) return;
-      const bodyRect = ref.current.getBoundingClientRect();
+      const bodyRect = ref.current.closest(".wrapper")?.getBoundingClientRect();
+      if (!elem || !bodyRect) return;
+
       const elemRect = elem.getBoundingClientRect();
       const offset = elemRect.top - bodyRect.top;
       const height = elem.clientHeight;
-      console.log({ bodyRect, elemRect, offset, height });
       if (height !== undefined) {
-        setTop(offset + Math.floor(height / 2));
+        setRiskTop(offset + Math.floor(height / 2));
       }
     }
   }, [riskLevel]);
-  useLayoutEffect(() => position(), [position]);
-  useResizeObserver((ref.current || null) as HTMLElement | null, position);
+  useLayoutEffect(() => positionRisk(), [positionRisk]);
+  useResizeObserver((ref.current || null) as HTMLElement | null, positionRisk);
+
+  useLayoutEffect(() => positionValue(), [positionValue]);
+  useResizeObserver((ref.current || null) as HTMLElement | null, positionValue);
 
   return (
-    <div className="bg-[url('/scale/yaxis.svg')] w-2.5 bg-repeat-y bg-[center_top] flex flex-col justify-end">
-      <div ref={ref} className="flex flex-col h-2/4 relative">
-        <div className="w-full bg-yikes h-16 rounded-lg"></div>
-        <div className="w-full bg-risky h-16 rounded-lg"></div>
-        <div className="w-full bg-fine flex-1 rounded-t-lg"></div>
-        <MessageBox color="black" top={0}>
-          NFT Value
-        </MessageBox>
-        <MessageBox color="red" top={top}>
-          lava
-        </MessageBox>
+    <>
+      <div
+        ref={ref}
+        className="bg-[url('/scale/yaxis.svg')] w-2.5 bg-repeat-y bg-[center_top] flex flex-col justify-end"
+      >
+        <div className="flex flex-col h-2/4">
+          <div className="w-full bg-yikes h-16 rounded-lg"></div>
+          <div className="w-full bg-risky h-16 rounded-lg"></div>
+          <div className="w-full bg-fine flex-1 rounded-t-lg"></div>
+          <MessageBox color="black" top={valueTop}>
+            NFT Value
+          </MessageBox>
+          <Lava top={riskTop ? riskTop - 40 : null} />
+          <MessageBox color="red" top={riskTop}>
+            lava
+          </MessageBox>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -88,6 +110,22 @@ function MessageBox({ children, color, top }: MessageBoxProps) {
     >
       <Pointer color={color} />
       <div className={className}>{children}</div>
+    </div>
+  );
+}
+
+type LavaProps = {
+  top: number | null;
+};
+
+function Lava({ top }: LavaProps) {
+  const style = useMemo(
+    () => (top !== null ? { top: `${top}px` } : { display: "none" }),
+    [top]
+  );
+  return (
+    <div className="absolute flex w-full justify-center" style={style}>
+      <img src="/scale/lava.svg" alt="lava" />
     </div>
   );
 }
