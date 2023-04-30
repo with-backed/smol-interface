@@ -39,8 +39,8 @@ export default function HowMuchBorrow() {
 
   return (
     <div className="flex h-full">
-      <RektScale />
-      <div className="flex flex-col items-center w-full grow-0 mt-12'">
+      <RektScale riskLevel={riskLevel || loggedOutRiskLevel} />
+      <div className="flex flex-col items-center w-full grow-0 pt-6 h-2/4">
         <RiskRadio riskLevel={riskLevel} handleChange={setSelectedBorrow} />
         <FrogCooker riskLevel={riskLevel || loggedOutRiskLevel} />
       </div>

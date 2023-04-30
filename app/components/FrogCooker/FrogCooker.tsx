@@ -18,7 +18,7 @@ export function FrogCooker({ riskLevel }: FrogCookerProps) {
   }, [riskLevel]);
 
   return (
-    <div>
+    <div className="mt-auto">
       <img src={image} alt={`this frog is feeling ${riskLevel}`} />
     </div>
   );

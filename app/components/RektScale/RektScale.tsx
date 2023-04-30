@@ -1,6 +1,11 @@
 import { useMemo } from "react";
+import { type RiskLevel } from "~/lib/globalStore";
 
-export function RektScale() {
+type RektScaleProps = {
+  riskLevel: RiskLevel | undefined;
+};
+
+export function RektScale({ riskLevel }: RektScaleProps) {
   return (
     <div className="bg-[url('/scale/yaxis.svg')] w-2.5 bg-repeat-y bg-[center_top] flex flex-col justify-end">
       <div className="flex flex-col h-2/4 relative">
@@ -8,10 +13,10 @@ export function RektScale() {
         <div className="w-full bg-risky h-16 rounded-lg"></div>
         <div className="w-full bg-fine flex-1 rounded-t-lg"></div>
         <MessageBox color="black" top={0}>
-          henlo
+          NFT Value
         </MessageBox>
         <MessageBox color="red" top={45}>
-          goobdye
+          lava
         </MessageBox>
       </div>
     </div>
@@ -43,7 +48,7 @@ type MessageBoxProps = React.PropsWithChildren<
 
 function MessageBox({ children, color, top }: MessageBoxProps) {
   const className = useMemo(() => {
-    const base = `text-white px-2 py-1`;
+    const base = `text-white px-2 py-1 ml-[-1px]`;
     if (color === "black") {
       return `${base} bg-black`;
     }
@@ -55,7 +60,7 @@ function MessageBox({ children, color, top }: MessageBoxProps) {
 
   return (
     <div
-      className="absolute flex flex-row justify-center items-center ml-1"
+      className="absolute flex flex-row justify-center items-center ml-1 whitespace-nowrap"
       style={style}
     >
       <Pointer color={color} />
