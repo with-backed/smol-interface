@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import useResizeObserver from "@react-hook/resize-observer";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { type RiskLevel } from "~/lib/globalStore";
 
 type RektScaleProps = {
@@ -6,16 +7,35 @@ type RektScaleProps = {
 };
 
 export function RektScale({ riskLevel }: RektScaleProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [top, setTop] = useState<number | null>(null);
+  const position = useCallback(() => {
+    if (ref.current) {
+      const elem = ref.current.querySelector(`.bg-${riskLevel}`);
+      if (!elem) return;
+      const bodyRect = ref.current.getBoundingClientRect();
+      const elemRect = elem.getBoundingClientRect();
+      const offset = elemRect.top - bodyRect.top;
+      const height = elem.clientHeight;
+      console.log({ bodyRect, elemRect, offset, height });
+      if (height !== undefined) {
+        setTop(offset + Math.floor(height / 2));
+      }
+    }
+  }, [riskLevel]);
+  useLayoutEffect(() => position(), [position]);
+  useResizeObserver((ref.current || null) as HTMLElement | null, position);
+
   return (
     <div className="bg-[url('/scale/yaxis.svg')] w-2.5 bg-repeat-y bg-[center_top] flex flex-col justify-end">
-      <div className="flex flex-col h-2/4 relative">
+      <div ref={ref} className="flex flex-col h-2/4 relative">
         <div className="w-full bg-yikes h-16 rounded-lg"></div>
         <div className="w-full bg-risky h-16 rounded-lg"></div>
         <div className="w-full bg-fine flex-1 rounded-t-lg"></div>
         <MessageBox color="black" top={0}>
           NFT Value
         </MessageBox>
-        <MessageBox color="red" top={45}>
+        <MessageBox color="red" top={top}>
           lava
         </MessageBox>
       </div>
@@ -42,7 +62,7 @@ function Pointer({ color }: PointerProps) {
 
 type MessageBoxProps = React.PropsWithChildren<
   Colorable & {
-    top: number;
+    top: number | null;
   }
 >;
 
@@ -56,7 +76,10 @@ function MessageBox({ children, color, top }: MessageBoxProps) {
   }, [color]);
 
   // TODO: this is a hack to get the pointer to line up with the text
-  const style = useMemo(() => ({ top: `${top - 16}px` }), [top]);
+  const style = useMemo(
+    () => (top !== null ? { top: `${top - 16}px` } : { display: "none" }),
+    [top]
+  );
 
   return (
     <div

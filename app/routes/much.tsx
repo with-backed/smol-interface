@@ -12,7 +12,7 @@ export default function HowMuchBorrow() {
   const riskLevel = useGlobalStore((s) => s.inProgressLoan?.riskLevel);
   const [loggedOutRiskLevel, setLoggedOutRiskLevel] = useState<
     RiskLevel | undefined
-  >(undefined);
+  >("fine");
 
   const setSelectedBorrow = useCallback(
     (riskLevel: RiskLevel) => {
