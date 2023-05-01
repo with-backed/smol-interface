@@ -168,7 +168,7 @@ export default function App() {
                           value={headerDisclosureState}
                         >
                           <Header />
-                          <div className="wrapper">
+                          <div className="wrapper relative">
                             <Outlet />
                           </div>
                           <ScrollRestoration />

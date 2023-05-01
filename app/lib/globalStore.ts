@@ -2,7 +2,7 @@ import { create } from "zustand";
 import type { VaultsByOwnerForControllerQuery } from "~/gql/graphql";
 import { HeaderState } from "~/components/Header/HeaderState";
 import type { ethers } from "ethers";
-import { SubgraphVault } from "~/hooks/useVault";
+import type { SubgraphVault } from "~/hooks/useVault";
 
 export type RiskLevel = "fine" | "risky" | "yikes";
 
