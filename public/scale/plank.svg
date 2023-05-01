@@ -1,0 +1,15 @@
+<svg width="310" height="45" viewBox="0 0 310 45" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g id="group1">
+<path d="M295.523 23.4238L295.298 32.9119" stroke="black" stroke-width="3" stroke-linecap="round"/>
+<path d="M15.1255 14.9652C28.0092 15.2713 40.324 16.7341 53.0794 17.7447C70.5122 19.1258 87.4752 15.718 104.818 16.13C131.252 16.7579 157.685 17.3858 184.119 18.0137C195.031 18.2729 205.766 18.6245 216.57 19.6966C227.777 20.8088 239.414 22.2245 250.533 22.4886C264.987 22.8319 279.795 22.2179 294.024 22.5559" stroke="black" stroke-width="3" stroke-linecap="round"/>
+<path d="M15.8404 26.9848C28.724 27.2908 41.0388 28.7536 53.7942 29.7642C71.227 31.1453 88.19 27.7376 105.533 28.1495C131.967 28.7774 158.4 29.4053 184.834 30.0332C195.746 30.2924 206.481 30.6441 217.285 31.7162C228.492 32.8283 240.129 34.244 251.248 34.5081C265.702 34.8515 280.51 34.2374 294.739 34.5754" stroke="black" stroke-width="3" stroke-linecap="round"/>
+<path d="M15.3633 14.834L15.1101 25.4916" stroke="black" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <g id="group2" style="display:none">
+<path d="M295.531 25.0547L295.196 34.5395" stroke="black" stroke-width="3" stroke-linecap="round"/>
+<path d="M15.251 13.3399C28.1303 13.7956 40.4272 15.4013 53.1701 16.56C70.5856 18.1435 87.5871 14.933 104.924 15.5464C131.349 16.4813 157.773 17.4161 184.198 18.351C195.106 18.7369 205.836 19.2132 216.627 20.4108C227.82 21.653 239.44 23.2038 250.556 23.597C265.005 24.1082 279.818 23.6662 294.042 24.1695" stroke="black" stroke-width="3" stroke-linecap="round"/>
+<path d="M15.8252 25.3672C28.7045 25.8229 41.0015 27.4287 53.7443 28.5873C71.1599 30.1708 88.1613 26.9603 105.498 27.5737C131.923 28.5086 158.347 29.4435 184.772 30.3784C195.68 30.7643 206.41 31.2406 217.201 32.4381C228.394 33.6803 240.015 35.2311 251.13 35.6244C265.579 36.1356 280.393 35.6936 294.617 36.1968" stroke="black" stroke-width="3" stroke-linecap="round"/>
+<path d="M15.4922 13.2109L15.1153 23.8649" stroke="black" stroke-width="3" stroke-linecap="round"/>  </g>
+  <animate xlink:href="#group1" attributeName="display" from="inline" to="none" dur="1s" begin="0s" repeatCount="indefinite" />
+  <animate xlink:href="#group2" attributeName="display" from="none" to="inline" dur="1s" begin="0s" repeatCount="indefinite" />
+</svg>
