@@ -40,7 +40,7 @@ import { useDisclosureState } from "reakit/Disclosure";
 import { HeaderDisclosureContextProvider } from "./hooks/useHeaderDisclosureState/useHeaderDisclosureState";
 import { TargetProvider } from "./hooks/useTarget";
 import { LavaExplainer, ValueExplainer } from "./components/RektScale";
-import { useGlobalStore } from "./lib/globalStore";
+import { useExplainerStore } from "./lib/explainerStore";
 
 declare global {
   interface Window {
@@ -146,7 +146,7 @@ export default function App() {
     });
   }, [paprSubgraph]);
 
-  const activeExplainer = useGlobalStore((s) => s.activeExplainer);
+  const activeExplainer = useExplainerStore((s) => s.activeExplainer);
 
   const pageContent = useMemo(() => {
     if (activeExplainer === "lava") {

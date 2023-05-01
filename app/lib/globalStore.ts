@@ -5,7 +5,6 @@ import type { ethers } from "ethers";
 import type { SubgraphVault } from "~/hooks/useVault";
 
 export type RiskLevel = "fine" | "risky" | "yikes";
-export type Explainer = "value" | "lava";
 
 interface InProgressLoan {
   collectionAddress: string;
@@ -50,8 +49,6 @@ interface GlobalStore {
     fn: (prev: InProgressLoan | null) => InProgressLoan | null
   ) => void;
   clear: () => void;
-  activeExplainer: Explainer | null;
-  setActiveExplainer: (activeExplainer: Explainer | null) => void;
 }
 
 export const useGlobalStore = create<GlobalStore>((set) => ({
@@ -72,6 +69,4 @@ export const useGlobalStore = create<GlobalStore>((set) => ({
       state: HeaderState.Default,
       inProgressLoan: null,
     }),
-  activeExplainer: null,
-  setActiveExplainer: (activeExplainer) => set({ activeExplainer }),
 }));

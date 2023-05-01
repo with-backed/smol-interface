@@ -1,9 +1,9 @@
 import useResizeObserver from "@react-hook/resize-observer";
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { useGlobalStore } from "~/lib/globalStore";
-import type { Explainer, RiskLevel } from "~/lib/globalStore";
+import type { RiskLevel } from "~/lib/globalStore";
 import { MessageBox } from "./MessageBox";
 import { Button } from "reakit/Button";
+import { type Explainer, useExplainerStore } from "~/lib/explainerStore";
 
 type RektScaleProps = {
   riskLevel: RiskLevel | undefined;
@@ -107,7 +107,7 @@ type InfoButtonProps = {
 };
 
 function InfoButton({ explainer }: InfoButtonProps) {
-  const setActiveExplainer = useGlobalStore((s) => s.setActiveExplainer);
+  const setActiveExplainer = useExplainerStore((s) => s.setActiveExplainer);
   const handleClick = useCallback(() => {
     setActiveExplainer(explainer);
   }, [explainer, setActiveExplainer]);

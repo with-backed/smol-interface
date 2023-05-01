@@ -2,10 +2,10 @@ import useResizeObserver from "@react-hook/resize-observer";
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { MessageBox } from "./MessageBox";
 import { Button } from "reakit/Button";
-import { useGlobalStore } from "~/lib/globalStore";
+import { useExplainerStore } from "~/lib/explainerStore";
 
 export function LavaExplainer() {
-  const setActiveExplainer = useGlobalStore((s) => s.setActiveExplainer);
+  const setActiveExplainer = useExplainerStore((s) => s.setActiveExplainer);
   const handleClick = useCallback(() => {
     setActiveExplainer(null);
   }, [setActiveExplainer]);
@@ -38,7 +38,7 @@ export function LavaExplainer() {
 }
 
 export function ValueExplainer() {
-  const setActiveExplainer = useGlobalStore((s) => s.setActiveExplainer);
+  const setActiveExplainer = useExplainerStore((s) => s.setActiveExplainer);
   const handleClick = useCallback(() => {
     setActiveExplainer(null);
   }, [setActiveExplainer]);
