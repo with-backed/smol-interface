@@ -111,5 +111,9 @@ function InfoButton({ explainer }: InfoButtonProps) {
   const handleClick = useCallback(() => {
     setActiveExplainer(explainer);
   }, [explainer, setActiveExplainer]);
-  return <Button onClick={handleClick}>ⓘ</Button>;
+  return (
+    <Button onClick={handleClick}>
+      <img src="/scale/question-mark.svg" alt="more info" />
+    </Button>
+  );
 }

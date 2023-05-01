@@ -29,7 +29,7 @@ type MessageBoxProps = React.PropsWithChildren<
 
 export function MessageBox({ children, color, top }: MessageBoxProps) {
   const className = useMemo(() => {
-    const base = `text-white px-2 py-1 ml-[-1px]`;
+    const base = `text-white px-2 py-1 ml-[-1px] flex justify-center items-center gap-2`;
     if (color === "black") {
       return `${base} bg-black`;
     }
