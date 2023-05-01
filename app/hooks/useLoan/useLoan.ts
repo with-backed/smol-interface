@@ -129,14 +129,9 @@ export function useLoan(vault: NonNullable<SubgraphVault>): LoanDetails {
       return amountIn.add(calculateSwapFee(amountIn));
     }
 
-    if (!totalRepaymentQuote || !recentLoanActivity) return null;
+    if (!totalRepaymentQuote) return null;
     return totalRepaymentQuote.add(calculateSwapFee(totalRepaymentQuote));
-  }, [
-    totalRepaymentQuote,
-    recentLoanActivity,
-    loanRepaid,
-    recentRepaymentActivity,
-  ]);
+  }, [totalRepaymentQuote, loanRepaid, recentRepaymentActivity]);
 
   const interest = useMemo(() => {
     if (!borrowedFromSwap || !totalRepayment) return null;

@@ -25,14 +25,14 @@ export function LoanDetails({
 }: LoanDetailsBarProps) {
   const { underlying, paprToken } = usePaprController();
 
-  const liquidationAction = useMemo(() => {
+  const isLiquidationAction = useMemo(() => {
     return action === "liquidating" || action === "liquidated";
   }, [action]);
   const isBorrowing = useMemo(() => action === "borrow", [action]);
   const backgroundColor = useMemo(() => {
-    if (liquidationAction) return "bg-liquidate-red";
+    if (isLiquidationAction) return "bg-liquidate-red";
     return `bg-${riskLevel}`;
-  }, [liquidationAction, riskLevel]);
+  }, [isLiquidationAction, riskLevel]);
 
   const quote = usePoolQuote({
     amount: amountToBorrowOrRepay,
@@ -49,14 +49,24 @@ export function LoanDetails({
     );
   }, [quote, underlying.decimals, underlying.symbol]);
 
+  const leftText = useMemo(() => {
+    if (isLiquidationAction) return "Rekt";
+    return riskLevel;
+  }, [isLiquidationAction, riskLevel]);
+
+  const textColor = useMemo(() => {
+    if (isLiquidationAction) return "text-white";
+    return "text-black";
+  }, [isLiquidationAction]);
+
   return (
     <div
-      className={`w-full rounded-lg flex flex-row justify-between items-center ${backgroundColor} text-black leading-8`}
+      className={`w-full rounded-lg flex flex-row justify-between items-center ${backgroundColor} ${textColor} leading-8`}
     >
       <div className="flex flex-row items-center">
         <NFTs collectionAddress={collectionAddress} tokenIds={tokenIds} />
         <div className="ml-2">
-          <p>{riskLevel}!</p>
+          <p>{leftText}!</p>
         </div>
       </div>
       <RightText action={action} formattedAmount={formattedAmount} />

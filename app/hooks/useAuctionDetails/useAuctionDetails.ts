@@ -18,8 +18,14 @@ export function useAuctionDetails(vault: NonNullable<SubgraphVault>) {
 
   const auctionProceedsInETH = useMemo(() => {
     if (!loanDetails.vaultDebt || !loanDetails.borrowedPapr) return null;
-    // TODO:adamgobes - this is not always correct, need to think through more
-    const auctionProceeds = loanDetails.borrowedPapr.sub(loanDetails.vaultDebt);
+
+    let auctionProceeds: ethers.BigNumber;
+
+    // if the vault has no more debt, their proceeds were the end price of the most recent auction
+    if (loanDetails.vaultDebt.isZero()) auctionProceeds = auction.endPrice;
+    // otherwise, the auction proceeds are the difference between what they initially borrowed and the vaults current debt
+    else auctionProceeds = loanDetails.borrowedPapr.sub(loanDetails.vaultDebt);
+
     // convert the proceeds in papr to the eth naively using the latest market price (although this is not a true quote, its a fine approximation)
     return ethers.utils.parseUnits(
       (
@@ -32,6 +38,7 @@ export function useAuctionDetails(vault: NonNullable<SubgraphVault>) {
   }, [
     loanDetails.vaultDebt,
     loanDetails.borrowedPapr,
+    auction.endPrice,
     paprToken.decimals,
     underlying.decimals,
   ]);

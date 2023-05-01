@@ -5,6 +5,7 @@ import { HeaderState } from "./";
 import type { SubgraphVault } from "~/hooks/useVault";
 import { useRiskLevel } from "~/hooks/useRiskLevel";
 import { LoanDetailsForExistingLoan } from "./LoanDetailsForExistingLoan";
+import { useHeaderDisclosureState } from "~/hooks/useHeaderDisclosureState";
 
 export function ExistingLoans() {
   const currentVaults = useGlobalStore((s) => s.currentVaults);
@@ -30,21 +31,27 @@ type ExistingLoanProps = {
 };
 
 function ExistingLoan({ vault, index }: ExistingLoanProps) {
+  const selectedVault = useGlobalStore((s) => s.selectedVault);
   const setSelectedVault = useGlobalStore((s) => s.setSelectedVault);
   const state = useGlobalStore((s) => s.state);
+  const { setVisible } = useHeaderDisclosureState();
   const riskLevel = useRiskLevel(vault);
 
   const selectVaultAsCurrent = useCallback(
     (vault: NonNullable<SubgraphVault>, riskLevel: RiskLevel) => {
       setSelectedVault({ ...vault, riskLevel });
+      setVisible(false);
     },
-    [setSelectedVault]
+    [setSelectedVault, setVisible]
   );
 
+  // setting the initial/default selectedVault
+  // TODO: adamgobes, potentially sort by risk level and default to highest risk loan
   useEffect(() => {
+    if (selectedVault) return;
     if (index === 0 && riskLevel && state === HeaderState.Default)
       selectVaultAsCurrent(vault, riskLevel);
-  }, [state, index, riskLevel, selectVaultAsCurrent, vault]);
+  }, [selectedVault, state, index, riskLevel, selectVaultAsCurrent, vault]);
 
   if (!riskLevel) return <></>;
 
