@@ -9,7 +9,9 @@ import { riskLevelToLTV } from "~/lib/utils";
 export default function HowMuchBorrow() {
   const maxDebt = useGlobalStore((s) => s.inProgressLoan?.maxDebtForChosen);
   const setInProgressLoan = useGlobalStore((s) => s.setInProgressLoan);
-  const riskLevel = useGlobalStore((s) => s.inProgressLoan?.riskLevel);
+  const riskLevel = useGlobalStore(
+    (s) => s.selectedVault?.riskLevel || s.inProgressLoan?.riskLevel
+  );
   const [loggedOutRiskLevel, setLoggedOutRiskLevel] = useState<
     RiskLevel | undefined
   >("fine");
