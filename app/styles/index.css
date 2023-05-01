@@ -3,11 +3,15 @@ body {
   min-height: 100vh;
 }
 
-.wrapper,
-.explainer {
+.wrapper {
   background-color: white;
   width: 360px;
   height: 640px;
+}
+
+.explainer {
+  width: 360px;
+  height: 780px;
 }
 
 @media screen and (max-width: 480px) {
