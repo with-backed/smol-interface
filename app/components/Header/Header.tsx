@@ -91,9 +91,17 @@ export function Header() {
 type DropdownButtonProps = DisclosureStateReturn;
 
 function DropdownButton({ visible, ...props }: DropdownButtonProps) {
+  const clear = useGlobalStore((s) => s.clear);
+
+  const handleClick = useCallback(() => {
+    if (visible) {
+      clear();
+    }
+  }, [visible, clear]);
+
   return (
     <Disclosure visible={visible} {...props}>
-      <Caret orientation={visible ? "up" : "down"} />
+      <Caret orientation={visible ? "up" : "down"} onClick={handleClick} />
     </Disclosure>
   );
 }
@@ -103,7 +111,11 @@ function NewLoan() {
   return (
     <>
       <button className="bg-medium-grey rounded-lg h-7 w-full text-black">
-        <Link to="/pick" className="no-underline text-black">
+        <Link
+          to="/pick"
+          state={{ startCreate: true }}
+          className="no-underline text-black"
+        >
           Create new Loan
         </Link>
       </button>
@@ -420,7 +432,7 @@ function SelectNFTsHeaderContent() {
       if (prev) {
         return {
           ...prev,
-          tokenIds: [...prev.tokenIds, ...tokenIds],
+          tokenIds: [...new Set([...prev.tokenIds, ...tokenIds])],
         };
       }
       return null;
@@ -510,6 +522,7 @@ function CancelButton() {
   const handleClick = useCallback(() => {
     if (isConnected) {
       clear();
+      toggle();
     } else {
       clear();
       toggle();

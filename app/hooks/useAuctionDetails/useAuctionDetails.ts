@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { usePaprController } from "../usePaprController";
-import { SubgraphVault } from "../useVault";
+import type { SubgraphVault } from "../useVault";
 import { useLoan } from "../useLoan";
 import { ethers } from "ethers";
 import { formatBigNum } from "~/lib/numberFormat";
@@ -18,6 +18,7 @@ export function useAuctionDetails(vault: NonNullable<SubgraphVault>) {
 
   const auctionProceedsInETH = useMemo(() => {
     if (!loanDetails.vaultDebt || !loanDetails.borrowedPapr) return null;
+    // TODO:adamgobes - this is not always correct, need to think through more
     const auctionProceeds = loanDetails.borrowedPapr.sub(loanDetails.vaultDebt);
     // convert the proceeds in papr to the eth naively using the latest market price (although this is not a true quote, its a fine approximation)
     return ethers.utils.parseUnits(
@@ -25,7 +26,7 @@ export function useAuctionDetails(vault: NonNullable<SubgraphVault>) {
         parseFloat(
           ethers.utils.formatUnits(auctionProceeds, paprToken.decimals)
         ) * latestMarketPrice
-      ).toString(),
+      ).toFixed(6),
       underlying.decimals
     );
   }, [
