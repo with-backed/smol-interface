@@ -1,28 +1,39 @@
-import { useCallback } from "react";
+import { useLocation, useParams } from "@remix-run/react";
+import { useCallback, useEffect, useMemo } from "react";
 import { Button } from "~/components/Buttons/Button";
 import { HeaderState } from "~/components/Header";
 import { useHeaderDisclosureState } from "~/hooks/useHeaderDisclosureState";
 import { useGlobalStore } from "~/lib/globalStore";
 
 export default function Intro() {
+  const location = useLocation();
+  const selectedVault = useGlobalStore((s) => s.selectedVault);
   const clear = useGlobalStore((s) => s.clear);
-  const { toggle } = useHeaderDisclosureState();
-  const { state, setHeaderState } = useGlobalStore();
+  const { setVisible } = useHeaderDisclosureState();
+  const { setHeaderState } = useGlobalStore();
+
+  useEffect(() => {
+    if (location.state?.startCreate) {
+      setVisible(true);
+      clear();
+      setHeaderState(HeaderState.ListEligibleCollections);
+    }
+  }, [location.state, setVisible, clear, setHeaderState]);
 
   const handleClick = useCallback(() => {
-    if (state !== HeaderState.Default) {
-      // Don't handle this click if we're already in the flow
-      return;
-    }
-
     clear();
     setHeaderState(HeaderState.ListEligibleCollections);
-    toggle();
-  }, [clear, setHeaderState, state, toggle]);
+    setVisible(true);
+  }, [clear, setHeaderState, setVisible]);
+
+  const buttonText = useMemo(() => {
+    if (selectedVault) return "create new loan";
+    return "pick ur hero";
+  }, [selectedVault]);
 
   return (
     <div className="flex flex-col items-center p-4 gap-4 justify-center h-full grow graph-papr">
-      <Button onClick={handleClick}>pick ur hero</Button>
+      <Button onClick={handleClick}>{buttonText}</Button>
       <div className="w-full flex flex-col items-center">
         <div>
           <p className="relative left-[76px] top-[100px] z-[2] w-24 text-center">

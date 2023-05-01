@@ -32,7 +32,13 @@ const mostRecentLoanByVaultDocument = graphql(`
 const mostRecentRepaymentByVaultDocument = graphql(`
   query mostRecentRepaymentByVault($vaultId: String!) {
     activities(
-      where: { and: [{ vault: $vaultId }, { amountRepaid_not: null }] }
+      where: {
+        and: [
+          { vault: $vaultId }
+          { amountRepaid_not: null }
+          { amountIn_not: null }
+        ]
+      }
       orderBy: timestamp
       orderDirection: desc
       first: 1
