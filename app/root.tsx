@@ -39,6 +39,8 @@ import { TimestampProvider } from "./hooks/useTimestamp";
 import { useDisclosureState } from "reakit/Disclosure";
 import { HeaderDisclosureContextProvider } from "./hooks/useHeaderDisclosureState/useHeaderDisclosureState";
 import { TargetProvider } from "./hooks/useTarget";
+import { LavaExplainer, ValueExplainer } from "./components/RektScale";
+import { useExplainerStore } from "./lib/explainerStore";
 
 declare global {
   interface Window {
@@ -144,6 +146,27 @@ export default function App() {
     });
   }, [paprSubgraph]);
 
+  const activeExplainer = useExplainerStore((s) => s.activeExplainer);
+
+  const pageContent = useMemo(() => {
+    if (activeExplainer === "lava") {
+      return <LavaExplainer />;
+    }
+    if (activeExplainer === "value") {
+      return <ValueExplainer />;
+    }
+    return (
+      <>
+        <Header />
+        <div className="wrapper relative">
+          <Outlet />
+        </div>
+
+        <Footer />
+      </>
+    );
+  }, [activeExplainer]);
+
   return (
     <html lang="en">
       <head>
@@ -167,11 +190,10 @@ export default function App() {
                         <HeaderDisclosureContextProvider
                           value={headerDisclosureState}
                         >
-                          <Header />
-                          <div className="wrapper relative">
-                            <Outlet />
-                          </div>
+                          {pageContent}
                           <ScrollRestoration />
+                          <Scripts />
+                          <LiveReload />
                           <script
                             dangerouslySetInnerHTML={{
                               __html: `window.ENV = ${JSON.stringify(
@@ -179,9 +201,6 @@ export default function App() {
                               )}`,
                             }}
                           />
-                          <Scripts />
-                          <LiveReload />
-                          <Footer />
                         </HeaderDisclosureContextProvider>
                       </CenterProvider>
                     </ControllerContextProvider>

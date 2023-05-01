@@ -9,14 +9,21 @@ body {
   height: 640px;
 }
 
+.explainer {
+  width: 360px;
+  height: 780px;
+}
+
 @media screen and (max-width: 480px) {
-  .wrapper {
+  .wrapper,
+  .explainer {
     height: 100vh;
     width: 100vw;
   }
 
   @supports (height: 100svh) {
-    body {
+    body,
+    .explainer {
       min-height: 100svh;
     }
     .wrapper {
