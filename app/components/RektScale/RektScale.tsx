@@ -8,39 +8,57 @@ type RektScaleProps = {
 
 export function RektScale({ riskLevel }: RektScaleProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [riskTop, setRiskTop] = useState<number | null>(null);
-  const [valueTop, setValueTop] = useState<number | null>(null);
+  const [riskLevelTop, setRiskLevelTop] = useState<number | null>(null);
+  const [nftValueTop, setNFTValueTop] = useState<number | null>(null);
 
-  const positionValue = useCallback(() => {
+  const positionNFTValue = useCallback(() => {
     if (ref.current) {
       const elem = ref.current.querySelector(`.bg-yikes`);
       const bodyRect = ref.current.closest(".wrapper")?.getBoundingClientRect();
-      if (!elem || !bodyRect) return;
+
+      if (!elem || !bodyRect) {
+        console.error("Could not find elements to position NFT value on scale");
+        return;
+      }
+
       const elemRect = elem.getBoundingClientRect();
       const offset = elemRect.top - bodyRect.top;
-      setValueTop(offset);
+      setNFTValueTop(offset);
     }
   }, []);
 
-  const positionRisk = useCallback(() => {
+  const positionRiskLevel = useCallback(() => {
     if (ref.current) {
       const elem = ref.current.querySelector(`.bg-${riskLevel}`);
       const bodyRect = ref.current.closest(".wrapper")?.getBoundingClientRect();
-      if (!elem || !bodyRect) return;
+
+      if (!elem || !bodyRect) {
+        console.error(
+          "Could not find elements to position risk level on scale"
+        );
+        return;
+      }
 
       const elemRect = elem.getBoundingClientRect();
       const offset = elemRect.top - bodyRect.top;
       const height = elem.clientHeight;
       if (height !== undefined) {
-        setRiskTop(offset + Math.floor(height / 2));
+        setRiskLevelTop(offset + Math.floor(height / 2));
       }
     }
   }, [riskLevel]);
-  useLayoutEffect(() => positionRisk(), [positionRisk]);
-  useResizeObserver((ref.current || null) as HTMLElement | null, positionRisk);
 
-  useLayoutEffect(() => positionValue(), [positionValue]);
-  useResizeObserver((ref.current || null) as HTMLElement | null, positionValue);
+  useLayoutEffect(() => positionRiskLevel(), [positionRiskLevel]);
+  useResizeObserver(
+    (ref.current || null) as HTMLElement | null,
+    positionRiskLevel
+  );
+
+  useLayoutEffect(() => positionNFTValue(), [positionNFTValue]);
+  useResizeObserver(
+    (ref.current || null) as HTMLElement | null,
+    positionNFTValue
+  );
 
   return (
     <>
@@ -52,11 +70,11 @@ export function RektScale({ riskLevel }: RektScaleProps) {
           <div className="w-full bg-yikes h-16 rounded-lg"></div>
           <div className="w-full bg-risky h-16 rounded-lg"></div>
           <div className="w-full bg-fine flex-1 rounded-t-lg"></div>
-          <MessageBox color="black" top={valueTop}>
+          <MessageBox color="black" top={nftValueTop}>
             NFT Value
           </MessageBox>
-          <Lava top={riskTop ? riskTop - 40 : null} />
-          <MessageBox color="red" top={riskTop}>
+          <Lava top={riskLevelTop ? riskLevelTop - 40 : null} />
+          <MessageBox color="red" top={riskLevelTop}>
             lava
           </MessageBox>
         </div>
