@@ -432,7 +432,7 @@ function SelectNFTsHeaderContent() {
       if (prev) {
         return {
           ...prev,
-          tokenIds: [...new Set([...prev.tokenIds, ...tokenIds])],
+          tokenIds: [...new Set(tokenIds)],
         };
       }
       return null;

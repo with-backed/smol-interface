@@ -49,6 +49,11 @@ export function LoanDetails({
     );
   }, [quote, underlying.decimals, underlying.symbol]);
 
+  const leftText = useMemo(() => {
+    if (action === "borrow" || action === "repay") return riskLevel;
+    return "Rekt";
+  }, [action, riskLevel]);
+
   return (
     <div
       className={`w-full rounded-lg flex flex-row justify-between items-center ${backgroundColor} text-black leading-8`}
@@ -56,7 +61,7 @@ export function LoanDetails({
       <div className="flex flex-row items-center">
         <NFTs collectionAddress={collectionAddress} tokenIds={tokenIds} />
         <div className="ml-2">
-          <p>{riskLevel}!</p>
+          <p>{leftText}!</p>
         </div>
       </div>
       <RightText action={action} formattedAmount={formattedAmount} />

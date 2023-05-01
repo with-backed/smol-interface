@@ -99,14 +99,6 @@ export function PastAuctionWithClaim({ vault }: PastAuctionWithClaimProps) {
             <p>{formattedProceeds}</p>
           </div>
         </div>
-        <div className="flex flex-row justify-between py-1">
-          <div>
-            <p>Total Repayment:</p>
-          </div>
-          <div>
-            <p>{loanDetails.formattedTotalRepayment}</p>
-          </div>
-        </div>
       </div>
       <div className="py-2 px-6">
         <p>
