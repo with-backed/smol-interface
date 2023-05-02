@@ -51,7 +51,7 @@ const mostRecentRepaymentByVaultDocument = graphql(`
 export type LoanDetails = {
   borrowedPapr: ethers.BigNumber | null;
   borrowedUnderlying: ethers.BigNumber | null;
-  vaultDebt: ethers.BigNumber | null; // different from borrowedPapr in the case of an auction
+  vaultDebt: ethers.BigNumber; // different from borrowedPapr in the case of an auction
   formattedBorrowed: string;
   interest: ethers.BigNumber | null;
   formattedInterest: string;

@@ -26,8 +26,13 @@ export function Repay({
   const oracleSynced = useOracleSynced(vault.token.id, OraclePriceType.lower);
   const [underlyingApproved, setUnderlyingApproved] = useState<boolean>(false);
   const repayDisabled = useMemo(() => {
-    return !underlyingApproved || !oracleSynced || disabled;
-  }, [underlyingApproved, oracleSynced, disabled]);
+    return (
+      !underlyingApproved ||
+      !oracleSynced ||
+      loanDetails.vaultDebt.isZero() ||
+      disabled
+    );
+  }, [underlyingApproved, oracleSynced, loanDetails.vaultDebt, disabled]);
 
   const vaultNFTs = useMemo(() => {
     return loanDetails.vaultNFTs;
