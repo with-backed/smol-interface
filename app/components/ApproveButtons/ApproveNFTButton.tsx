@@ -41,8 +41,6 @@ export function ApproveNFTButton({
     setApprovedLoading(false);
   }, [isApproved]);
 
-  console.log({ approvedLoading });
-
   const symbol = useNFTSymbol(collateralContractAddress);
 
   const { config } = usePrepareContractWrite({
