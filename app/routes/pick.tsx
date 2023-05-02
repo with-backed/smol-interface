@@ -35,7 +35,11 @@ export default function Intro() {
     <div className="flex flex-col items-center p-4 gap-4 justify-between h-full grow graph-papr">
       <Button onClick={handleClick}>{buttonText}</Button>
 
-      <img src="3-hero-super-dance.svg" alt="Toad says: Put me in coach!" />
+      <img
+        src="3-hero-super-dance.svg"
+        className="scalable"
+        alt="Toad says: Put me in coach!"
+      />
 
       <p className="text-center">
         WARNING! your NFT will be at risk until ETH repaid. More borrow = More
