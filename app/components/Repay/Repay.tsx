@@ -69,7 +69,7 @@ export function Repay({
           text={
             !oracleSynced
               ? "Waiting for oracle..."
-              : `Repay ${loanDetails.formattedTotalRepayment}`
+              : `Repay ${loanDetails.formattedTotalOwed}`
           }
           theme={`bg-${vault.riskLevel}`}
           onClick={write!}

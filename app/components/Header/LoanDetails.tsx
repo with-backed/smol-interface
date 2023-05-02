@@ -2,7 +2,7 @@ import type { ethers } from "ethers";
 import { useMemo } from "react";
 import { usePaprController } from "~/hooks/usePaprController";
 import { usePoolQuote } from "~/hooks/usePoolQuote";
-import type { RiskLevel } from "~/lib/globalStore";
+import { RiskLevel, useGlobalStore } from "~/lib/globalStore";
 import { formatBigNum } from "~/lib/numberFormat";
 import { NFTs } from "./NFTs";
 
@@ -24,15 +24,18 @@ export function LoanDetails({
   amountToBorrowOrRepay,
 }: LoanDetailsBarProps) {
   const { underlying, paprToken } = usePaprController();
+  const hasRepaid = useGlobalStore((s) => s.recentActions.hasRepaid);
+  const hasClaimed = useGlobalStore((s) => s.recentActions.hasClaimed);
 
   const isLiquidationAction = useMemo(() => {
     return action === "liquidating" || action === "liquidated";
   }, [action]);
   const isBorrowing = useMemo(() => action === "borrow", [action]);
   const backgroundColor = useMemo(() => {
+    if (hasRepaid || hasClaimed) return "bg-medium-gray";
     if (isLiquidationAction) return "bg-liquidate-red";
     return `bg-${riskLevel}`;
-  }, [isLiquidationAction, riskLevel]);
+  }, [hasRepaid, hasClaimed, isLiquidationAction, riskLevel]);
 
   const quote = usePoolQuote({
     amount: amountToBorrowOrRepay,
@@ -55,9 +58,9 @@ export function LoanDetails({
   }, [isLiquidationAction, riskLevel]);
 
   const textColor = useMemo(() => {
-    if (isLiquidationAction) return "text-white";
+    if (isLiquidationAction && !hasRepaid && !hasClaimed) return "text-white";
     return "text-black";
-  }, [isLiquidationAction]);
+  }, [isLiquidationAction, hasRepaid, hasClaimed]);
 
   return (
     <div
@@ -69,7 +72,12 @@ export function LoanDetails({
           <p>{leftText}!</p>
         </div>
       </div>
-      <RightText action={action} formattedAmount={formattedAmount} />
+      <RightText
+        action={action}
+        formattedAmount={formattedAmount}
+        hasRepaid={hasRepaid}
+        hasClaimed={hasClaimed}
+      />
     </div>
   );
 }
@@ -77,10 +85,30 @@ export function LoanDetails({
 function RightText({
   action,
   formattedAmount,
+  hasRepaid,
+  hasClaimed,
 }: {
   action: LoanDetailsAction;
   formattedAmount: string;
+  hasRepaid: boolean;
+  hasClaimed: boolean;
 }) {
+  if (hasRepaid) {
+    return (
+      <div className="mr-2">
+        <p>Repaid</p>
+      </div>
+    );
+  }
+
+  if (hasClaimed) {
+    return (
+      <div className="mr-2">
+        <p>Claimed</p>
+      </div>
+    );
+  }
+
   if (action === "liquidating") {
     return (
       <div className="mr-2">
@@ -88,10 +116,11 @@ function RightText({
       </div>
     );
   }
+
   if (action === "liquidated") {
     return (
       <div className="mr-2">
-        <p>Liquidated!</p>
+        <p>Repaid!</p>
       </div>
     );
   }

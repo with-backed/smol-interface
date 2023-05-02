@@ -53,16 +53,16 @@ export function useAuctionDetails(vault: NonNullable<SubgraphVault>) {
   // interest is the cost of what they would have to repay compared to what they borrowed while factoring in their auction proceeds
   const interest = useMemo(() => {
     if (
-      !loanDetails.repaymentQuote ||
+      !loanDetails.totalOwed ||
       !loanDetails.borrowedUnderlying ||
       !auctionProceedsInETH
     )
       return null;
-    return loanDetails.repaymentQuote
+    return loanDetails.totalOwed
       .add(auctionProceedsInETH)
       .sub(loanDetails.borrowedUnderlying);
   }, [
-    loanDetails.repaymentQuote,
+    loanDetails.totalOwed,
     loanDetails.borrowedUnderlying,
     auctionProceedsInETH,
   ]);

@@ -33,6 +33,11 @@ export type VaultWithRiskLevel =
   | (SubgraphVault & { riskLevel: RiskLevel })
   | null;
 
+export type RecentActions = {
+  hasRepaid: boolean;
+  hasClaimed: boolean;
+};
+
 interface GlobalStore {
   state: HeaderState;
   setHeaderState: (newState: HeaderState) => void;
@@ -48,6 +53,8 @@ interface GlobalStore {
   setInProgressLoan: (
     fn: (prev: InProgressLoan | null) => InProgressLoan | null
   ) => void;
+  recentActions: RecentActions;
+  setRecentActions: (fn: (prev: RecentActions) => RecentActions) => void;
   clear: () => void;
 }
 
@@ -64,6 +71,12 @@ export const useGlobalStore = create<GlobalStore>((set) => ({
   inProgressLoan: null,
   setInProgressLoan: (fn) =>
     set((state) => ({ inProgressLoan: fn(state.inProgressLoan) })),
+  recentActions: {
+    hasRepaid: false,
+    hasClaimed: false,
+  },
+  setRecentActions: (fn) =>
+    set((state) => ({ recentActions: fn(state.recentActions) })),
   clear: () =>
     set({
       state: HeaderState.Default,

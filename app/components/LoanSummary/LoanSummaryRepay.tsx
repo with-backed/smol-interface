@@ -19,7 +19,7 @@ export function LoanSummaryRepay({ vault, refresh }: LoanSummaryRepayProps) {
       <LoanDetails
         borrowed={loanDetails.formattedBorrowed}
         interest={loanDetails.formattedInterest}
-        totalRepayment={loanDetails.formattedTotalRepayment}
+        totalRepayment={loanDetails.formattedTotalOwed}
         numDays={loanDetails.numDays}
         costPercentage={loanDetails.formattedCostPercentage}
       />

@@ -10,7 +10,7 @@ export function LoanSummaryRepaid({
 }) {
   const {
     formattedBorrowed,
-    formattedTotalRepayment,
+    formattedRepaid,
     formattedInterest,
     formattedCostPercentage,
     numDays,
@@ -21,7 +21,7 @@ export function LoanSummaryRepaid({
       <LoanDetails
         borrowed={formattedBorrowed}
         interest={formattedInterest}
-        totalRepayment={formattedTotalRepayment}
+        totalRepayment={formattedRepaid}
         numDays={numDays}
         costPercentage={formattedCostPercentage}
       />
@@ -30,7 +30,7 @@ export function LoanSummaryRepaid({
       </div>
       <div className="graphPapr flex-auto flex flex-col justify-center items-center">
         <Button theme="bg-completed-grey" additionalClassNames={["text-white"]}>
-          Repaid {formattedTotalRepayment}
+          Repaid {formattedRepaid}
         </Button>
       </div>
     </>
