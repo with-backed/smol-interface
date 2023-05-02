@@ -109,7 +109,7 @@ export function BorrowConnected({
           <div className="my-2">
             <ApproveNFTButton
               collateralContractAddress={collateralContractAddress}
-              theme={`bg-${riskLevel}-faint`}
+              theme={`bg-${riskLevel}`}
               setApproved={setCollateralApproved}
             />
           </div>
@@ -139,8 +139,9 @@ export function BorrowUnconnected() {
       <BorrowBase />
       <div className="graph-papr flex-auto flex flex-col justify-center items-center">
         <Button
-          theme="bg-unclickable-grey"
+          theme="bg-black"
           additionalClassNames={["text-[#969696]"]}
+          disabled
         >
           Borrow $$$
         </Button>

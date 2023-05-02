@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useAuctionDetails } from "~/hooks/useAuctionDetails";
 import { usePaprController } from "~/hooks/usePaprController";
-import { VaultWithRiskLevel } from "~/lib/globalStore";
+import type { VaultWithRiskLevel } from "~/lib/globalStore";
 import { TransactionButton } from "../Buttons/TransactionButton";
 import {
   erc20ABI,
@@ -122,7 +122,7 @@ export function PastAuctionWithClaim({ vault }: PastAuctionWithClaimProps) {
         <div className="my-2">
           <TransactionButton
             text={formattedClaimable}
-            theme={"bg-black"}
+            theme="bg-black"
             onClick={write!}
             transactionData={data}
             disabled={!paprTokenApproved}
