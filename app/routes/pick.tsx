@@ -32,7 +32,7 @@ export default function Intro() {
   }, [selectedVault]);
 
   return (
-    <div className="flex flex-col items-center p-4 gap-4 justify-center h-full grow graph-papr">
+    <div className="flex flex-col items-center p-4 gap-4 justify-between h-full grow graph-papr">
       <Button onClick={handleClick}>{buttonText}</Button>
 
       <img src="3-hero-super-dance.svg" alt="Toad says: Put me in coach!" />
