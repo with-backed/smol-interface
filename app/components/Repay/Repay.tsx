@@ -58,7 +58,7 @@ export function Repay({
           <ApproveTokenButton
             token={underlying}
             spender={id}
-            theme="bg-yikes-faint"
+            theme={`bg-${vault.riskLevel}-faint`}
             tokenApproved={underlyingApproved}
             setTokenApproved={setUnderlyingApproved}
           />

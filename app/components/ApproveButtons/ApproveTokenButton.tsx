@@ -1,9 +1,8 @@
 import { TransactionButton } from "~/components/Buttons/TransactionButton";
 import { ethers } from "ethers";
-import { usePaprController } from "~/hooks/usePaprController";
 import { useEffect, useState } from "react";
+import type { Address } from "wagmi";
 import {
-  Address,
   erc20ABI,
   useAccount,
   useContractRead,
@@ -28,7 +27,6 @@ export function ApproveTokenButton({
   tokenApproved,
   setTokenApproved,
 }: ApproveTokenButtonProps) {
-  const controller = usePaprController();
   const { address } = useAccount();
 
   const [approvedLoading, setApprovedLoading] = useState<boolean>(true);
@@ -37,7 +35,7 @@ export function ApproveTokenButton({
     address: token.id as `0x${string}`,
     abi: erc20ABI,
     functionName: "allowance",
-    args: [address as `0x${string}`, spender as `0x${string}`],
+    args: [address as Address, spender as Address],
   });
 
   useEffect(() => {
