@@ -32,7 +32,7 @@ export default function Intro() {
   }, [selectedVault]);
 
   return (
-    <div className="flex flex-col items-center p-4 gap-4 justify-between h-full grow graph-papr">
+    <div className="flex flex-col items-center p-4 gap-4 justify-evenly h-full grow graph-papr">
       <Button onClick={handleClick}>{buttonText}</Button>
 
       <img

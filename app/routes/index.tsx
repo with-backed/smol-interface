@@ -1,6 +1,6 @@
 export default function Index() {
   return (
-    <div className="graph-papr h-full w-full flex flex-col justify-between p-3">
+    <div className="graph-papr h-full w-full flex flex-col justify-evenly p-3">
       <img src="/title.svg" alt="Title" />
       <img
         src="/1-super-dance.svg"
