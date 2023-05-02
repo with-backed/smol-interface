@@ -52,8 +52,7 @@ export function PastAuctionWithClaim({ vault }: PastAuctionWithClaimProps) {
       underlying.symbol
     }`;
   }, [quoteForClaimable, underlying.decimals, underlying.symbol]);
-  const { auction, loanDetails, formattedInterest, formattedProceeds } =
-    useAuctionDetails(vault);
+  const { auction, loanDetails } = useAuctionDetails(vault);
 
   const { config } = usePrepareContractWrite({
     address:
@@ -100,18 +99,10 @@ export function PastAuctionWithClaim({ vault }: PastAuctionWithClaimProps) {
         </div>
         <div className="flex flex-row justify-between py-1">
           <div>
-            <p>Cost:</p>
+            <p>Claimable proceeds:</p>
           </div>
           <div>
-            <p>{formattedInterest}</p>
-          </div>
-        </div>
-        <div className="flex flex-row justify-between py-1">
-          <div>
-            <p>Auction proceeds:</p>
-          </div>
-          <div>
-            <p>{formattedProceeds}</p>
+            <p>{formattedClaimable}</p>
           </div>
         </div>
       </div>

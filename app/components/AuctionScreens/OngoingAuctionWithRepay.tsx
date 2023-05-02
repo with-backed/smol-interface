@@ -69,14 +69,6 @@ export function OngoingAuctionWithRepay({
         </div>
         <div className="flex flex-row justify-between py-1">
           <div>
-            <p>Cost:</p>
-          </div>
-          <div>
-            <p>{loanDetails.formattedInterest}</p>
-          </div>
-        </div>
-        <div className="flex flex-row justify-between py-1">
-          <div>
             <p>Total {hasRepaidAuction ? "Repaid" : "Owed"}:</p>
           </div>
           <div>

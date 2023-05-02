@@ -49,36 +49,10 @@ export function useAuctionDetails(vault: NonNullable<SubgraphVault>) {
     }`;
   }, [auctionProceedsInETH, underlying]);
 
-  // compute interest manually by doing repayment + proceeds - borrowed
-  // interest is the cost of what they would have to repay compared to what they borrowed while factoring in their auction proceeds
-  const interest = useMemo(() => {
-    if (
-      !loanDetails.totalOwed ||
-      !loanDetails.borrowedUnderlying ||
-      !auctionProceedsInETH
-    )
-      return null;
-    return loanDetails.totalOwed
-      .add(auctionProceedsInETH)
-      .sub(loanDetails.borrowedUnderlying);
-  }, [
-    loanDetails.totalOwed,
-    loanDetails.borrowedUnderlying,
-    auctionProceedsInETH,
-  ]);
-  const formattedInterest = useMemo(() => {
-    if (!interest) return "...";
-    return `${formatBigNum(interest, underlying.decimals)} ${
-      underlying.symbol
-    }`;
-  }, [interest, underlying]);
-
   return {
     auction,
     auctionProceedsInETH,
     formattedProceeds,
-    interest,
-    formattedInterest,
     loanDetails,
   };
 }
