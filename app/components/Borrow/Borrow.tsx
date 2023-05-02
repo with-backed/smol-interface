@@ -5,7 +5,7 @@ import { usePaprController } from "~/hooks/usePaprController";
 import { useVaultWrite } from "~/hooks/useVaultWrite";
 import { VaultWriteType } from "~/hooks/useVaultWrite/helpers";
 import { getUniqueNFTId } from "~/lib/utils";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { OraclePriceType } from "~/lib/reservoir";
 import { useOracleSynced } from "~/hooks/useOracleSynced";
 import { formatBigNum } from "~/lib/numberFormat";
@@ -13,6 +13,7 @@ import { TransactionButton } from "../Buttons/TransactionButton";
 import { getAddress } from "ethers/lib/utils.js";
 import type { ethers } from "ethers";
 import { Button } from "../Buttons/Button";
+import { ApproveNFTButton } from "../ApproveButtons";
 
 type BorrowConnectedProps = {
   collateralContractAddress: string;
@@ -27,6 +28,8 @@ export function BorrowConnected({
   riskLevel,
   amount,
 }: BorrowConnectedProps) {
+  const { paprToken, underlying } = usePaprController();
+
   const clearInProgressLoan = useGlobalStore((s) => s.clear);
   const currentVaults = useGlobalStore((s) => s.currentVaults);
   const refresh = useGlobalStore((s) => s.refreshCurrentVaults);
@@ -54,8 +57,7 @@ export function BorrowConnected({
     clearInProgressLoan,
   ]);
 
-  const { paprToken, underlying } = usePaprController();
-
+  const [collateralApproved, setCollateralApproved] = useState<boolean>(false);
   const depositNFTs = useMemo(() => {
     return tokenIds.map((tokenId) =>
       getUniqueNFTId(collateralContractAddress, tokenId)
@@ -84,6 +86,9 @@ export function BorrowConnected({
     collateralContractAddress,
     OraclePriceType.lower
   );
+  const disabled = useMemo(() => {
+    return !oracleSynced || (!collateralApproved && !usingSafeTransferFrom);
+  }, [oracleSynced, collateralApproved, usingSafeTransferFrom]);
   const { data, write, error } = useVaultWrite({
     writeType: VaultWriteType.BorrowWithSwap,
     collateralContractAddress: collateralContractAddress,
@@ -92,7 +97,7 @@ export function BorrowConnected({
     amount: amount,
     quote: amountBorrowInEth,
     usingSafeTransferFrom,
-    disabled: !oracleSynced,
+    disabled,
     refresh,
   });
 
@@ -100,18 +105,29 @@ export function BorrowConnected({
     <div className="flex flex-col h-full justify-center">
       <BorrowBase />
       <div className="graph-papr flex-auto flex flex-col justify-center items-center">
-        <TransactionButton
-          text={
-            !oracleSynced
-              ? "Waiting for oracle..."
-              : `Borrow ${formattedBorrow}`
-          }
-          theme={`bg-${riskLevel}`}
-          onClick={write!}
-          transactionData={data}
-          disabled={!oracleSynced}
-          error={error?.message}
-        />
+        {!usingSafeTransferFrom && !collateralApproved && (
+          <div className="my-2">
+            <ApproveNFTButton
+              collateralContractAddress={collateralContractAddress}
+              theme={`bg-${riskLevel}`}
+              setApproved={setCollateralApproved}
+            />
+          </div>
+        )}
+        <div className="my-2">
+          <TransactionButton
+            text={
+              !oracleSynced
+                ? "Waiting for oracle..."
+                : `Borrow ${formattedBorrow}`
+            }
+            theme={`bg-${riskLevel}`}
+            onClick={write!}
+            transactionData={data}
+            disabled={disabled}
+            error={error?.message}
+          />
+        </div>
       </div>
     </div>
   );
@@ -123,8 +139,9 @@ export function BorrowUnconnected() {
       <BorrowBase />
       <div className="graph-papr flex-auto flex flex-col justify-center items-center">
         <Button
-          theme="bg-unclickable-grey"
+          theme="bg-black"
           additionalClassNames={["text-[#969696]"]}
+          disabled
         >
           Borrow $$$
         </Button>

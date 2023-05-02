@@ -48,9 +48,9 @@ export function TransactionButton({
   const buttonClassNames = useMemo(() => {
     return [
       status === "confirming" ? "opacity-80" : "",
-      disabled ? ["bg-unclickable-grey", "text-grey"] : "",
+      disabled ? [`${theme}-faint`, "text-[rgba(0,0,0,0.3)]"] : "",
     ].flat();
-  }, [status, disabled]);
+  }, [status, theme, disabled]);
 
   const onClickWithConfirm = useCallback(() => {
     if (!onClick) return;

@@ -5,13 +5,13 @@ export type ButtonBaseTheme =
   | "bg-fine"
   | "bg-risky"
   | "bg-yikes"
-  | "bg-unclickable-grey"
-  | "bg-completed-grey"
-  | "bg-black";
+  | "bg-black"
+  | "bg-completed-grey";
 export type ButtonFaintTheme =
   | "bg-fine-faint"
   | "bg-risky-faint"
-  | "bg-yikes-faint";
+  | "bg-yikes-faint"
+  | "bg-black-faint";
 export type ButtonTheme = ButtonBaseTheme | ButtonFaintTheme;
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
