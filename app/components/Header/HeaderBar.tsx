@@ -67,7 +67,7 @@ export function HeaderBar() {
           tokenIds={inProgressLoan.tokenIds}
           riskLevel={inProgressLoan.riskLevel!} // amount and risk level get updated in lock step
           action="borrow"
-          amountToBorrowOrRepay={inProgressLoan.amount}
+          amount={inProgressLoan.amount}
         />
       </div>
     );

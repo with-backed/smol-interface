@@ -33,7 +33,9 @@ export function PastAuctionWithClaim({ vault }: PastAuctionWithClaimProps) {
     args: [address as `0x${string}`],
   });
 
-  const hasClaimed = useGlobalStore((s) => s.recentActions.hasClaimed);
+  const hasClaimed = useGlobalStore(
+    (s) => s.recentActions[vault.token.id]?.hasClaimed || false
+  );
   const setRecentActions = useGlobalStore((s) => s.setRecentActions);
 
   const quoteForClaimable = usePoolQuote({
@@ -77,7 +79,10 @@ export function PastAuctionWithClaim({ vault }: PastAuctionWithClaimProps) {
     onSuccess: () => {
       setRecentActions((actions) => ({
         ...actions,
-        hasClaimed: true,
+        [vault.token.id]: {
+          hasClaimed: true,
+          hasRepaid: false,
+        },
       }));
     },
   });
@@ -110,42 +115,44 @@ export function PastAuctionWithClaim({ vault }: PastAuctionWithClaimProps) {
           </div>
         </div>
       </div>
-      <div className="py-2 px-6">
-        <p>
-          You waited too long and tokenID {auction.auctionAssetID} was sold at a
-          liquidation auction! The excess has been credited to you in paprMEME,
-          click here to swap it for ETH.
-        </p>
-      </div>
       {!hasClaimed && (
-        <div className="graph-papr flex-auto flex flex-col justify-center items-center">
-          {!paprTokenApproved && (
+        <>
+          <div className="py-4 px-6">
+            <p>
+              You waited too long and tokenID {auction.auctionAssetID} was sold
+              at a liquidation auction! The excess has been credited to you in
+              paprMEME, click here to swap it for ETH.
+            </p>
+          </div>
+          <div className="graph-papr flex-auto flex flex-col justify-center items-center">
+            {!paprTokenApproved && (
+              <div className="my-2">
+                <ApproveTokenButton
+                  token={paprToken}
+                  spender={swapRouterAddress[1]}
+                  theme="bg-black"
+                  tokenApproved={paprTokenApproved}
+                  setTokenApproved={setPaprTokenApproved}
+                />
+              </div>
+            )}
             <div className="my-2">
-              <ApproveTokenButton
-                token={paprToken}
-                spender={swapRouterAddress[1]}
-                theme="bg-black"
-                tokenApproved={paprTokenApproved}
-                setTokenApproved={setPaprTokenApproved}
+              <TransactionButton
+                text={formattedClaimable}
+                theme={"bg-black"}
+                onClick={write!}
+                transactionData={data}
+                disabled={!paprTokenApproved}
+                error={error?.message}
               />
             </div>
-          )}
-          <div className="my-2">
-            <TransactionButton
-              text={formattedClaimable}
-              theme={"bg-black"}
-              onClick={write!}
-              transactionData={data}
-              disabled={!paprTokenApproved}
-              error={error?.message}
-            />
           </div>
-        </div>
+        </>
       )}
       {hasClaimed && (
-        <div className="my-8">
+        <div className="my-8 flex flex-col items-center">
           <img src="/5-RIP-dance.svg" alt="rip dance" />
-          <p className="my-2">sorry for ur loss</p>
+          <p className="my-2 text-center">sorry for ur loss</p>
         </div>
       )}
     </div>

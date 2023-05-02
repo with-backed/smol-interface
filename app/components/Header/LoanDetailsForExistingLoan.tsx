@@ -56,19 +56,31 @@ export function LoanDetailsForExistingLoan({
         tokenIds={tokenIdsForDetails}
         riskLevel={vault.riskLevel}
         action="liquidating"
-        amountToBorrowOrRepay={ethers.BigNumber.from(vault.debt)}
+        amount={ethers.BigNumber.from(vault.debt)}
       />
     );
   }
 
-  if (showPastAuctionWithRepay || showPastAuctionWithClaim) {
+  if (showPastAuctionWithRepay) {
     return (
       <LoanDetails
         collectionAddress={vault.token.id}
         tokenIds={tokenIdsForDetails}
         riskLevel={vault.riskLevel}
         action="liquidated"
-        amountToBorrowOrRepay={ethers.BigNumber.from(vault.debt)}
+        amount={ethers.BigNumber.from(vault.debt)}
+      />
+    );
+  }
+
+  if (showPastAuctionWithClaim) {
+    return (
+      <LoanDetails
+        collectionAddress={vault.token.id}
+        tokenIds={tokenIdsForDetails}
+        riskLevel={vault.riskLevel}
+        action="claim"
+        amount={ethers.BigNumber.from(0)}
       />
     );
   }
@@ -79,7 +91,7 @@ export function LoanDetailsForExistingLoan({
       tokenIds={tokenIdsForDetails}
       riskLevel={vault.riskLevel}
       action="repay"
-      amountToBorrowOrRepay={ethers.BigNumber.from(vault.debt)}
+      amount={ethers.BigNumber.from(vault.debt)}
     />
   );
 }

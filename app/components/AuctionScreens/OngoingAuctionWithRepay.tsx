@@ -45,14 +45,16 @@ export function OngoingAuctionWithRepay({
 
   const loanDetails = useLoan(vault);
 
-  const hasRepaidAuction = useGlobalStore((s) => s.recentActions.hasRepaid);
-  const setRecentActions = useGlobalStore((s) => s.setRecentActions);
-  const setHasRepaidAuction = useCallback(
-    (val: boolean) => {
-      setRecentActions((actions) => ({ ...actions, hasRepaid: val }));
-    },
-    [setRecentActions]
+  const hasRepaidAuction = useGlobalStore(
+    (s) => s.recentActions[vault.token.id]?.hasRepaid || false
   );
+  const setRecentActions = useGlobalStore((s) => s.setRecentActions);
+  const setHasRepaidAuction = useCallback(() => {
+    setRecentActions((actions) => ({
+      ...actions,
+      [vault.token.id]: { hasRepaid: true, hasClaimed: false },
+    }));
+  }, [vault.token.id, setRecentActions]);
 
   return (
     <div className="h-full w-full flex flex-col">
@@ -95,7 +97,7 @@ export function OngoingAuctionWithRepay({
           <Repay
             vault={vault}
             loanDetails={loanDetails}
-            refresh={() => setHasRepaidAuction(true)}
+            refresh={() => setHasRepaidAuction()}
             disabled={!vaultHasCollateral}
           />
         </>

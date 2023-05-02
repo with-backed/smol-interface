@@ -2,18 +2,24 @@ import type { ethers } from "ethers";
 import { useMemo } from "react";
 import { usePaprController } from "~/hooks/usePaprController";
 import { usePoolQuote } from "~/hooks/usePoolQuote";
-import { RiskLevel, useGlobalStore } from "~/lib/globalStore";
+import type { RiskLevel } from "~/lib/globalStore";
+import { useGlobalStore } from "~/lib/globalStore";
 import { formatBigNum } from "~/lib/numberFormat";
 import { NFTs } from "./NFTs";
 
-type LoanDetailsAction = "borrow" | "repay" | "liquidating" | "liquidated";
+type LoanDetailsAction =
+  | "borrow"
+  | "repay"
+  | "liquidating"
+  | "liquidated"
+  | "claim";
 
 type LoanDetailsBarProps = {
   collectionAddress: string;
   tokenIds: string[];
   riskLevel: RiskLevel;
   action: LoanDetailsAction;
-  amountToBorrowOrRepay: ethers.BigNumber | null;
+  amount: ethers.BigNumber | null;
 };
 
 export function LoanDetails({
@@ -21,28 +27,35 @@ export function LoanDetails({
   tokenIds,
   riskLevel,
   action,
-  amountToBorrowOrRepay,
+  amount,
 }: LoanDetailsBarProps) {
   const { underlying, paprToken } = usePaprController();
-  const hasRepaid = useGlobalStore((s) => s.recentActions.hasRepaid);
-  const hasClaimed = useGlobalStore((s) => s.recentActions.hasClaimed);
+  const hasRepaid = useGlobalStore(
+    (s) => s.recentActions[collectionAddress]?.hasRepaid || false
+  );
+  const hasClaimed = useGlobalStore(
+    (s) => s.recentActions[collectionAddress]?.hasClaimed || false
+  );
 
   const isLiquidationAction = useMemo(() => {
-    return action === "liquidating" || action === "liquidated";
+    return (
+      action === "liquidating" || action === "liquidated" || action === "claim"
+    );
   }, [action]);
   const isBorrowing = useMemo(() => action === "borrow", [action]);
+
   const backgroundColor = useMemo(() => {
-    if (hasRepaid || hasClaimed) return "bg-medium-gray";
+    if (hasRepaid || hasClaimed) return "bg-medium-grey";
     if (isLiquidationAction) return "bg-liquidate-red";
     return `bg-${riskLevel}`;
   }, [hasRepaid, hasClaimed, isLiquidationAction, riskLevel]);
 
   const quote = usePoolQuote({
-    amount: amountToBorrowOrRepay,
+    amount,
     inputToken: isBorrowing ? paprToken.id : underlying.id,
     outputToken: isBorrowing ? underlying.id : paprToken.id,
     tradeType: isBorrowing ? "exactIn" : "exactOut",
-    skip: !amountToBorrowOrRepay || amountToBorrowOrRepay.isZero(),
+    skip: !amount || amount.isZero(),
   });
 
   const formattedAmount = useMemo(() => {
@@ -121,6 +134,14 @@ function RightText({
     return (
       <div className="mr-2">
         <p>Repaid!</p>
+      </div>
+    );
+  }
+
+  if (action === "claim") {
+    return (
+      <div className="mr-2">
+        <p>Claim Excess!</p>
       </div>
     );
   }
