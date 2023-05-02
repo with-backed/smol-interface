@@ -7,8 +7,7 @@ type PastAuctionWithRepayProps = {
 };
 
 export function PastAuctionWithRepay({ vault }: PastAuctionWithRepayProps) {
-  const { auction, loanDetails, formattedInterest, formattedProceeds } =
-    useAuctionDetails(vault);
+  const { auction, loanDetails, formattedProceeds } = useAuctionDetails(vault);
 
   return (
     <div className="h-full w-full flex flex-col">
@@ -19,14 +18,6 @@ export function PastAuctionWithRepay({ vault }: PastAuctionWithRepayProps) {
           </div>
           <div>
             <p>{loanDetails.formattedBorrowed}</p>
-          </div>
-        </div>
-        <div className="flex flex-row justify-between py-1">
-          <div>
-            <p>Cost:</p>
-          </div>
-          <div>
-            <p>{formattedInterest}</p>
           </div>
         </div>
         <div className="flex flex-row justify-between py-1">
@@ -42,7 +33,7 @@ export function PastAuctionWithRepay({ vault }: PastAuctionWithRepayProps) {
             <p>Total Repayment:</p>
           </div>
           <div>
-            <p>{loanDetails.formattedTotalRepayment}</p>
+            <p>{loanDetails.formattedTotalOwed}</p>
           </div>
         </div>
       </div>

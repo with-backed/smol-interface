@@ -2,10 +2,7 @@ import { ethers } from "ethers";
 import { SubgraphVault } from "~/hooks/useVault";
 
 export function isCurrentAuctionWithRepay(vault: NonNullable<SubgraphVault>) {
-  return (
-    vault.ongoingAuctions.length > 0 &&
-    !ethers.BigNumber.from(vault.debt).isZero()
-  );
+  return vault.ongoingAuctions.length > 0;
 }
 
 export function isPastAuctionWithRepay(vault: NonNullable<SubgraphVault>) {

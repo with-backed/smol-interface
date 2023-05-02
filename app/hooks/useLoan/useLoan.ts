@@ -51,13 +51,15 @@ const mostRecentRepaymentByVaultDocument = graphql(`
 export type LoanDetails = {
   borrowedPapr: ethers.BigNumber | null;
   borrowedUnderlying: ethers.BigNumber | null;
-  vaultDebt: ethers.BigNumber | null; // different from borrowedPapr in the case of an auction
+  vaultDebt: ethers.BigNumber; // different from borrowedPapr in the case of an auction
   formattedBorrowed: string;
   interest: ethers.BigNumber | null;
   formattedInterest: string;
   repaymentQuote: ethers.BigNumber | null;
-  totalRepayment: ethers.BigNumber | null;
-  formattedTotalRepayment: string;
+  totalOwed: ethers.BigNumber | null;
+  formattedTotalOwed: string;
+  repaid: ethers.BigNumber | null;
+  formattedRepaid: string;
   costPercentage: number | null;
   formattedCostPercentage: string;
   numDays: number | null;
@@ -114,7 +116,12 @@ export function useLoan(vault: NonNullable<SubgraphVault>): LoanDetails {
     return amountOut.sub(calculateSwapFee(amountOut));
   }, [recentLoanActivity]);
 
-  const totalRepaymentQuote = usePoolQuote({
+  const formattedBorrowed = useMemo(() => {
+    if (!borrowedFromSwap) return "...";
+    return formatBigNum(borrowedFromSwap, underlying.decimals) + " WETH";
+  }, [borrowedFromSwap, underlying.decimals]);
+
+  const repaymentQuote = usePoolQuote({
     amount: vaultDebt,
     inputToken: underlying.id,
     outputToken: paprToken.id,
@@ -122,21 +129,41 @@ export function useLoan(vault: NonNullable<SubgraphVault>): LoanDetails {
     skip: !borrowedFromSwap || loanRepaid, // save RPC call and do not fetch quote if loan is repaid
   });
 
-  const totalRepayment = useMemo(() => {
-    if (loanRepaid) {
-      if (!recentRepaymentActivity) return null;
-      const amountIn = ethers.BigNumber.from(recentRepaymentActivity.amountIn);
-      return amountIn.add(calculateSwapFee(amountIn));
-    }
+  const totalOwed = useMemo(() => {
+    if (loanRepaid) return ethers.BigNumber.from(0);
+    if (!repaymentQuote) return null;
+    return repaymentQuote.add(calculateSwapFee(repaymentQuote));
+  }, [repaymentQuote, loanRepaid]);
 
-    if (!totalRepaymentQuote) return null;
-    return totalRepaymentQuote.add(calculateSwapFee(totalRepaymentQuote));
-  }, [totalRepaymentQuote, loanRepaid, recentRepaymentActivity]);
+  const formattedTotalOwed = useMemo(() => {
+    if (!totalOwed) return "...";
+    return formatBigNum(totalOwed, underlying.decimals) + " WETH";
+  }, [totalOwed, underlying.decimals]);
+
+  const repaid = useMemo(() => {
+    if (!loanRepaid || !recentRepaymentActivity) return null;
+    const amountIn = ethers.BigNumber.from(recentRepaymentActivity.amountIn);
+    return amountIn.add(calculateSwapFee(amountIn));
+  }, [recentRepaymentActivity, loanRepaid]);
+
+  const formattedRepaid = useMemo(() => {
+    if (!repaid) return "...";
+    return formatBigNum(repaid, underlying.decimals) + " WETH";
+  }, [repaid, underlying.decimals]);
+
+  const repaymentForInterest = useMemo(() => {
+    return repaid || totalOwed;
+  }, [repaid, totalOwed]);
 
   const interest = useMemo(() => {
-    if (!borrowedFromSwap || !totalRepayment) return null;
-    return totalRepayment.sub(borrowedFromSwap);
-  }, [borrowedFromSwap, totalRepayment]);
+    if (!borrowedFromSwap || !repaymentForInterest) return null;
+    return repaymentForInterest.sub(borrowedFromSwap);
+  }, [borrowedFromSwap, repaymentForInterest]);
+
+  const formattedInterest = useMemo(() => {
+    if (!interest) return "...";
+    return formatBigNum(interest, underlying.decimals) + " WETH";
+  }, [interest, underlying.decimals]);
 
   const loanDuration = useMemo(() => {
     if (loanRepaid) {
@@ -168,21 +195,6 @@ export function useLoan(vault: NonNullable<SubgraphVault>): LoanDetails {
     return interestNum / principalNum;
   }, [interest, borrowedFromSwap, underlying.decimals]);
 
-  const formattedBorrowed = useMemo(() => {
-    if (!borrowedFromSwap) return "...";
-    return formatBigNum(borrowedFromSwap, underlying.decimals) + " WETH";
-  }, [borrowedFromSwap, underlying.decimals]);
-
-  const formattedInterest = useMemo(() => {
-    if (!interest) return "...";
-    return formatBigNum(interest, underlying.decimals) + " WETH";
-  }, [interest, underlying.decimals]);
-
-  const formattedTotalRepayment = useMemo(() => {
-    if (!totalRepayment) return "...";
-    return formatBigNum(totalRepayment, underlying.decimals) + " WETH";
-  }, [totalRepayment, underlying.decimals]);
-
   const formattedCostPercentage = useMemo(() => {
     if (!costPercentage) return "...";
     return formatPercent(costPercentage);
@@ -199,9 +211,11 @@ export function useLoan(vault: NonNullable<SubgraphVault>): LoanDetails {
     formattedBorrowed,
     interest,
     formattedInterest,
-    repaymentQuote: totalRepaymentQuote,
-    totalRepayment,
-    formattedTotalRepayment,
+    repaymentQuote,
+    totalOwed,
+    formattedTotalOwed,
+    repaid,
+    formattedRepaid,
     costPercentage,
     formattedCostPercentage,
     numDays,

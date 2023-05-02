@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { useGlobalStore } from "~/lib/globalStore";
 import { useLoan } from "~/hooks/useLoan";
 import { Repay } from "../Repay";
 import type { VaultWithRiskLevel } from "~/lib/globalStore";
@@ -44,6 +45,17 @@ export function OngoingAuctionWithRepay({
 
   const loanDetails = useLoan(vault);
 
+  const hasRepaidAuction = useGlobalStore(
+    (s) => s.recentActions[vault.token.id]?.hasRepaid || false
+  );
+  const setRecentActions = useGlobalStore((s) => s.setRecentActions);
+  const setHasRepaidAuction = useCallback(() => {
+    setRecentActions((actions) => ({
+      ...actions,
+      [vault.token.id]: { hasRepaid: true, hasClaimed: false },
+    }));
+  }, [vault.token.id, setRecentActions]);
+
   return (
     <div className="h-full w-full flex flex-col">
       <div className="flex-initial flex flex-col px-6 py-4">
@@ -57,35 +69,36 @@ export function OngoingAuctionWithRepay({
         </div>
         <div className="flex flex-row justify-between py-1">
           <div>
-            <p>Cost:</p>
+            <p>Total {hasRepaidAuction ? "Repaid" : "Owed"}:</p>
           </div>
           <div>
-            <p>{loanDetails.formattedInterest}</p>
-          </div>
-        </div>
-        <div className="flex flex-row justify-between py-1">
-          <div>
-            <p>Total Owed:</p>
-          </div>
-          <div>
-            <p>{loanDetails.formattedTotalRepayment}</p>
+            <p>{loanDetails.formattedTotalOwed}</p>
           </div>
         </div>
       </div>
-      <div className="px-6 py-1">
-        <p className="leading-loose">
-          Uh oh! {pastAuctionedString}
-          tokenID #{auction.auctionAssetID} is being sold via liquidation
-          auction! The proceeds will pay down debt and you will receive any
-          excess.
-        </p>
-      </div>
-      <Repay
-        vault={vault}
-        loanDetails={loanDetails}
-        refresh={() => null}
-        disabled={!vaultHasCollateral}
-      />
+      {!hasRepaidAuction && (
+        <>
+          <div className="px-6 py-1">
+            <p className="leading-loose">
+              Uh oh! {pastAuctionedString}
+              tokenID #{auction.auctionAssetID} is being sold via liquidation
+              auction! The proceeds will pay down debt and you will receive any
+              excess.
+            </p>
+          </div>
+          <Repay
+            vault={vault}
+            loanDetails={loanDetails}
+            refresh={() => setHasRepaidAuction()}
+            disabled={!vaultHasCollateral}
+          />
+        </>
+      )}
+      {hasRepaidAuction && (
+        <div className="my-16">
+          <img src="/u-came-back.png" />
+        </div>
+      )}
     </div>
   );
 }
