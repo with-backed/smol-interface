@@ -45,10 +45,6 @@ export function TransactionButton({
     if (error?.startsWith("User rejected request")) setStatus("ready");
   }, [error]);
 
-  const buttonTheme = useMemo(() => {
-    if (disabled) return "bg-unclickable-grey";
-    return theme;
-  }, [disabled, theme]);
   const buttonClassNames = useMemo(() => {
     return [
       status === "confirming" ? "opacity-80" : "",
@@ -91,7 +87,7 @@ export function TransactionButton({
       ""
     );
     return (
-      <Button type={type} theme={buttonTheme}>
+      <Button type={type} theme={theme}>
         <span className="inline-block">{text}</span>
         <span className="inline-block text-xs">
           {message} {transactionLink}
@@ -105,7 +101,7 @@ export function TransactionButton({
       onClick={onClickWithConfirm}
       type={type}
       disabled={disabled || status !== "ready"}
-      theme={buttonTheme}
+      theme={theme}
       additionalClassNames={buttonClassNames}
       {...props}
     >
