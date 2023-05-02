@@ -23,7 +23,7 @@ body {
   }
 
   .scalable {
-    scale: 0.7;
+    max-height: 70%;
   }
 
   .explainer {
