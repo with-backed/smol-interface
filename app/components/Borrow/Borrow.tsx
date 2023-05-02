@@ -87,8 +87,8 @@ export function BorrowConnected({
     OraclePriceType.lower
   );
   const disabled = useMemo(() => {
-    return !oracleSynced || !collateralApproved;
-  }, [oracleSynced, collateralApproved]);
+    return !oracleSynced || (!collateralApproved && !usingSafeTransferFrom);
+  }, [oracleSynced, collateralApproved, usingSafeTransferFrom]);
   const { data, write, error } = useVaultWrite({
     writeType: VaultWriteType.BorrowWithSwap,
     collateralContractAddress: collateralContractAddress,
