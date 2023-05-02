@@ -48,7 +48,7 @@ export function TransactionButton({
   const buttonClassNames = useMemo(() => {
     return [
       status === "confirming" ? "opacity-80" : "",
-      disabled ? `${theme}-faint` : "",
+      disabled ? [`${theme}-faint`, "text-opacity-30"] : "",
     ].flat();
   }, [status, theme, disabled]);
 
