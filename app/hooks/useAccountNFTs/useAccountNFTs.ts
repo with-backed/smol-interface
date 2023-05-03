@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useConfig } from "../useConfig";
 
 export type AccountNFTsResponse = {
   address: string;
@@ -9,6 +10,7 @@ export const useAccountNFTs = (
   address: string | undefined,
   collections: string[] | undefined
 ) => {
+  const { centerKey } = useConfig();
   const [nftsLoading, setNftsLoading] = useState<boolean>(true);
   const [userCollectionNFTs, setUserCollectionNFTs] = useState<
     AccountNFTsResponse[]
@@ -22,7 +24,7 @@ export const useAccountNFTs = (
         )}&limit=100`,
         {
           headers: {
-            "x-API-Key": window.ENV.CENTER_KEY,
+            "x-API-Key": centerKey,
           },
         }
       );
@@ -30,7 +32,7 @@ export const useAccountNFTs = (
       setUserCollectionNFTs(json.items);
       setNftsLoading(false);
     }
-  }, [address, collections]);
+  }, [address, collections, centerKey]);
 
   const reexecuteQuery = useCallback(() => {
     setNftsLoading(true);
