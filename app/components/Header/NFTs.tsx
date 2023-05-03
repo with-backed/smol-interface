@@ -8,9 +8,9 @@ type NFTsProps = {
 
 export function NFTs({ collectionAddress, tokenIds }: NFTsProps) {
   return (
-    <div className="w-7 h-7">
-      <div className="w-full h-full overflow-hidden rounded-lg">
-        <Marquee>
+    <div className="w-7 h-7 overflow-hidden rounded-lg">
+      <div className="w-full h-full">
+        <Marquee className="marquee">
           {tokenIds.map((tokenId) => (
             <Asset
               key={tokenId}
