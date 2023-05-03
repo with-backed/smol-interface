@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
-import { LoanDetails } from "~/hooks/useLoan/useLoan";
+import type { LoanDetails } from "~/hooks/useLoan/useLoan";
 import { useOracleSynced } from "~/hooks/useOracleSynced";
 import { useVaultWrite } from "~/hooks/useVaultWrite";
 import { VaultWriteType } from "~/hooks/useVaultWrite/helpers";
-import { VaultWithRiskLevel } from "~/lib/globalStore";
+import type { VaultWithRiskLevel } from "~/lib/globalStore";
 import { OraclePriceType } from "~/lib/reservoir";
 import { ApproveTokenButton } from "../ApproveButtons";
 import { usePaprController } from "~/hooks/usePaprController";

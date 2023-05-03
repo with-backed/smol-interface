@@ -37,9 +37,10 @@ export function ApproveNFTButton({
 
   useEffect(() => {
     if (isApproved === undefined) return;
+    setApproved(isApproved);
     setAlreadyApproved(isApproved);
     setApprovedLoading(false);
-  }, [isApproved]);
+  }, [isApproved, setApproved]);
 
   const symbol = useNFTSymbol(collateralContractAddress);
 

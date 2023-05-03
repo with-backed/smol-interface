@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { useAuctionDetails } from "~/hooks/useAuctionDetails";
 import { usePaprController } from "~/hooks/usePaprController";
 import type { VaultWithRiskLevel } from "~/lib/globalStore";
 import { useGlobalStore } from "~/lib/globalStore";
@@ -18,14 +17,22 @@ import { usePoolQuote } from "~/hooks/usePoolQuote";
 import { ethers } from "ethers";
 import { getCurrentUnixTime } from "~/lib/duration";
 import { FEE_TIER } from "~/lib/constants";
+import { useLoan } from "~/hooks/useLoan";
 
-type PastAuctionWithClaimProps = {
+type AuctionWithClaimProps = {
   vault: NonNullable<VaultWithRiskLevel>;
 };
-export function PastAuctionWithClaim({ vault }: PastAuctionWithClaimProps) {
+export function AuctionWithClaim({ vault }: AuctionWithClaimProps) {
   const { address } = useAccount();
   const { paprToken, underlying } = usePaprController();
-  const [paprTokenApproved, setPaprTokenApproved] = useState(false);
+
+  const loanDetails = useLoan(vault);
+  const mostRecentAuction = useMemo(() => {
+    return vault.pastAuctions.sort(
+      (a, b) => b.end!.timestamp - a.end!.timestamp
+    )[0];
+  }, [vault.pastAuctions]);
+
   const { data: claimableAmount } = useContractRead({
     address: paprToken.id as `0x${string}`,
     abi: erc20ABI,
@@ -33,6 +40,7 @@ export function PastAuctionWithClaim({ vault }: PastAuctionWithClaimProps) {
     args: [address as `0x${string}`],
   });
 
+  const [paprTokenApproved, setPaprTokenApproved] = useState(false);
   const hasClaimed = useGlobalStore(
     (s) => s.recentActions[vault.token.id]?.hasClaimed || false
   );
@@ -52,7 +60,6 @@ export function PastAuctionWithClaim({ vault }: PastAuctionWithClaimProps) {
       underlying.symbol
     }`;
   }, [quoteForClaimable, underlying.decimals, underlying.symbol]);
-  const { auction, loanDetails } = useAuctionDetails(vault);
 
   const { config } = usePrepareContractWrite({
     address:
@@ -110,9 +117,9 @@ export function PastAuctionWithClaim({ vault }: PastAuctionWithClaimProps) {
         <>
           <div className="py-4 px-6">
             <p>
-              You waited too long and tokenID {auction.auctionAssetID} was sold
-              at a liquidation auction! The excess has been credited to you in
-              paprMEME, click here to swap it for ETH.
+              You waited too long and tokenID {mostRecentAuction.auctionAssetID}{" "}
+              was sold at a liquidation auction! The excess has been credited to
+              you in paprMEME, click here to swap it for ETH.
             </p>
           </div>
           <div className="graph-papr flex-auto flex flex-col justify-center items-center">
