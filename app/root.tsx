@@ -31,7 +31,7 @@ import type { PaprController } from "./hooks/usePaprController";
 import { ControllerContextProvider } from "./hooks/usePaprController";
 import tailwindStyles from "~/tailwind.css";
 import customStyles from "~/styles/index.css";
-import { Header } from "~/components/Header";
+import { Header, HeaderBar } from "~/components/Header";
 import { Footer } from "~/components/Footer";
 import { OracleInfoProvider } from "./hooks/useOracleInfo";
 import { useMemo } from "react";
@@ -158,7 +158,8 @@ export default function App() {
     return (
       <>
         <Header />
-        <div className="wrapper relative">
+        <div className="wrapper relative flex flex-col">
+          <HeaderBar />
           <Outlet />
         </div>
 

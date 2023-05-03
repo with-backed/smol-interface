@@ -15,7 +15,7 @@ import { getAddress } from "ethers/lib/utils";
 import { Button } from "reakit/Button";
 import { useGlobalStore } from "~/lib/globalStore";
 import { HeaderState } from "./HeaderState";
-import { HeaderBar, ExistingLoans } from "./";
+import { ExistingLoans } from "./";
 import { useMaxDebt } from "~/hooks/useMaxDebt";
 import { OraclePriceType } from "~/lib/reservoir";
 import { usePoolQuote } from "~/hooks/usePoolQuote";
@@ -61,7 +61,6 @@ export function Header() {
         <ConnectWallet />
         {isConnected && <DropdownButton {...disclosure} />}
       </div>
-      <HeaderBar />
       <DisclosureContent
         className={`absolute ${
           showHowMuchBorrow ? "top-24" : "top-12"
@@ -248,9 +247,9 @@ function SelectCollectionHeaderContent() {
     <>
       <NewLoan />
       {isConnected && (
-        <p className="self-start">
-          Select collection (max loan)
-          <ul className="list-[square] pl-6">
+        <>
+          <p className="self-start">Select collection (max loan)</p>
+          <ul className="list-[square] pl-6 self-start">
             {uniqueCollections.map((c) => (
               <SelectCollectionLineItem
                 key={c}
@@ -267,7 +266,7 @@ function SelectCollectionHeaderContent() {
               />
             ))}
           </ul>
-        </p>
+        </>
       )}
       <CancelButton />
     </>
