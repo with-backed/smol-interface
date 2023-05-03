@@ -1,5 +1,5 @@
-import { useAsset } from "@center-inc/react";
-import { useMemo } from "react";
+import { Asset } from "@center-inc/react";
+import Marquee from "react-fast-marquee";
 
 type NFTsProps = {
   collectionAddress: string;
@@ -7,19 +7,18 @@ type NFTsProps = {
 };
 
 export function NFTs({ collectionAddress, tokenIds }: NFTsProps) {
-  const assets = useAsset({
-    address: collectionAddress,
-    tokenId: tokenIds[0],
-  });
-  const assetUrl = useMemo(() => {
-    return assets[0].mediaUrl;
-  }, [assets]);
-
   return (
     <div className="w-7 h-7">
-      <div className="w-full h-full">
-        {!assetUrl && <span>...</span>}
-        {assetUrl && <img src={assetUrl} alt="nft" className="rounded-lg" />}
+      <div className="w-full h-full overflow-hidden rounded-lg">
+        <Marquee>
+          {tokenIds.map((tokenId) => (
+            <Asset
+              key={tokenId}
+              address={collectionAddress}
+              tokenId={tokenId}
+            />
+          ))}
+        </Marquee>
       </div>
     </div>
   );
