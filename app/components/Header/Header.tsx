@@ -90,17 +90,9 @@ export function Header() {
 type DropdownButtonProps = DisclosureStateReturn;
 
 function DropdownButton({ visible, ...props }: DropdownButtonProps) {
-  const clear = useGlobalStore((s) => s.clear);
-
-  const handleClick = useCallback(() => {
-    if (visible) {
-      clear();
-    }
-  }, [visible, clear]);
-
   return (
     <Disclosure visible={visible} {...props}>
-      <Caret orientation={visible ? "up" : "down"} onClick={handleClick} />
+      <Caret orientation={visible ? "up" : "down"} />
     </Disclosure>
   );
 }
@@ -181,7 +173,6 @@ function NoEligibleNFTsHeaderContent() {
   const { allowedCollateral } = usePaprController();
   return (
     <>
-      <NewLoan />
       <p>
         No eligible NFTs! come back with 1 of these{" "}
         <Link to="https://github.com/with-backed/paprMEME-info">
@@ -245,7 +236,6 @@ function SelectCollectionHeaderContent() {
 
   return (
     <>
-      <NewLoan />
       {isConnected && (
         <>
           <p className="self-start">Select collection (max loan)</p>
@@ -346,23 +336,21 @@ function SelectNFTsHeaderContent() {
   const maxDebtForCollection = useGlobalStore(
     (s) => s.inProgressLoan?.maxDebtForCollection
   );
-  const maxDebtForChosen = useGlobalStore(
-    (s) => s.inProgressLoan?.maxDebtForChosen || null
-  );
-  const maxDebtChosenInETH = usePoolQuote({
-    amount: maxDebtForChosen,
+
+  const maxDebtInETH = usePoolQuote({
+    amount: maxDebtForCollection || null,
     inputToken: paprToken.id,
     outputToken: underlying.id,
     tradeType: "exactIn",
-    skip: !maxDebtForChosen,
+    skip: !maxDebtForCollection,
   });
 
   const formattedMaxDebt = useMemo(() => {
-    if (!maxDebtChosenInETH) return "...";
-    return `${formatBigNum(maxDebtChosenInETH, underlying.decimals, 3)} ${
+    if (!maxDebtInETH) return "...";
+    return `${formatBigNum(maxDebtInETH, underlying.decimals, 3)} ${
       underlying.symbol
     }`;
-  }, [maxDebtChosenInETH, underlying.decimals, underlying.symbol]);
+  }, [maxDebtInETH, underlying.decimals, underlying.symbol]);
 
   const setInProgressLoan = useGlobalStore((s) => s.setInProgressLoan);
   const { address } = useAccount();
@@ -441,7 +429,6 @@ function SelectNFTsHeaderContent() {
 
   return (
     <>
-      <NewLoan />
       <p>Select items (Max: {formattedMaxDebt})</p>
       <div className="flex flex-wrap gap-2">
         {userCollectionNFTs.map(({ address, tokenId }, i) => (
@@ -458,7 +445,10 @@ function SelectNFTsHeaderContent() {
           </Button>
         ))}
       </div>
-      <TextButton onClick={handleDoneClick}>Done</TextButton>
+      <div className="w-2/5 flex flex-row justify-between items-center">
+        <CancelButton />
+        <TextButton onClick={handleDoneClick}>Done</TextButton>
+      </div>
     </>
   );
 }
@@ -527,5 +517,5 @@ function CancelButton() {
       toggle();
     }
   }, [isConnected, toggle, clear]);
-  return <TextButton onClick={handleClick}>cancel</TextButton>;
+  return <TextButton onClick={handleClick}>Cancel</TextButton>;
 }
