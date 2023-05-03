@@ -40,12 +40,17 @@ export default function HowMuchBorrow() {
   );
 
   return (
-    <div className="flex h-full">
-      <RektScale riskLevel={riskLevel || loggedOutRiskLevel} />
-      <div className="flex flex-col items-center w-full grow-0 pt-6 h-2/4">
-        <RiskRadio riskLevel={riskLevel} handleChange={setSelectedBorrow} />
-        <FrogCooker riskLevel={riskLevel || loggedOutRiskLevel} />
+    <>
+      <div className="flex h-full">
+        <RektScale riskLevel={riskLevel || loggedOutRiskLevel} />
+        <div className="flex flex-col items-center w-full grow-0 pt-6 h-2/4">
+          <FrogCooker riskLevel={riskLevel || loggedOutRiskLevel} />
+        </div>
       </div>
-    </div>
+      <div className="flex flex-col py-2 items-center">
+        <span>How much to borrow?</span>
+        <RiskRadio riskLevel={riskLevel} handleChange={setSelectedBorrow} />
+      </div>
+    </>
   );
 }
