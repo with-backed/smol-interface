@@ -2,16 +2,13 @@ import { ethers } from "ethers";
 import { useMemo } from "react";
 import { erc20ABI, useAccount, useContractRead } from "wagmi";
 import {
-  OngoingAuctionWithRepay,
-  PastAuctionWithClaim,
+  AuctionWithRepay,
+  AuctionWithClaim,
 } from "~/components/AuctionScreens";
-import { PastAuctionWithRepay } from "~/components/AuctionScreens";
 import { BorrowConnected, BorrowUnconnected } from "~/components/Borrow";
 import { LoanSummaryContent } from "~/components/LoanSummary";
 import { usePaprController } from "~/hooks/usePaprController";
-import { isPastAuctionWithClaim } from "~/lib/auctionStates";
-import { isPastAuctionWithRepay } from "~/lib/auctionStates";
-import { isCurrentAuctionWithRepay } from "~/lib/auctionStates";
+import { isAuctionWithRepay, isAuctionWithClaim } from "~/lib/auctionStates";
 import { inProgressLoanFilledOut, useGlobalStore } from "~/lib/globalStore";
 
 export default function Five() {
@@ -28,20 +25,14 @@ export default function Five() {
     args: [address as `0x${string}`],
   });
 
-  const showCurrentAuctionWithRepay = useMemo(() => {
+  const showAuctionWithRepay = useMemo(() => {
     if (!selectedVault) return false;
-    return isCurrentAuctionWithRepay(selectedVault);
+    return isAuctionWithRepay(selectedVault);
   }, [selectedVault]);
 
-  const showPastAuctionWithRepay = useMemo(() => {
-    if (!selectedVault) return false;
-
-    return isPastAuctionWithRepay(selectedVault);
-  }, [selectedVault]);
-
-  const showPastAuctionWithClaim = useMemo(() => {
+  const showAuctionWithClaim = useMemo(() => {
     if (!selectedVault || !paprBalance) return false;
-    return isPastAuctionWithClaim(selectedVault, paprBalance);
+    return isAuctionWithClaim(selectedVault, paprBalance);
   }, [selectedVault, paprBalance]);
 
   if (!isConnected) {
@@ -66,16 +57,12 @@ export default function Five() {
   if (selectedVault) {
     if (!paprBalance) return <></>; // papr balance data loading
 
-    if (showCurrentAuctionWithRepay) {
-      return <OngoingAuctionWithRepay vault={selectedVault} />;
+    if (showAuctionWithRepay) {
+      return <AuctionWithRepay vault={selectedVault} />;
     }
 
-    if (showPastAuctionWithRepay) {
-      return <PastAuctionWithRepay vault={selectedVault} />;
-    }
-
-    if (showPastAuctionWithClaim) {
-      return <PastAuctionWithClaim vault={selectedVault} />;
+    if (showAuctionWithClaim) {
+      return <AuctionWithClaim vault={selectedVault} />;
     }
 
     return <LoanSummaryContent collateralAddress={selectedVault.token.id} />;

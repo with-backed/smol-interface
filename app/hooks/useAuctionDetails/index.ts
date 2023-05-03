@@ -1,1 +1,0 @@
-export { useAuctionDetails } from "./useAuctionDetails";

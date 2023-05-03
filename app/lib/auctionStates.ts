@@ -1,26 +1,24 @@
 import { ethers } from "ethers";
-import { SubgraphVault } from "~/hooks/useVault";
+import type { SubgraphVault } from "~/hooks/useVault";
 
-export function isCurrentAuctionWithRepay(vault: NonNullable<SubgraphVault>) {
-  return vault.ongoingAuctions.length > 0;
-}
+export function isAuctionWithRepay(vault: NonNullable<SubgraphVault>) {
+  let latestBorrowBeforeLatestAuction = false;
+  if (vault.pastAuctions.length > 0) {
+    const latestAuctionEndTime = vault.pastAuctions.sort(
+      (a, b) => b.end!.timestamp - a.end!.timestamp
+    )[0].end!.timestamp;
 
-export function isPastAuctionWithRepay(vault: NonNullable<SubgraphVault>) {
-  if (vault.pastAuctions.length === 0) return false;
-
-  const latestAuctionEndTime = vault.pastAuctions.sort(
-    (a, b) => b.end!.timestamp - a.end!.timestamp
-  )[0].end!.timestamp;
-
-  const latestBorrowBeforeAuction =
-    vault.latestIncreaseDebt < latestAuctionEndTime;
+    latestBorrowBeforeLatestAuction =
+      vault.latestIncreaseDebt < latestAuctionEndTime;
+  }
 
   return (
-    latestBorrowBeforeAuction && !ethers.BigNumber.from(vault.debt).isZero()
+    (vault.ongoingAuctions.length > 0 || latestBorrowBeforeLatestAuction) &&
+    !ethers.BigNumber.from(vault.debt).isZero()
   );
 }
 
-export function isPastAuctionWithClaim(
+export function isAuctionWithClaim(
   vault: NonNullable<SubgraphVault>,
   paprBalance: ethers.BigNumber
 ) {

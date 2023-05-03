@@ -1,11 +1,7 @@
 import { ethers } from "ethers";
-import { VaultWithRiskLevel } from "~/lib/globalStore";
+import type { VaultWithRiskLevel } from "~/lib/globalStore";
 import { LoanDetails } from "./LoanDetails";
-import {
-  isCurrentAuctionWithRepay,
-  isPastAuctionWithClaim,
-  isPastAuctionWithRepay,
-} from "~/lib/auctionStates";
+import { isAuctionWithRepay, isAuctionWithClaim } from "~/lib/auctionStates";
 import { useMemo } from "react";
 import { usePaprController } from "~/hooks/usePaprController";
 import { erc20ABI, useAccount, useContractRead } from "wagmi";
@@ -31,49 +27,31 @@ export function LoanDetailsForExistingLoan({
 
   const tokenIdsForDetails = useTokenIdsForVault(vault);
 
-  const showCurrentAuctionWithRepay = useMemo(() => {
+  const showAuctionWithRepay = useMemo(() => {
     if (!vault) return false;
-    return isCurrentAuctionWithRepay(vault);
+    return isAuctionWithRepay(vault);
   }, [vault]);
 
-  const showPastAuctionWithRepay = useMemo(() => {
-    if (!vault) return false;
-
-    return isPastAuctionWithRepay(vault);
-  }, [vault]);
-
-  const showPastAuctionWithClaim = useMemo(() => {
+  const showAuctionWithClaim = useMemo(() => {
     if (!vault || !paprBalance) return false;
-    return isPastAuctionWithClaim(vault, paprBalance);
+    return isAuctionWithClaim(vault, paprBalance);
   }, [vault, paprBalance]);
 
   if (!paprBalance) return <></>; // papr balance data loading
 
-  if (showCurrentAuctionWithRepay) {
+  if (showAuctionWithRepay) {
     return (
       <LoanDetails
         collectionAddress={vault.token.id}
         tokenIds={tokenIdsForDetails}
         riskLevel={vault.riskLevel}
-        action="liquidating"
+        action={vault.ongoingAuctions.length > 0 ? "liquidating" : "liquidated"}
         amount={ethers.BigNumber.from(vault.debt)}
       />
     );
   }
 
-  if (showPastAuctionWithRepay) {
-    return (
-      <LoanDetails
-        collectionAddress={vault.token.id}
-        tokenIds={tokenIdsForDetails}
-        riskLevel={vault.riskLevel}
-        action="liquidated"
-        amount={ethers.BigNumber.from(vault.debt)}
-      />
-    );
-  }
-
-  if (showPastAuctionWithClaim) {
+  if (showAuctionWithClaim) {
     return (
       <LoanDetails
         collectionAddress={vault.token.id}

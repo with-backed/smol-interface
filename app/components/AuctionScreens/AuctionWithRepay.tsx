@@ -4,20 +4,20 @@ import { useLoan } from "~/hooks/useLoan";
 import { Repay } from "../Repay";
 import type { VaultWithRiskLevel } from "~/lib/globalStore";
 
-type OngoingAuctionWithRepayProps = {
+type AuctionWithRepayProps = {
   vault: NonNullable<VaultWithRiskLevel>;
 };
 
-export function OngoingAuctionWithRepay({
-  vault,
-}: OngoingAuctionWithRepayProps) {
-  const auction = useMemo(() => {
-    return vault.ongoingAuctions[0];
-  }, [vault.ongoingAuctions]);
+export function AuctionWithRepay({ vault }: AuctionWithRepayProps) {
+  const loanDetails = useLoan(vault);
 
-  const vaultHasCollateral = useMemo(() => {
-    return vault.collateral.length > 0;
-  }, [vault.collateral]);
+  const currentOngoingAuction = useMemo(() => {
+    return vault.ongoingAuctions[0]; // assume only one ongoing auction, will rarely ever have two in a rational market
+  }, [vault.ongoingAuctions]);
+  const currentAuctionString = useMemo(() => {
+    if (!currentOngoingAuction) return "";
+    return `tokenID #${currentOngoingAuction.auctionAssetID} is being sold via liquidation auction! The proceeds will pay down debt and you will receive any excess.`;
+  }, [currentOngoingAuction]);
 
   const pastAuctions = useMemo(() => {
     return vault.pastAuctions.filter(
@@ -42,8 +42,6 @@ export function OngoingAuctionWithRepay({
           } sold at a liquidation auction!
     `;
   }, [pastAuctions, auctionedTokenIds, moreThanOneAuctioned]);
-
-  const loanDetails = useLoan(vault);
 
   const hasRepaidAuction = useGlobalStore(
     (s) => s.recentActions[vault.token.id]?.hasRepaid || false
@@ -80,17 +78,14 @@ export function OngoingAuctionWithRepay({
         <>
           <div className="px-6 py-1">
             <p className="leading-loose">
-              Uh oh! {pastAuctionedString}
-              tokenID #{auction.auctionAssetID} is being sold via liquidation
-              auction! The proceeds will pay down debt and you will receive any
-              excess.
+              Uh oh! {pastAuctionedString} {currentAuctionString}
             </p>
           </div>
           <Repay
             vault={vault}
             loanDetails={loanDetails}
             refresh={() => setHasRepaidAuction()}
-            disabled={!vaultHasCollateral}
+            disabled={vault.collateral.length === 0}
           />
         </>
       )}
