@@ -6,6 +6,7 @@ import { useExplainerStore } from "~/lib/explainerStore";
 import { useSelectedCollectionValue } from "~/hooks/useSelectedCollectionValue";
 import { formatTokenAmount } from "~/lib/numberFormat";
 import { usePaprController } from "~/hooks/usePaprController";
+import { useCollectionTwapBidChange } from "~/hooks/useCollectionTwapBidChange";
 
 export function LavaExplainer() {
   const setActiveExplainer = useExplainerStore((s) => s.setActiveExplainer);
@@ -48,7 +49,8 @@ export function ValueExplainer() {
   }, [setActiveExplainer]);
   const [nftValueTop, setNFTValueTop] = useState<number | null>(null);
   const ref = useRef<HTMLDivElement>(null);
-  const nftValue = useSelectedCollectionValue();
+  const { collateralCount, currentPriceForCollection, price24hrAgo } =
+    useSelectedCollectionValue();
 
   const positionNFTValue = useCallback(() => {
     if (ref.current) {
@@ -57,6 +59,17 @@ export function ValueExplainer() {
       setNFTValueTop(top + 16);
     }
   }, []);
+
+  const nftValue = useMemo(() => {
+    if (currentPriceForCollection && collateralCount) {
+      return (
+        formatTokenAmount(currentPriceForCollection * collateralCount) +
+        " " +
+        underlying.symbol
+      );
+    }
+    return "NFT Value";
+  }, [collateralCount, currentPriceForCollection, underlying]);
 
   const plankStyle = useMemo(
     () =>
@@ -79,9 +92,7 @@ export function ValueExplainer() {
     >
       <div className="bg-[url('/scale/yaxis.svg')] w-2.5 bg-repeat-y bg-[center_top] flex flex-col justify-end">
         <MessageBox color="black" top={nftValueTop}>
-          {nftValue
-            ? `${formatTokenAmount(nftValue)} ${underlying.symbol}`
-            : "NFT Value"}
+          {nftValue}
           <img src="/scale/question-mark.svg" alt="more info" />
         </MessageBox>
         {nftValueTop && (

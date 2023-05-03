@@ -1,11 +1,7 @@
-import { useMemo } from "react";
-import { useOracleInfo } from "~/hooks/useOracleInfo";
 import { useGlobalStore } from "~/lib/globalStore";
-import { OraclePriceType } from "~/lib/reservoir";
+import { useCollectionTwapBidChange } from "../useCollectionTwapBidChange";
 
 export function useSelectedCollectionValue() {
-  const oracleInfo = useOracleInfo(OraclePriceType.twap);
-
   const { collateralCount, collection } = useGlobalStore((s) => ({
     collection:
       // it's really weird that this is the way we recover the collection address
@@ -15,13 +11,7 @@ export function useSelectedCollectionValue() {
       s.selectedVault?.collateral.length || s.inProgressLoan?.tokenIds.length,
   }));
 
-  const collateralValue = useMemo(() => {
-    if (!oracleInfo || !collection || !collateralCount) {
-      return null;
-    }
+  const result = useCollectionTwapBidChange(collection || "");
 
-    return oracleInfo[collection].price * collateralCount;
-  }, [collateralCount, collection, oracleInfo]);
-
-  return collateralValue;
+  return { ...result, collateralCount };
 }
