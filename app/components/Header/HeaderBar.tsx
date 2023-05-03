@@ -95,6 +95,12 @@ function NFTsSelected() {
     }`;
   }, [maxLoanQuote, underlying.decimals, underlying.symbol]);
 
+  const pluralizedNumberNfts = useMemo(() => {
+    if (!inProgressLoan) return "";
+    if (inProgressLoan.tokenIds.length === 1) return "NFT";
+    return "NFTs";
+  }, [inProgressLoan]);
+
   if (!inProgressLoan) return <></>;
 
   return (
@@ -104,7 +110,9 @@ function NFTsSelected() {
           collectionAddress={inProgressLoan.collectionAddress}
           tokenIds={inProgressLoan.tokenIds}
         />
-        <p className="ml-2">{inProgressLoan.tokenIds.length} NFTs</p>
+        <p className="ml-2">
+          {inProgressLoan.tokenIds.length} {pluralizedNumberNfts}
+        </p>
       </div>
       <div className="mr-2">
         <p>Max Loan: {formattedQuote}</p>
