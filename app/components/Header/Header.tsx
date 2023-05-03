@@ -366,12 +366,12 @@ function SelectNFTsHeaderContent() {
 
   const setInProgressLoan = useGlobalStore((s) => s.setInProgressLoan);
   const { address } = useAccount();
-  const { userCollectionNFTs, nftsLoading } = useAccountNFTs(address, [
-    // it should not be possible to get here without a selected collection.
-    // we'll want to look into enforcing that invariant. We can have `setHeaderState`
-    // check that the state conforms to our expectations before advancing.
-    selectedCollectionAddress || "",
-  ]);
+  const { userCollectionNFTs, nftsLoading } = useAccountNFTs(
+    address,
+    useMemo(() => {
+      return selectedCollectionAddress ? [selectedCollectionAddress] : [""];
+    }, [selectedCollectionAddress])
+  );
   const [selectedTokenIds, setSelectedTokenIds] = useState<{
     [tokenId: string]: boolean;
   }>({});
