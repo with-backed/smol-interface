@@ -1,20 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "urql";
-import { graphql } from "~/gql/erc721";
-import type { NftsForAccountAndCollectionQuery } from "~/gql/erc721/graphql";
-import { useConfig } from "~/hooks/useConfig";
-
-const nftsForAccountAndCollectionDocument = graphql(`
-  query nftsForAccountAndCollection($owner: String, $collections: [String!]) {
-    tokens(where: { owner: $owner, registry_in: $collections }) {
-      id
-      registry {
-        id
-      }
-      identifier
-    }
-  }
-`);
+import { useCallback, useEffect, useState } from "react";
+import { useConfig } from "../useConfig";
 
 export type AccountNFTsResponse = {
   address: string;
@@ -25,42 +10,38 @@ export const useAccountNFTs = (
   address: string | undefined,
   collections: string[] | undefined
 ) => {
-  const { erc721Subgraph } = useConfig();
-  // Cache last result, so that when refreshing we don't have a flash of
-  // blank page while new results are fetching
-  const [prevData, setPrevData] = useState<
-    NftsForAccountAndCollectionQuery | undefined
-  >(undefined);
+  const { centerKey } = useConfig();
+  const [nftsLoading, setNftsLoading] = useState<boolean>(true);
+  const [userCollectionNFTs, setUserCollectionNFTs] = useState<
+    AccountNFTsResponse[]
+  >([]);
 
-  const [{ data, fetching: nftsLoading }, reexecuteQuery] = useQuery({
-    query: nftsForAccountAndCollectionDocument,
-    variables: {
-      owner: address?.toLowerCase(),
-      collections: collections?.map((c) => c.toLowerCase()),
-    },
-    context: useMemo(
-      () => ({
-        url: erc721Subgraph,
-      }),
-      [erc721Subgraph]
-    ),
-  });
+  const fetchUserNFTs = useCallback(async () => {
+    if (address && collections) {
+      const res = await fetch(
+        `https://api.center.dev/v1/ethereum-goerli/account/${address}/assets-owned?collection=${collections?.join(
+          ","
+        )}&limit=100`,
+        {
+          headers: {
+            "x-API-Key": centerKey,
+          },
+        }
+      );
+      const json = await res.json();
+      setUserCollectionNFTs(json.items);
+      setNftsLoading(false);
+    }
+  }, [address, collections, centerKey]);
+
+  const reexecuteQuery = useCallback(() => {
+    setNftsLoading(true);
+    fetchUserNFTs();
+  }, [fetchUserNFTs]);
 
   useEffect(() => {
-    if (data) {
-      setPrevData(data);
-    }
-  }, [data]);
-
-  const dataToUse = data ?? prevData;
-
-  const userCollectionNFTs = useMemo(() => {
-    if (!dataToUse?.tokens) return [];
-    return dataToUse?.tokens.map((token) => ({
-      address: token.registry.id,
-      tokenId: token.identifier,
-    }));
-  }, [dataToUse]);
+    fetchUserNFTs();
+  }, [fetchUserNFTs]);
 
   return {
     userCollectionNFTs,

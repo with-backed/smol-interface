@@ -48,6 +48,7 @@ declare global {
       TOKEN: SupportedToken;
       ALCHEMY_KEY: string;
       ETHERSCAN_API_KEY: string;
+      CENTER_KEY: string;
     };
   }
 }
@@ -122,6 +123,7 @@ export const loader = async () => {
       QUOTER: process.env.QUOTER,
       TOKEN: process.env.TOKEN,
       ETHERSCAN_API_KEY: process.env.ETHERSCAN_API_KEY,
+      CENTER_KEY: process.env.CENTER_KEY,
     },
   });
 };
