@@ -9,7 +9,33 @@ const config: CodegenConfig = {
       documents: [
         "app/**/*.{ts,tsx}",
         "!app/hooks/useAccountNFTs/useAccountNFTs.ts",
+        "!app/hooks/useTWAB/useTWAB.ts",
       ],
+      preset: "client",
+      plugins: [],
+      presetConfig: {
+        fragmentMasking: false,
+      },
+    },
+    "app/gql/erc721/": {
+      schema:
+        "https://api.thegraph.com/subgraphs/name/sunguru98/mainnet-erc721-subgraph",
+      documents: "app/hooks/useAccountNFTs/useAccountNFTs.ts",
+      preset: "client",
+      plugins: [],
+      presetConfig: {
+        fragmentMasking: false,
+      },
+    },
+    "app/gql/twabs/": {
+      schema: [
+        {
+          "https://optimal-mole-21.hasura.app/v1/graphql": {
+            headers: { "x-hasura-admin-secret": process.env.HASURA_ADMIN_KEY! },
+          },
+        },
+      ],
+      documents: "app/hooks/useTWAB/useTWAB.ts",
       preset: "client",
       plugins: [],
       presetConfig: {

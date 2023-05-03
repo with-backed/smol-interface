@@ -3,6 +3,9 @@ import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { MessageBox } from "./MessageBox";
 import { Button } from "reakit/Button";
 import { useExplainerStore } from "~/lib/explainerStore";
+import { useSelectedCollectionValue } from "~/hooks/useSelectedCollectionValue";
+import { formatTokenAmount } from "~/lib/numberFormat";
+import { usePaprController } from "~/hooks/usePaprController";
 
 export function LavaExplainer() {
   const setActiveExplainer = useExplainerStore((s) => s.setActiveExplainer);
@@ -38,12 +41,14 @@ export function LavaExplainer() {
 }
 
 export function ValueExplainer() {
+  const { underlying } = usePaprController();
   const setActiveExplainer = useExplainerStore((s) => s.setActiveExplainer);
   const handleClick = useCallback(() => {
     setActiveExplainer(null);
   }, [setActiveExplainer]);
   const [nftValueTop, setNFTValueTop] = useState<number | null>(null);
   const ref = useRef<HTMLDivElement>(null);
+  const nftValue = useSelectedCollectionValue();
 
   const positionNFTValue = useCallback(() => {
     if (ref.current) {
@@ -74,7 +79,10 @@ export function ValueExplainer() {
     >
       <div className="bg-[url('/scale/yaxis.svg')] w-2.5 bg-repeat-y bg-[center_top] flex flex-col justify-end">
         <MessageBox color="black" top={nftValueTop}>
-          NFT Value
+          {nftValue
+            ? `${formatTokenAmount(nftValue)} ${underlying.symbol}`
+            : "NFT Value"}
+          <img src="/scale/question-mark.svg" alt="more info" />
         </MessageBox>
         {nftValueTop && (
           <div
