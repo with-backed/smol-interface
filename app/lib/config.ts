@@ -21,9 +21,9 @@ const paprHero: Config = {
   jsonRpcProvider: `https://eth-goerli.alchemyapi.io/v2/${alchemyId}`,
   etherscanUrl: "https://goerli.etherscan.io",
   network: "goerli",
-  controllerAddress: "0x8bce9c41bd0a8c0ce8b08787f4de1be95eb3369e",
+  controllerAddress: "0x937968d77f8e312574d659ccd9a527ec063ff601",
   underlyingAddress: "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
-  paprTokenAddress: "0xccdd5997c1d279d119d206e67de7b79a53006d27",
+  paprTokenAddress: "0x7b863de6be0c945a2317af4ed78959da10a7eddc",
   uniswapSubgraph:
     "https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli",
   paprSubgraph:
