@@ -34,7 +34,7 @@ import customStyles from "~/styles/index.css";
 import { Header, HeaderBar } from "~/components/Header";
 import { Footer } from "~/components/Footer";
 import { OracleInfoProvider } from "./hooks/useOracleInfo";
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 import { TimestampProvider } from "./hooks/useTimestamp";
 import { useDisclosureState } from "reakit/Disclosure";
 import { HeaderDisclosureContextProvider } from "./hooks/useHeaderDisclosureState/useHeaderDisclosureState";
@@ -157,7 +157,9 @@ export default function App() {
     }
     return (
       <>
-        <Header />
+        <Suspense fallback={<header></header>}>
+          <Header />
+        </Suspense>
         <div className="wrapper relative flex flex-col">
           <HeaderBar />
           <Outlet />
