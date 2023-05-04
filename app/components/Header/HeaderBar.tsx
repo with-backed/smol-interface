@@ -81,11 +81,11 @@ function NFTsSelected() {
   const inProgressLoan = useGlobalStore((s) => s.inProgressLoan);
 
   const maxLoanQuote = usePoolQuote({
-    amount: inProgressLoan?.maxDebtForChosen || null,
+    amount: inProgressLoan?.maxDebtForChosenPapr || null,
     inputToken: paprToken.id,
     outputToken: underlying.id,
     tradeType: "exactIn",
-    skip: !inProgressLoan?.maxDebtForChosen,
+    skip: !inProgressLoan?.maxDebtForChosenPapr,
   });
 
   const formattedQuote = useMemo(() => {
