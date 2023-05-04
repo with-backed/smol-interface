@@ -35,7 +35,11 @@ function ExistingLoan({ vault, index }: ExistingLoanProps) {
   const setSelectedVault = useGlobalStore((s) => s.setSelectedVault);
   const state = useGlobalStore((s) => s.state);
   const { setVisible } = useHeaderDisclosureState();
-  const riskLevel = useRiskLevel(vault);
+  const riskLevelResult = useRiskLevel({
+    collateralCount: vault.collateral.length,
+    debt: vault.debt,
+    tokenId: vault.token.id,
+  });
 
   const selectVaultAsCurrent = useCallback(
     (vault: NonNullable<SubgraphVault>, riskLevel: RiskLevel) => {
@@ -49,11 +53,18 @@ function ExistingLoan({ vault, index }: ExistingLoanProps) {
   // TODO: adamgobes, potentially sort by risk level and default to highest risk loan
   useEffect(() => {
     if (selectedVault) return;
-    if (index === 0 && riskLevel && state === HeaderState.Default)
-      selectVaultAsCurrent(vault, riskLevel);
-  }, [selectedVault, state, index, riskLevel, selectVaultAsCurrent, vault]);
+    if (index === 0 && riskLevelResult && state === HeaderState.Default)
+      selectVaultAsCurrent(vault, riskLevelResult.riskLevel);
+  }, [
+    selectedVault,
+    state,
+    index,
+    riskLevelResult,
+    selectVaultAsCurrent,
+    vault,
+  ]);
 
-  if (!riskLevel)
+  if (!riskLevelResult)
     return (
       <div
         className="my-1 cursor-pointer h-[32px] bg-medium-grey rounded-lg"
@@ -71,9 +82,11 @@ function ExistingLoan({ vault, index }: ExistingLoanProps) {
     <div
       className="my-1 cursor-pointer"
       key={vault.id}
-      onClick={() => selectVaultAsCurrent(vault, riskLevel)}
+      onClick={() => selectVaultAsCurrent(vault, riskLevelResult.riskLevel)}
     >
-      <LoanDetailsForExistingLoan vault={{ ...vault, riskLevel }} />
+      <LoanDetailsForExistingLoan
+        vault={{ ...vault, riskLevel: riskLevelResult.riskLevel }}
+      />
     </div>
   );
 }

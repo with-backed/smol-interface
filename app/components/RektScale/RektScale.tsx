@@ -7,16 +7,27 @@ import { type Explainer, useExplainerStore } from "~/lib/explainerStore";
 import { formatTokenAmount } from "~/lib/numberFormat";
 import { usePaprController } from "~/hooks/usePaprController";
 import { useSelectedCollectionValue } from "~/hooks/useSelectedCollectionValue";
+import { useGlobalStore } from "~/lib/globalStore";
+import { useLiquidationTriggerPrice } from "~/hooks/useLiquidationTriggerPrice";
 
 type RektScaleProps = {
   riskLevel: RiskLevel | undefined;
 };
 
 export function RektScale({ riskLevel }: RektScaleProps) {
+  const hasLoan = useGlobalStore(
+    (s) => !!s.inProgressLoan || !!s.selectedVault
+  );
+
+  if (hasLoan) {
+    return <RektScaleWithLoan riskLevel={riskLevel} />;
+  }
+
+  return <RektScaleNoLoan riskLevel={riskLevel} />;
+}
+
+function RektScaleWithLoan({ riskLevel = "fine" }: RektScaleProps) {
   const { underlying } = usePaprController();
-  const ref = useRef<HTMLDivElement>(null);
-  const [riskLevelTop, setRiskLevelTop] = useState<number | null>(null);
-  const [nftValueTop, setNFTValueTop] = useState<number | null>(null);
   const { collateralCount, currentPriceForCollection } =
     useSelectedCollectionValue();
 
@@ -30,7 +41,32 @@ export function RektScale({ riskLevel }: RektScaleProps) {
     }
     return "NFT Value";
   }, [collateralCount, currentPriceForCollection, underlying]);
+  const liquidationTriggerPrice = useLiquidationTriggerPrice();
+  return (
+    <RektScaleBase
+      lava={liquidationTriggerPrice || "..."}
+      nftValue={nftValue}
+      riskLevel={riskLevel}
+    />
+  );
+}
 
+function RektScaleNoLoan({ riskLevel = "fine" }: RektScaleProps) {
+  return (
+    <RektScaleBase lava="lava" nftValue="NFT Value" riskLevel={riskLevel} />
+  );
+}
+
+type RektScaleBaseProps = {
+  lava: string;
+  nftValue: string;
+  riskLevel: RiskLevel;
+};
+
+function RektScaleBase({ lava, nftValue, riskLevel }: RektScaleBaseProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [riskLevelTop, setRiskLevelTop] = useState<number | null>(null);
+  const [nftValueTop, setNFTValueTop] = useState<number | null>(null);
   const positionNFTValue = useCallback(() => {
     if (ref.current) {
       const elem = ref.current.querySelector(`.bg-yikes`);
@@ -95,7 +131,7 @@ export function RektScale({ riskLevel }: RektScaleProps) {
           </MessageBox>
           <Lava top={riskLevelTop ? riskLevelTop - 40 : null} />
           <MessageBox color="red" top={riskLevelTop}>
-            lava <InfoButton explainer="lava" />
+            {lava} <InfoButton explainer="lava" />
           </MessageBox>
         </div>
       </div>

@@ -1,25 +1,35 @@
 import { useMemo } from "react";
 import { OraclePriceType } from "~/lib/reservoir";
 import { riskLevelFromDebts } from "~/lib/utils";
-import type { SubgraphVault } from "../useVault";
 import { useMaxDebt } from "../useMaxDebt";
 import { usePaprController } from "../usePaprController";
+import type { ethers } from "ethers";
 
-export function useRiskLevel(vault: NonNullable<SubgraphVault>) {
+type LoanDescriptor = {
+  tokenId: string;
+  collateralCount: number;
+  debt: ethers.BigNumber;
+};
+
+export function useRiskLevel({
+  collateralCount,
+  debt,
+  tokenId,
+}: LoanDescriptor) {
   const { paprToken } = usePaprController();
   const maxDebtForDefaultCollection = useMaxDebt(
-    vault.token.id,
+    tokenId,
     OraclePriceType.lower
   );
   const maxDebtForVault = useMemo(() => {
     if (!maxDebtForDefaultCollection) return null;
-    return maxDebtForDefaultCollection.mul(vault.collateral.length);
-  }, [vault, maxDebtForDefaultCollection]);
+    return maxDebtForDefaultCollection.mul(collateralCount);
+  }, [collateralCount, maxDebtForDefaultCollection]);
 
   const riskLevel = useMemo(() => {
     if (!maxDebtForVault) return null;
-    return riskLevelFromDebts(vault.debt, maxDebtForVault, paprToken.decimals);
-  }, [vault.debt, maxDebtForVault, paprToken.decimals]);
+    return riskLevelFromDebts(debt, maxDebtForVault, paprToken.decimals);
+  }, [debt, maxDebtForVault, paprToken.decimals]);
 
   return riskLevel;
 }

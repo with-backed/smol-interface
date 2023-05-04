@@ -6,13 +6,35 @@ import { useExplainerStore } from "~/lib/explainerStore";
 import { useSelectedCollectionValue } from "~/hooks/useSelectedCollectionValue";
 import { formatTokenAmount } from "~/lib/numberFormat";
 import { usePaprController } from "~/hooks/usePaprController";
-import { useCollectionTwapBidChange } from "~/hooks/useCollectionTwapBidChange";
+import { useLiquidationTriggerPrice } from "~/hooks/useLiquidationTriggerPrice";
+import { useGlobalStore } from "~/lib/globalStore";
 
 export function LavaExplainer() {
+  const hasLoan = useGlobalStore(
+    (s) => !!s.inProgressLoan || !!s.selectedVault
+  );
+
+  if (hasLoan) {
+    return <LavaExplainerWithLoan />;
+  }
+
+  return <LavaExplainerNoLoan />;
+}
+
+function LavaExplainerWithLoan() {
+  return <LavaExplainerBase />;
+}
+
+function LavaExplainerNoLoan() {
+  return <LavaExplainerBase />;
+}
+
+function LavaExplainerBase() {
   const setActiveExplainer = useExplainerStore((s) => s.setActiveExplainer);
   const handleClick = useCallback(() => {
     setActiveExplainer(null);
   }, [setActiveExplainer]);
+  const liquidationTriggerPrice = useLiquidationTriggerPrice();
   return (
     <Button
       as="div"
@@ -24,6 +46,10 @@ export function LavaExplainer() {
           <div className="w-full bg-yikes h-16 rounded-lg"></div>
           <div className="w-full bg-risky h-16 rounded-lg"></div>
           <div className="w-full bg-fine flex-1 rounded-t-lg"></div>
+          <MessageBox color="red" top={0}>
+            {liquidationTriggerPrice || "lava"}{" "}
+            <img src="/scale/question-mark.svg" alt="more info" />
+          </MessageBox>
         </div>
       </div>
       <div className="w-9/12 flex flex-col gap-8 mt-12 ml-8">
