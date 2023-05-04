@@ -312,7 +312,7 @@ function SelectCollectionLineItem({
   });
 
   return (
-    <li>
+    <li className="flex flex-row justify-between">
       <TextButton
         disabled={
           collateralAddressesForExistingVaults.has(collateralAddress) ||
@@ -333,12 +333,17 @@ function SelectCollectionLineItem({
           {nftSymbol}
         </span>
       </TextButton>{" "}
-      (
-      {maxDebtInETH
-        ? formatBigNum(maxDebtInETH, underlying.decimals, 3) +
-          ` ${underlying.symbol}`
-        : "..."}
-      )
+      {maxDebtInETH ? (
+        `(${formatBigNum(maxDebtInETH, underlying.decimals, 3)} ${
+          underlying.symbol
+        })`
+      ) : (
+        <img
+          src="/loading-ellipses.svg"
+          alt="loading ellipses"
+          className="relative left-[-16px] top-[2px]"
+        />
+      )}
     </li>
   );
 }

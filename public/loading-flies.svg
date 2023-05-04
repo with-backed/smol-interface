@@ -1,0 +1,25 @@
+<svg viewBox="0 0 73 30" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+
+  <svg visibility="hidden" width="73" height="30" viewBox="0 0 73 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M14.3423 21C17.0039 22.5 21.6055 20.7716 21.6055 18.8095C21.6055 16.9573 19.3261 16.1914 17.8619 15.8386C15.1339 15.1813 14.3423 17.2254 14.3423 19.543" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M11.4692 20.9989C12.8943 20.8607 9.92209 10.6869 6.03235 15.1161C3.11903 18.4335 6.95187 20.9189 10.4039 21.06" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="13.0039" cy="22" r="3" fill="black"/>
+    <animate attributeName="visibility" values="hidden; visible; visible; visible" dur="1300ms" begin="0s" repeatCount="indefinite" />
+  </svg>
+
+  <svg wvisibility="hidden" idth="73" height="30" viewBox="0 0 73 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M37.0039 10.5148C34.8052 11.7959 31.0039 10.3197 31.0039 8.64395C31.0039 7.06197 32.8869 6.40782 34.0964 6.10652C36.35 5.54515 37.0039 7.29101 37.0039 9.2704" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M39.3226 9.95667C38.0709 9.85881 40.6815 2.65362 44.0979 5.79046C46.6568 8.13987 43.2903 9.90006 40.2582 10" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="3" cy="3" r="3" transform="matrix(-1 0 0 1 41 8)" fill="black"/>
+    <animate attributeName="visibility" values="hidden; hidden; visible; visible" dur="1300ms" begin="0s" repeatCount="indefinite" />
+  </svg>
+
+  <svg visibility="hidden" width="73" height="30" viewBox="0 0 73 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M60.0039 19.5488C58.2634 20.5929 56.4504 19.6442 55.6571 18.5347C54.466 17.0963 55.0902 15.3042 56.0477 15.0586C57.8315 14.6011 60.5 16.9216 60.5 18.5347" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M62.4987 19.5006C62.0429 18.0183 65.4975 13.5021 68.3524 17.1574C70.4907 19.8952 66.8808 21.0786 63.8735 20.6792" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="3" cy="3" r="3" transform="matrix(-1 0 0 1 64 18)" fill="black"/>
+    <animate attributeName="visibility" values="hidden; hidden; hidden; visible" dur="1300ms" begin="0s" repeatCount="indefinite" />
+  </svg>
+
+
+</svg>
