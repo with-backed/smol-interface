@@ -9,7 +9,24 @@ const config: CodegenConfig = {
       documents: [
         "app/**/*.{ts,tsx}",
         "!app/hooks/useAccountNFTs/useAccountNFTs.ts",
+        "!app/hooks/useCollectionTwapBidChange/useCollectionTwapBidChange.ts",
       ],
+      preset: "client",
+      plugins: [],
+      presetConfig: {
+        fragmentMasking: false,
+      },
+    },
+    "app/gql/twabs/": {
+      schema: [
+        {
+          "https://optimal-mole-21.hasura.app/v1/graphql": {
+            headers: { "x-hasura-admin-secret": process.env.HASURA_ADMIN_KEY! },
+          },
+        },
+      ],
+      documents:
+        "app/hooks/useCollectionTwapBidChange/useCollectionTwapBidChange.ts",
       preset: "client",
       plugins: [],
       presetConfig: {

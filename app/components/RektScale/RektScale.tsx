@@ -4,15 +4,32 @@ import type { RiskLevel } from "~/lib/globalStore";
 import { MessageBox } from "./MessageBox";
 import { Button } from "reakit/Button";
 import { type Explainer, useExplainerStore } from "~/lib/explainerStore";
+import { formatTokenAmount } from "~/lib/numberFormat";
+import { usePaprController } from "~/hooks/usePaprController";
+import { useSelectedCollectionValue } from "~/hooks/useSelectedCollectionValue";
 
 type RektScaleProps = {
   riskLevel: RiskLevel | undefined;
 };
 
 export function RektScale({ riskLevel }: RektScaleProps) {
+  const { underlying } = usePaprController();
   const ref = useRef<HTMLDivElement>(null);
   const [riskLevelTop, setRiskLevelTop] = useState<number | null>(null);
   const [nftValueTop, setNFTValueTop] = useState<number | null>(null);
+  const { collateralCount, currentPriceForCollection } =
+    useSelectedCollectionValue();
+
+  const nftValue = useMemo(() => {
+    if (currentPriceForCollection && collateralCount) {
+      return (
+        formatTokenAmount(currentPriceForCollection * collateralCount) +
+        " " +
+        underlying.symbol
+      );
+    }
+    return "NFT Value";
+  }, [collateralCount, currentPriceForCollection, underlying]);
 
   const positionNFTValue = useCallback(() => {
     if (ref.current) {
@@ -74,7 +91,7 @@ export function RektScale({ riskLevel }: RektScaleProps) {
           <div className="w-full bg-risky h-16 rounded-lg"></div>
           <div className="w-full bg-fine flex-1 rounded-t-lg"></div>
           <MessageBox color="black" top={nftValueTop}>
-            NFT Value <InfoButton explainer="value" />
+            {nftValue} <InfoButton explainer="value" />
           </MessageBox>
           <Lava top={riskLevelTop ? riskLevelTop - 40 : null} />
           <MessageBox color="red" top={riskLevelTop}>

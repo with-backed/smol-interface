@@ -9,7 +9,7 @@
     "start": "remix-serve build",
     "typecheck": "tsc",
     "lint": "eslint",
-    "codegen": "graphql-codegen --config codegen/papr-codegen.ts",
+    "codegen": "npx dotenv -e .env -- graphql-codegen --config codegen/papr-codegen.ts",
     "prestart": "yarn codegen",
     "predev": "yarn codegen",
     "abis:generate": "npx dotenv -e .env -- wagmi generate",
