@@ -11,17 +11,27 @@ type LoanSummaryRepayProps = {
 };
 
 export function LoanSummaryRepay({ vault, refresh }: LoanSummaryRepayProps) {
-  const riskLevel = useGlobalStore((s) => s.selectedVault!.riskLevel); // really should just pass down the selected vault here, will do in a future PR
+  const riskLevel = useGlobalStore((s) => s.selectedVault!.riskLevel);
 
   const loanDetails = useLoan(vault);
 
+  const vaultHasDebt = useMemo(() => {
+    return !loanDetails.vaultDebt.isZero();
+  }, [loanDetails.vaultDebt]);
   const owedOrRepaid = useMemo(() => {
-    if (loanDetails.vaultDebt.isZero()) {
-      return loanDetails.formattedRepaid;
+    if (vaultHasDebt) {
+      return loanDetails.formattedTotalOwed;
     }
 
-    return loanDetails.formattedTotalOwed;
-  }, [loanDetails]);
+    return loanDetails.formattedRepaid;
+  }, [vaultHasDebt, loanDetails]);
+
+  const repayButtonText = useMemo(() => {
+    if (vaultHasDebt) {
+      return `Repay ${loanDetails.formattedTotalOwed}`;
+    }
+    return `Repaid ${loanDetails.formattedRepaid}`;
+  }, [loanDetails, vaultHasDebt]);
 
   return (
     <>
@@ -33,11 +43,13 @@ export function LoanSummaryRepay({ vault, refresh }: LoanSummaryRepayProps) {
         costPercentage={loanDetails.formattedCostPercentage}
       />
       <div className="my-4">
-        <img src="/instrument.png" />
+        {vaultHasDebt && <img src="/5-instrument-super-dance.svg" />}
+        {!vaultHasDebt && <img src="/5-happy-super-dance.svg" />}
       </div>
       <Repay
         vault={{ ...vault, riskLevel }}
         loanDetails={loanDetails}
+        buttonText={repayButtonText}
         refresh={refresh}
       />
     </>

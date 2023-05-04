@@ -91,7 +91,7 @@ export function AuctionWithRepay({ vault }: AuctionWithRepayProps) {
       )}
       {hasRepaidAuction && (
         <div className="my-16">
-          <img src="/u-came-back.png" />
+          <img src="/5-happy-super-dance.svg" />
         </div>
       )}
     </div>

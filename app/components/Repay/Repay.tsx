@@ -3,7 +3,8 @@ import type { LoanDetails } from "~/hooks/useLoan/useLoan";
 import { useOracleSynced } from "~/hooks/useOracleSynced";
 import { useVaultWrite } from "~/hooks/useVaultWrite";
 import { VaultWriteType } from "~/hooks/useVaultWrite/helpers";
-import { VaultWithRiskLevel, useGlobalStore } from "~/lib/globalStore";
+import type { VaultWithRiskLevel } from "~/lib/globalStore";
+import { useGlobalStore } from "~/lib/globalStore";
 import { OraclePriceType } from "~/lib/reservoir";
 import { ApproveTokenButton } from "../ApproveButtons";
 import { usePaprController } from "~/hooks/usePaprController";
@@ -12,6 +13,7 @@ import { TransactionButton } from "../Buttons/TransactionButton";
 type RepayProps = {
   vault: NonNullable<VaultWithRiskLevel>;
   loanDetails: LoanDetails;
+  buttonText: string;
   refresh: () => void;
   disabled?: boolean;
 };
@@ -19,6 +21,7 @@ type RepayProps = {
 export function Repay({
   vault,
   loanDetails,
+  buttonText,
   refresh,
   disabled = false,
 }: RepayProps) {
@@ -84,11 +87,7 @@ export function Repay({
       )}
       <div className="my-2">
         <TransactionButton
-          text={
-            !oracleSynced
-              ? "Waiting for oracle..."
-              : `Repay ${loanDetails.formattedTotalOwed}`
-          }
+          text={!oracleSynced ? "Waiting for oracle..." : buttonText}
           theme={`bg-${vault.riskLevel}`}
           onClick={write!}
           transactionData={data}
