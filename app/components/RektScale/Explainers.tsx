@@ -30,23 +30,41 @@ function LavaExplainerNoLoan() {
 }
 
 function LavaExplainerBase() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [riskLevelTop, setRiskLevelTop] = useState<number | null>(null);
   const setActiveExplainer = useExplainerStore((s) => s.setActiveExplainer);
   const handleClick = useCallback(() => {
     setActiveExplainer(null);
   }, [setActiveExplainer]);
   const liquidationTriggerPrice = useLiquidationTriggerPrice();
+
+  const positionRiskLevel = useCallback(() => {
+    if (ref.current) {
+      const height = ref.current.getBoundingClientRect().height;
+      const top = height / 2;
+      setRiskLevelTop(top + 16);
+    }
+  }, []);
+
+  useLayoutEffect(() => positionRiskLevel(), [positionRiskLevel]);
+  useResizeObserver(
+    (ref.current || null) as HTMLElement | null,
+    positionRiskLevel
+  );
+
   return (
     <Button
       as="div"
       onClick={handleClick}
       className="explainer bg-white flex relative"
+      ref={ref}
     >
       <div className="bg-[url('/scale/yaxis.svg')] w-2.5 bg-repeat-y bg-[center_top] flex flex-col justify-end">
         <div className="flex flex-col h-2/4">
           <div className="w-full bg-yikes h-16 rounded-lg"></div>
           <div className="w-full bg-risky h-16 rounded-lg"></div>
           <div className="w-full bg-fine flex-1 rounded-t-lg"></div>
-          <MessageBox color="red" top={0}>
+          <MessageBox color="red" top={riskLevelTop}>
             {liquidationTriggerPrice || "lava"}{" "}
             <img src="/scale/question-mark.svg" alt="more info" />
           </MessageBox>
