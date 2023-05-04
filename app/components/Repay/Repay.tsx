@@ -1,9 +1,9 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { LoanDetails } from "~/hooks/useLoan/useLoan";
 import { useOracleSynced } from "~/hooks/useOracleSynced";
 import { useVaultWrite } from "~/hooks/useVaultWrite";
 import { VaultWriteType } from "~/hooks/useVaultWrite/helpers";
-import type { VaultWithRiskLevel } from "~/lib/globalStore";
+import { VaultWithRiskLevel, useGlobalStore } from "~/lib/globalStore";
 import { OraclePriceType } from "~/lib/reservoir";
 import { ApproveTokenButton } from "../ApproveButtons";
 import { usePaprController } from "~/hooks/usePaprController";
@@ -44,6 +44,19 @@ export function Repay({
     return loanDetails.vaultDebt;
   }, [loanDetails.vaultDebt]);
 
+  const setRecentActions = useGlobalStore((s) => s.setRecentActions);
+  const setHasRepaid = useCallback(() => {
+    setRecentActions((actions) => ({
+      ...actions,
+      [vault.token.id]: { hasRepaid: true, hasClaimed: false },
+    }));
+  }, [vault.token.id, setRecentActions]);
+
+  const refreshWithRecentAction = useCallback(() => {
+    refresh();
+    setHasRepaid();
+  }, [refresh, setHasRepaid]);
+
   const { data, write, error } = useVaultWrite({
     writeType: VaultWriteType.RepayWithSwap,
     collateralContractAddress: vault.token.id,
@@ -53,7 +66,7 @@ export function Repay({
     quote: vaultDebt,
     usingSafeTransferFrom: false,
     disabled: repayDisabled,
-    refresh,
+    refresh: refreshWithRecentAction,
   });
 
   return (
