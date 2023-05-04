@@ -21,7 +21,7 @@ export function RiskRadio({ handleChange, riskLevel }: RiskRadioProps) {
 
   return (
     <RadioGroup
-      className="flex justify-center gap-4"
+      className="flex justify-center gap-4 py-2"
       {...radio}
       aria-label="fruits"
     >
