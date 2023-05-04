@@ -4,7 +4,7 @@ import { useRadioState, Radio, RadioGroup } from "reakit/Radio";
 import type { RiskLevel } from "~/lib/globalStore";
 
 type RiskRadioProps = {
-  riskLevel?: RiskLevel;
+  riskLevel: RiskLevel;
   handleChange: (riskLevel: RiskLevel) => void;
 };
 
