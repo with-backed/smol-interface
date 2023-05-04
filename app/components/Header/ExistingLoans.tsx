@@ -53,7 +53,19 @@ function ExistingLoan({ vault, index }: ExistingLoanProps) {
       selectVaultAsCurrent(vault, riskLevel);
   }, [selectedVault, state, index, riskLevel, selectVaultAsCurrent, vault]);
 
-  if (!riskLevel) return <></>;
+  if (!riskLevel)
+    return (
+      <div
+        className="my-1 cursor-pointer h-[32px] bg-medium-grey rounded-lg"
+        key={vault.id}
+      >
+        <img
+          src="/loading-flies.svg"
+          alt="loading flies"
+          className="w-full h-full"
+        />
+      </div>
+    );
 
   return (
     <div
