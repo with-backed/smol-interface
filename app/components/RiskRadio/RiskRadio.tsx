@@ -4,7 +4,7 @@ import { useRadioState, Radio, RadioGroup } from "reakit/Radio";
 import type { RiskLevel } from "~/lib/globalStore";
 
 type RiskRadioProps = {
-  riskLevel?: RiskLevel;
+  riskLevel: RiskLevel;
   handleChange: (riskLevel: RiskLevel) => void;
 };
 
@@ -21,7 +21,7 @@ export function RiskRadio({ handleChange, riskLevel }: RiskRadioProps) {
 
   return (
     <RadioGroup
-      className="flex justify-center gap-4"
+      className="flex justify-center gap-4 py-2"
       {...radio}
       aria-label="fruits"
     >

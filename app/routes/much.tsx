@@ -9,12 +9,11 @@ import { riskLevelToLTV } from "~/lib/utils";
 export default function HowMuchBorrow() {
   const maxDebt = useGlobalStore((s) => s.inProgressLoan?.maxDebtForChosen);
   const setInProgressLoan = useGlobalStore((s) => s.setInProgressLoan);
-  const riskLevel = useGlobalStore(
+  const storeRiskLevel = useGlobalStore(
     (s) => s.selectedVault?.riskLevel || s.inProgressLoan?.riskLevel
   );
-  const [loggedOutRiskLevel, setLoggedOutRiskLevel] = useState<
-    RiskLevel | undefined
-  >("fine");
+  const [loggedOutRiskLevel, setLoggedOutRiskLevel] =
+    useState<RiskLevel>("fine");
 
   const setSelectedBorrow = useCallback(
     (riskLevel: RiskLevel) => {
@@ -40,12 +39,20 @@ export default function HowMuchBorrow() {
   );
 
   return (
-    <div className="flex h-full">
-      <RektScale riskLevel={riskLevel || loggedOutRiskLevel} />
-      <div className="flex flex-col items-center w-full grow-0 pt-6 h-2/4">
-        <RiskRadio riskLevel={riskLevel} handleChange={setSelectedBorrow} />
-        <FrogCooker riskLevel={riskLevel || loggedOutRiskLevel} />
+    <>
+      <div className="flex h-full">
+        <RektScale riskLevel={storeRiskLevel || loggedOutRiskLevel} />
+        <div className="flex flex-col items-center w-full grow-0 pt-6 h-2/4">
+          <FrogCooker riskLevel={storeRiskLevel || loggedOutRiskLevel} />
+        </div>
       </div>
-    </div>
+      <div className="flex flex-col py-2 items-center">
+        <span>How much to borrow?</span>
+        <RiskRadio
+          riskLevel={storeRiskLevel || loggedOutRiskLevel}
+          handleChange={setSelectedBorrow}
+        />
+      </div>
+    </>
   );
 }
