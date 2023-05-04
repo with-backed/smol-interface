@@ -7,6 +7,7 @@ import { useGlobalStore } from "~/lib/globalStore";
 
 export default function Intro() {
   const location = useLocation();
+  const inProgressLoan = useGlobalStore((s) => s.inProgressLoan);
   const selectedVault = useGlobalStore((s) => s.selectedVault);
   const clear = useGlobalStore((s) => s.clear);
   const { setVisible } = useHeaderDisclosureState();
@@ -21,10 +22,14 @@ export default function Intro() {
   }, [location.state, setVisible, clear, setHeaderState]);
 
   const handleClick = useCallback(() => {
-    clear();
-    setHeaderState(HeaderState.ListEligibleCollections);
-    setVisible(true);
-  }, [clear, setHeaderState, setVisible]);
+    if (inProgressLoan) {
+      setVisible(true);
+    } else {
+      clear();
+      setHeaderState(HeaderState.ListEligibleCollections);
+      setVisible(true);
+    }
+  }, [inProgressLoan, clear, setHeaderState, setVisible]);
 
   const buttonText = useMemo(() => {
     if (selectedVault) return "create new loan";

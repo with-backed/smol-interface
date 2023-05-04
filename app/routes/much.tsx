@@ -7,7 +7,7 @@ import { useGlobalStore } from "~/lib/globalStore";
 import { riskLevelToLTV } from "~/lib/utils";
 
 export default function HowMuchBorrow() {
-  const maxDebt = useGlobalStore((s) => s.inProgressLoan?.maxDebtForChosen);
+  const maxDebt = useGlobalStore((s) => s.inProgressLoan?.maxDebtForChosenPapr);
   const setInProgressLoan = useGlobalStore((s) => s.setInProgressLoan);
   const riskLevel = useGlobalStore(
     (s) => s.selectedVault?.riskLevel || s.inProgressLoan?.riskLevel

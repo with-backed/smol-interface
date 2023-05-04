@@ -25,7 +25,7 @@ import { useNFTSymbol } from "~/hooks/useNFTSymbol";
 
 export function Header() {
   const { address, isConnected } = useAccount();
-  const disclosure = useHeaderDisclosureState(); // TODO: cnasc/adamgobes: this disclosure state is causing the entire header to re-render when opening/closing, which refetches quotes and is inefficient
+  const disclosure = useHeaderDisclosureState();
   const state = useGlobalStore((s) => s.state);
   const setCurrentVaults = useGlobalStore((s) => s.setCurrentVaults);
   const setRefreshCurrentVaults = useGlobalStore(
@@ -194,17 +194,23 @@ function SelectCollectionHeaderContent() {
   const currentVaults = useGlobalStore((s) => s.currentVaults);
   const setInProgressLoan = useGlobalStore((s) => s.setInProgressLoan);
   const setHeaderState = useGlobalStore((s) => s.setHeaderState);
-  const { userCollectionNFTs, nftsLoading } = useAccountNFTs(
+
+  const userNFTs = useGlobalStore((s) => s.userNFTs);
+  const setUserNFTs = useGlobalStore((s) => s.setUserNFTs);
+  const { nftsFromCenter } = useAccountNFTs(
     address,
     collateralContractAddresses
   );
+  useEffect(() => {
+    setUserNFTs(nftsFromCenter);
+  }, [nftsFromCenter, setUserNFTs]);
 
   const collateralAddressesForExistingVaults = useMemo(() => {
     return new Set(currentVaults?.map((v) => getAddress(v.token.id)));
   }, [currentVaults]);
 
   const uniqueCollections = useMemo(() => {
-    const userCollectionCollateral = userCollectionNFTs.map((nft) =>
+    const userCollectionCollateral = userNFTs.map((nft) =>
       getAddress(nft.address)
     );
 
@@ -215,16 +221,21 @@ function SelectCollectionHeaderContent() {
       .concat(userCollectionCollateral);
 
     return Array.from(new Set(userAndVaultCollateral));
-  }, [userCollectionNFTs, currentVaults]);
+  }, [userNFTs, currentVaults]);
 
   const handleClick = useCallback(
-    (selectedCollectionAddress: string, maxDebt: ethers.BigNumber) => {
+    (
+      selectedCollectionAddress: string,
+      maxDebtPapr: ethers.BigNumber,
+      maxDebtEth: ethers.BigNumber
+    ) => {
       setInProgressLoan((_prev) => {
         return {
           collectionAddress: selectedCollectionAddress,
           tokenIds: [],
-          maxDebtForCollection: maxDebt,
-          maxDebtForChosen: undefined,
+          maxDebtForCollectionPapr: maxDebtPapr,
+          maxDebtForCollectionEth: maxDebtEth,
+          maxDebtForChosenPapr: undefined,
           amount: undefined,
           riskLevel: undefined,
         };
@@ -245,7 +256,7 @@ function SelectCollectionHeaderContent() {
                 key={c}
                 collateralAddress={c}
                 numCollateral={
-                  userCollectionNFTs.filter(
+                  userNFTs.filter(
                     (nft) => getAddress(nft.address) === getAddress(c)
                   ).length
                 }
@@ -269,7 +280,8 @@ type LineItemProps = {
   numCollateral: number;
   handleClick: (
     selectedCollectionAddress: string,
-    maxDebt: ethers.BigNumber
+    maxDebtPapr: ethers.BigNumber,
+    maxDebtEth: ethers.BigNumber
   ) => void;
 };
 
@@ -304,9 +316,12 @@ function SelectCollectionLineItem({
       <TextButton
         disabled={
           collateralAddressesForExistingVaults.has(collateralAddress) ||
-          !maxDebtInPapr
+          !maxDebtInPapr ||
+          !maxDebtInETH
         }
-        onClick={() => handleClick(collateralAddress, maxDebtInPapr!)}
+        onClick={() =>
+          handleClick(collateralAddress, maxDebtInPapr!, maxDebtInETH!)
+        }
       >
         <span
           className={
@@ -329,51 +344,48 @@ function SelectCollectionLineItem({
 }
 
 function SelectNFTsHeaderContent() {
-  const { paprToken, underlying } = usePaprController();
+  const { underlying } = usePaprController();
   const selectedCollectionAddress = useGlobalStore(
     (s) => s.inProgressLoan?.collectionAddress
   );
-  const maxDebtForCollection = useGlobalStore(
-    (s) => s.inProgressLoan?.maxDebtForCollection
-  );
 
-  const maxDebtInETH = usePoolQuote({
-    amount: maxDebtForCollection || null,
-    inputToken: paprToken.id,
-    outputToken: underlying.id,
-    tradeType: "exactIn",
-    skip: !maxDebtForCollection,
-  });
+  const maxDebtForCollectionPapr = useGlobalStore(
+    (s) => s.inProgressLoan?.maxDebtForCollectionPapr
+  );
+  const maxDebtForCollectionEth = useGlobalStore(
+    (s) => s.inProgressLoan?.maxDebtForCollectionEth
+  );
 
   const formattedMaxDebt = useMemo(() => {
-    if (!maxDebtInETH) return "...";
-    return `${formatBigNum(maxDebtInETH, underlying.decimals, 3)} ${
+    if (!maxDebtForCollectionEth) return "...";
+    return `${formatBigNum(maxDebtForCollectionEth, underlying.decimals, 3)} ${
       underlying.symbol
     }`;
-  }, [maxDebtInETH, underlying.decimals, underlying.symbol]);
+  }, [maxDebtForCollectionEth, underlying.decimals, underlying.symbol]);
+
+  const userNFTs = useGlobalStore((s) => s.userNFTs);
+  const nftsForCollection = useMemo(() => {
+    if (!selectedCollectionAddress) return [];
+    return userNFTs.filter(
+      (nft) => getAddress(nft.address) === getAddress(selectedCollectionAddress)
+    );
+  }, [selectedCollectionAddress, userNFTs]);
 
   const setInProgressLoan = useGlobalStore((s) => s.setInProgressLoan);
-  const { address } = useAccount();
-  const { userCollectionNFTs, nftsLoading } = useAccountNFTs(
-    address,
-    useMemo(() => {
-      return selectedCollectionAddress ? [selectedCollectionAddress] : [""];
-    }, [selectedCollectionAddress])
-  );
   const [selectedTokenIds, setSelectedTokenIds] = useState<{
     [tokenId: string]: boolean;
   }>({});
 
   useEffect(() => {
-    if (userCollectionNFTs.length > 0) {
+    if (nftsForCollection.length > 0) {
       setSelectedTokenIds(
-        userCollectionNFTs.reduce(
+        nftsForCollection.reduce(
           (acc, nft) => ({ ...acc, [nft.tokenId]: true }),
           {} as { [tokenId: string]: boolean }
         )
       );
     }
-  }, [userCollectionNFTs]);
+  }, [nftsForCollection]);
 
   const handleNFTClick = useCallback((tokenId: string) => {
     setSelectedTokenIds((prev) => ({
@@ -381,31 +393,6 @@ function SelectNFTsHeaderContent() {
       [tokenId]: !prev[tokenId],
     }));
   }, []);
-  useEffect(() => {
-    const tokenIds = Object.entries(selectedTokenIds).reduce(
-      (acc, [id, include]) => (include ? [...acc, id] : acc),
-      [] as string[]
-    );
-    if (!maxDebtForCollection || tokenIds.length === 0) return;
-
-    setInProgressLoan((prev) => {
-      if (prev) {
-        return {
-          ...prev,
-          amount: undefined,
-          maxDebtForChosen: maxDebtForCollection
-            .mul(tokenIds.length)
-            .div(userCollectionNFTs.length),
-        };
-      }
-      return null;
-    });
-  }, [
-    maxDebtForCollection,
-    selectedTokenIds,
-    setInProgressLoan,
-    userCollectionNFTs.length,
-  ]);
 
   const { toggle } = useHeaderDisclosureState();
 
@@ -415,23 +402,34 @@ function SelectNFTsHeaderContent() {
       (acc, [id, include]) => (include ? [...acc, id] : acc),
       [] as string[]
     );
+    if (!maxDebtForCollectionPapr || tokenIds.length === 0) return;
     setInProgressLoan((prev) => {
       if (prev) {
         return {
           ...prev,
           tokenIds: [...new Set(tokenIds)],
+          amount: undefined,
+          maxDebtForChosenPapr: maxDebtForCollectionPapr
+            .mul(tokenIds.length)
+            .div(nftsForCollection.length),
         };
       }
       return null;
     });
     toggle();
-  }, [selectedTokenIds, setInProgressLoan, toggle]);
+  }, [
+    selectedTokenIds,
+    maxDebtForCollectionPapr,
+    setInProgressLoan,
+    toggle,
+    nftsForCollection.length,
+  ]);
 
   return (
     <>
       <p>Select items (Max: {formattedMaxDebt})</p>
       <div className="flex flex-wrap gap-2">
-        {userCollectionNFTs.map(({ address, tokenId }, i) => (
+        {nftsForCollection.map(({ address, tokenId }, i) => (
           <Button
             key={address + tokenId}
             onClick={() => handleNFTClick(tokenId)}

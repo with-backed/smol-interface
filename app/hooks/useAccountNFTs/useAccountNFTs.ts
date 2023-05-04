@@ -12,9 +12,9 @@ export const useAccountNFTs = (
 ) => {
   const { centerKey } = useConfig();
   const [nftsLoading, setNftsLoading] = useState<boolean>(true);
-  const [userCollectionNFTs, setUserCollectionNFTs] = useState<
-    AccountNFTsResponse[]
-  >([]);
+  const [nftsFromCenter, setNFTsFromCenter] = useState<AccountNFTsResponse[]>(
+    []
+  );
 
   const fetchUserNFTs = useCallback(async () => {
     if (address && collections) {
@@ -29,7 +29,7 @@ export const useAccountNFTs = (
         }
       );
       const json = await res.json();
-      setUserCollectionNFTs(json.items);
+      setNFTsFromCenter(json.items);
       setNftsLoading(false);
     }
   }, [address, collections, centerKey]);
@@ -44,7 +44,7 @@ export const useAccountNFTs = (
   }, [fetchUserNFTs]);
 
   return {
-    userCollectionNFTs,
+    nftsFromCenter,
     nftsLoading,
     reexecuteQuery,
   };
