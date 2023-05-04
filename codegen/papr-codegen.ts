@@ -17,16 +17,6 @@ const config: CodegenConfig = {
         fragmentMasking: false,
       },
     },
-    "app/gql/erc721/": {
-      schema:
-        "https://api.thegraph.com/subgraphs/name/sunguru98/mainnet-erc721-subgraph",
-      documents: "app/hooks/useAccountNFTs/useAccountNFTs.ts",
-      preset: "client",
-      plugins: [],
-      presetConfig: {
-        fragmentMasking: false,
-      },
-    },
     "app/gql/twabs/": {
       schema: [
         {

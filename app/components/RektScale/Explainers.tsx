@@ -49,7 +49,7 @@ export function ValueExplainer() {
   }, [setActiveExplainer]);
   const [nftValueTop, setNFTValueTop] = useState<number | null>(null);
   const ref = useRef<HTMLDivElement>(null);
-  const { collateralCount, currentPriceForCollection, price24hrAgo } =
+  const { collateralCount, currentPriceForCollection } =
     useSelectedCollectionValue();
 
   const positionNFTValue = useCallback(() => {

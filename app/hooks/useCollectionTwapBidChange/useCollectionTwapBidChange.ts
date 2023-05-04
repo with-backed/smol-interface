@@ -66,7 +66,7 @@ export function useCollectionTwapBidChange(collection: string) {
   });
 
   const currentPriceForCollection = useMemo(() => {
-    if (!oracleInfo) return null;
+    if (!oracleInfo || !oracleInfo[collection]) return null;
     return oracleInfo[collection].price;
   }, [oracleInfo, collection]);
   const price24hrAgo = useMemo(() => {
