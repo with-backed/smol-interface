@@ -32,6 +32,8 @@ const paprHero: Config = {
   erc721Subgraph:
     "https://api.thegraph.com/subgraphs/name/adamgobes/erc721-goerli",
   twabsApi: "",
+  rustOracleServer:
+    "https://papr-api.onrender.com/oracleInfoForAllowedCollateral",
 };
 
 const paprMeme = {
@@ -53,6 +55,7 @@ const paprMeme = {
   erc721Subgraph:
     "https://api.thegraph.com/subgraphs/name/sunguru98/mainnet-erc721-subgraph",
   twabsApi: "https://optimal-mole-21.hasura.app/v1/graphql",
+  rustOracleServer: "",
 };
 
 export const configs = {
