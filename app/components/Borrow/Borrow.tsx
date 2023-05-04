@@ -139,8 +139,8 @@ export function BorrowUnconnected() {
       <BorrowBase />
       <div className="graph-papr flex-auto flex flex-col justify-center items-center">
         <Button
-          theme="bg-black"
-          additionalClassNames={["text-[#969696]"]}
+          theme="bg-unclickable-grey"
+          additionalClassNames={["text-[#B1B1B1]"]}
           disabled
         >
           Borrow $$$
@@ -152,12 +152,12 @@ export function BorrowUnconnected() {
 
 function BorrowBase() {
   return (
-    <div className="w-full flex flex-col items-center p-8">
-      <div className="w-4/6 text-center">
+    <div className="w-full flex flex-col items-center px-8 py-4">
+      <div className="w-3/5 text-center">
         <p>GET ETH NOW RESCUE TOAD LATER</p>
       </div>
-      <div className="my-4 mt-16">
-        <img src="/instrument.png" />
+      <div className="mt-16">
+        <img src="/5-instrument-super-dance.svg" />
       </div>
     </div>
   );
