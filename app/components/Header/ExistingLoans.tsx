@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from "react";
 import type { RiskLevel } from "~/lib/globalStore";
 import { useGlobalStore } from "~/lib/globalStore";
-import { HeaderState } from "./";
+import { HeaderState, SelectedVaultLoading } from "./";
 import type { SubgraphVault } from "~/hooks/useVault";
 import { useRiskLevel } from "~/hooks/useRiskLevel";
 import { LoanDetailsForExistingLoan } from "./LoanDetailsForExistingLoan";
@@ -53,19 +53,7 @@ function ExistingLoan({ vault, index }: ExistingLoanProps) {
       selectVaultAsCurrent(vault, riskLevel);
   }, [selectedVault, state, index, riskLevel, selectVaultAsCurrent, vault]);
 
-  if (!riskLevel)
-    return (
-      <div
-        className="my-1 cursor-pointer h-[32px] bg-medium-grey rounded-lg"
-        key={vault.id}
-      >
-        <img
-          src="/loading-flies.svg"
-          alt="loading flies"
-          className="w-full h-full"
-        />
-      </div>
-    );
+  if (!riskLevel) return <SelectedVaultLoading />;
 
   return (
     <div
