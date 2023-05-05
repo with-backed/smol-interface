@@ -5,7 +5,7 @@ const config: CodegenConfig = {
   generates: {
     "app/gql/": {
       schema:
-        "https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.95/gn",
+        "https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr/0.2.04/gn",
       documents: [
         "app/**/*.{ts,tsx}",
         "!app/hooks/useAccountNFTs/useAccountNFTs.ts",
