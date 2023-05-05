@@ -184,7 +184,7 @@ export default function App() {
             <RainbowKitProvider chains={chains}>
               <TimestampProvider>
                 <TargetProvider>
-                  <OracleInfoProvider collections={allowedCollateral}>
+                  <OracleInfoProvider>
                     <ControllerContextProvider
                       value={serverSideData.paprSubgraphData as PaprController}
                     >

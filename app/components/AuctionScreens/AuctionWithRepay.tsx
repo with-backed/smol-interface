@@ -84,6 +84,7 @@ export function AuctionWithRepay({ vault }: AuctionWithRepayProps) {
           <Repay
             vault={vault}
             loanDetails={loanDetails}
+            buttonText={`Repay ${loanDetails.formattedTotalOwed}`}
             refresh={() => setHasRepaidAuction()}
             disabled={vault.collateral.length === 0}
           />
