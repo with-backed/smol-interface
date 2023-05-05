@@ -73,7 +73,7 @@ function ExistingLoan({ vault, index }: ExistingLoanProps) {
       key={vault.id}
       onClick={() => selectVaultAsCurrent(vault, riskLevel)}
     >
-      <LoanDetailsForExistingLoan vault={{ ...vault, riskLevel: riskLevel }} />
+      <LoanDetailsForExistingLoan vault={{ ...vault, riskLevel }} />
     </div>
   );
 }

@@ -38,7 +38,6 @@ export function riskLevelFromDebts(
   const debtNumber = parseFloat(formatBigNum(debt, paprTokenDecimals));
   const maxDebtNumber = parseFloat(formatBigNum(maxDebt, paprTokenDecimals));
   const ratio = (debtNumber / maxDebtNumber) * 100;
-
   if (ratio < riskLevelToLTV.fine.start) return "fine";
   else if (ratio < riskLevelToLTV.risky.start) return "risky";
   else return "yikes";
