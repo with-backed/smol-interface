@@ -37,14 +37,32 @@ function LavaExplainerBase() {
     setActiveExplainer(null);
   }, [setActiveExplainer]);
   const liquidationTriggerPrice = useLiquidationTriggerPrice();
+  const riskLevel = useGlobalStore(
+    (s) => s.selectedVault?.riskLevel || s.inProgressLoan?.riskLevel || "fine"
+  );
 
   const positionRiskLevel = useCallback(() => {
     if (ref.current) {
-      const height = ref.current.getBoundingClientRect().height;
-      const top = height / 2;
-      setRiskLevelTop(top + 16);
+      const elem = ref.current.querySelector(`.bg-${riskLevel}`);
+      const bodyRect = ref.current
+        .closest(".explainer")
+        ?.getBoundingClientRect();
+
+      if (!elem || !bodyRect) {
+        console.error(
+          "Could not find elements to position risk level on scale"
+        );
+        return;
+      }
+
+      const elemRect = elem.getBoundingClientRect();
+      const offset = elemRect.top - bodyRect.top;
+      const height = elem.clientHeight;
+      if (height !== undefined) {
+        setRiskLevelTop(offset + Math.floor(height / 2));
+      }
     }
-  }, []);
+  }, [riskLevel]);
 
   useLayoutEffect(() => positionRiskLevel(), [positionRiskLevel]);
   useResizeObserver(
