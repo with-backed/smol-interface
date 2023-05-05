@@ -34,14 +34,12 @@ export function riskLevelFromDebts(
   debt: ethers.BigNumber,
   maxDebt: ethers.BigNumber,
   paprTokenDecimals: number
-): { riskLevel: RiskLevel; ratio: number } {
+): RiskLevel {
   const debtNumber = parseFloat(formatBigNum(debt, paprTokenDecimals));
   const maxDebtNumber = parseFloat(formatBigNum(maxDebt, paprTokenDecimals));
   const ratio = (debtNumber / maxDebtNumber) * 100;
-  const riskLevel = (() => {
-    if (ratio < riskLevelToLTV.fine.start) return "fine";
-    else if (ratio < riskLevelToLTV.risky.start) return "risky";
-    else return "yikes";
-  })();
-  return { riskLevel, ratio };
+
+  if (ratio < riskLevelToLTV.fine.start) return "fine";
+  else if (ratio < riskLevelToLTV.risky.start) return "risky";
+  else return "yikes";
 }
