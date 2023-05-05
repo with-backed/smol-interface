@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FrogCooker } from "~/components/FrogCooker";
 import { RektScale } from "~/components/RektScale";
 import { RiskRadio } from "~/components/RiskRadio";
@@ -9,8 +9,8 @@ import { riskLevelToLTV } from "~/lib/utils";
 export default function HowMuchBorrow() {
   const maxDebt = useGlobalStore((s) => s.inProgressLoan?.maxDebtForChosenPapr);
   const setInProgressLoan = useGlobalStore((s) => s.setInProgressLoan);
-  const storeRiskLevel = useGlobalStore(
-    (s) => s.selectedVault?.riskLevel || s.inProgressLoan?.riskLevel
+  const storeRiskLevel = useGlobalStore((s) =>
+    s.inProgressLoan ? s.inProgressLoan.riskLevel : s.selectedVault?.riskLevel
   );
   const [loggedOutRiskLevel, setLoggedOutRiskLevel] =
     useState<RiskLevel>("fine");
@@ -37,6 +37,14 @@ export default function HowMuchBorrow() {
     },
     [maxDebt, setInProgressLoan]
   );
+
+  useEffect(() => {
+    // checking if max debt exists is a shortcut to determine if they have an in progress loan
+    // if they do, default to the logged out risk level
+    if (maxDebt) {
+      setSelectedBorrow(loggedOutRiskLevel);
+    }
+  }, [loggedOutRiskLevel, setSelectedBorrow, maxDebt]);
 
   return (
     <>
