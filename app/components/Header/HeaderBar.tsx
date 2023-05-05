@@ -29,7 +29,7 @@ export function HeaderBar() {
   );
 
   if (!inProgressLoan) {
-    if (currentVaults && !selectedVault) {
+    if (currentVaults && currentVaults.length > 0 && !selectedVault) {
       return (
         <div className={className}>
           <SelectedVaultLoading />
