@@ -7,7 +7,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { getAddress } from "ethers/lib/utils.js";
 import { useConfig } from "../useConfig";
 
-const ORACLE_POLL_INTERVAL = 1200000;
+const ORACLE_POLL_INTERVAL = 900000;
 
 export type OracleInfo = { [key: string]: ReservoirResponseData };
 export type OracleInfoRepository = {
