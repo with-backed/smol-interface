@@ -10,6 +10,7 @@ const config: CodegenConfig = {
         "app/**/*.{ts,tsx}",
         "!app/hooks/useAccountNFTs/useAccountNFTs.ts",
         "!app/hooks/useCollectionTwapBidChange/useCollectionTwapBidChange.ts",
+        "!app/hooks/useLatestMarketPrice/useLatestMarketPrice.ts",
       ],
       preset: "client",
       plugins: [],
@@ -27,6 +28,15 @@ const config: CodegenConfig = {
       ],
       documents:
         "app/hooks/useCollectionTwapBidChange/useCollectionTwapBidChange.ts",
+      preset: "client",
+      plugins: [],
+      presetConfig: {
+        fragmentMasking: false,
+      },
+    },
+    "app/gql/uniswap/": {
+      schema: "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3",
+      documents: "app/hooks/useLatestMarketPrice/useLatestMarketPrice.ts",
       preset: "client",
       plugins: [],
       presetConfig: {
