@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useAccount } from "wagmi";
 import { useGlobalStore } from "~/lib/globalStore";
-import { LoanDetails, NFTs } from "./";
+import { LoanDetails, NFTs, SelectedVaultLoading } from "./";
 import { LoanDetailsForExistingLoan } from "./LoanDetailsForExistingLoan";
 import { usePoolQuote } from "~/hooks/usePoolQuote";
 import { usePaprController } from "~/hooks/usePaprController";
@@ -20,6 +20,7 @@ export function HeaderBar() {
     return `flex items-center bg-light-grey text-black relative px-4 min-h-[50px] ${justification}`;
   }, [isConnected]);
 
+  const currentVaults = useGlobalStore((s) => s.currentVaults);
   const selectedVault = useGlobalStore((s) => s.selectedVault);
   const inProgressLoan = useGlobalStore((s) => s.inProgressLoan);
   const hasSelectedNFTs = useMemo(
@@ -28,6 +29,14 @@ export function HeaderBar() {
   );
 
   if (!inProgressLoan) {
+    if (currentVaults && !selectedVault) {
+      return (
+        <div className={className}>
+          <SelectedVaultLoading />
+        </div>
+      );
+    }
+
     if (selectedVault) {
       return (
         <div className={className}>
@@ -35,6 +44,7 @@ export function HeaderBar() {
         </div>
       );
     }
+
     return <></>;
   }
 
