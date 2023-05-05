@@ -333,17 +333,12 @@ function SelectCollectionLineItem({
           {nftSymbol}
         </span>
       </TextButton>{" "}
-      {maxDebtInETH ? (
-        `(${formatBigNum(maxDebtInETH, underlying.decimals, 3)} ${
-          underlying.symbol
-        })`
-      ) : (
-        <img
-          src="/loading-ellipses.svg"
-          alt="loading ellipses"
-          className="relative left-[-16px] top-[2px]"
-        />
-      )}
+      (
+      {maxDebtInETH
+        ? formatBigNum(maxDebtInETH, underlying.decimals, 3) +
+          ` ${underlying.symbol}`
+        : "..."}
+      )
     </li>
   );
 }
