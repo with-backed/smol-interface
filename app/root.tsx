@@ -41,6 +41,7 @@ import { HeaderDisclosureContextProvider } from "./hooks/useHeaderDisclosureStat
 import { TargetProvider } from "./hooks/useTarget";
 import { LavaExplainer, ValueExplainer } from "./components/RektScale";
 import { useExplainerStore } from "./lib/explainerStore";
+import { CollectionsPreviewExplainer } from "./components/CollectionsPreviewExplainer";
 
 declare global {
   interface Window {
@@ -151,6 +152,7 @@ export default function App() {
   const activeExplainer = useExplainerStore((s) => s.activeExplainer);
 
   const pageContent = useMemo(() => {
+    return <CollectionsPreviewExplainer />;
     if (activeExplainer === "lava") {
       return <LavaExplainer />;
     }
