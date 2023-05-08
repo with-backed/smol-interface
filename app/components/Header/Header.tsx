@@ -22,6 +22,7 @@ import { usePoolQuote } from "~/hooks/usePoolQuote";
 import { formatBigNum } from "~/lib/numberFormat";
 import type { ethers } from "ethers";
 import { useNFTSymbol } from "~/hooks/useNFTSymbol";
+import { PAGES } from "../Footer/Footer";
 
 export function Header() {
   const { address, isConnected } = useAccount();
@@ -103,7 +104,7 @@ function NewLoan() {
     <>
       <button className="bg-medium-grey rounded-lg h-7 w-full text-black">
         <Link
-          to="/pick"
+          to={PAGES[2]}
           state={{ startCreate: true }}
           className="no-underline text-black"
         >

@@ -56,7 +56,7 @@ export function AuctionWithClaim({ vault }: AuctionWithClaimProps) {
 
   const formattedClaimable = useMemo(() => {
     if (!quoteForClaimable) return "...";
-    return `Claim ${formatBigNum(quoteForClaimable, underlying.decimals, 4)} ${
+    return `${formatBigNum(quoteForClaimable, underlying.decimals, 4)} ${
       underlying.symbol
     }`;
   }, [quoteForClaimable, underlying.decimals, underlying.symbol]);

@@ -7,6 +7,7 @@ import { usePoolQuote } from "~/hooks/usePoolQuote";
 import { usePaprController } from "~/hooks/usePaprController";
 import { formatBigNum } from "~/lib/numberFormat";
 import { useMatches } from "@remix-run/react";
+import { PAGES } from "../Footer/Footer";
 
 export function HeaderBar() {
   const { isConnected } = useAccount();
@@ -49,7 +50,7 @@ export function HeaderBar() {
   }
 
   if (hasSelectedNFTs && !inProgressLoan.amount) {
-    if (pathname === "/much") {
+    if (pathname === PAGES[3]) {
       return (
         <div className={className}>
           <div className="flex flex-row items-center w-full h-7 rounded-lg bg-medium-grey">
