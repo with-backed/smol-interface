@@ -4,18 +4,21 @@ import type { ethers } from "ethers";
 import { formatBigNum } from "./numberFormat";
 
 export const riskLevelToLTV: {
-  [key in RiskLevel]: { start: number; border: number };
+  [key in RiskLevel]: { start: number; default: number; border: number };
 } = {
   fine: {
-    start: 50,
+    start: 0,
+    default: 50,
     border: 60,
   },
   risky: {
-    start: 70,
+    start: 60,
+    default: 70,
     border: 90,
   },
   yikes: {
-    start: 96,
+    start: 90,
+    default: 96,
     border: 100,
   },
 };
@@ -34,11 +37,16 @@ export function riskLevelFromDebts(
   debt: ethers.BigNumber,
   maxDebt: ethers.BigNumber,
   paprTokenDecimals: number
-): RiskLevel {
+): { riskLevel: RiskLevel; percentage: number } {
   const debtNumber = parseFloat(formatBigNum(debt, paprTokenDecimals));
   const maxDebtNumber = parseFloat(formatBigNum(maxDebt, paprTokenDecimals));
   const ratio = (debtNumber / maxDebtNumber) * 100;
-  if (ratio < riskLevelToLTV.fine.border) return "fine";
-  else if (ratio < riskLevelToLTV.risky.border) return "risky";
-  else return "yikes";
+  const riskLevel = (() => {
+    if (ratio < riskLevelToLTV.fine.border) return "fine";
+    else if (ratio < riskLevelToLTV.risky.border) return "risky";
+    else return "yikes";
+  })();
+  const range = riskLevelToLTV[riskLevel];
+  const percentage = (ratio - range.start) / (range.border - range.start);
+  return { riskLevel, percentage };
 }

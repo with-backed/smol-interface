@@ -9,6 +9,7 @@ import { usePaprController } from "~/hooks/usePaprController";
 import { useSelectedCollectionValue } from "~/hooks/useSelectedCollectionValue";
 import { useGlobalStore } from "~/lib/globalStore";
 import { useLiquidationTriggerPrice } from "~/hooks/useLiquidationTriggerPrice";
+import { useRiskLevel } from "~/hooks/useRiskLevel";
 
 type RektScaleProps = {
   riskLevel: RiskLevel | undefined;
@@ -16,7 +17,8 @@ type RektScaleProps = {
 
 export function RektScale({ riskLevel }: RektScaleProps) {
   const hasLoan = useGlobalStore(
-    (s) => !!s.inProgressLoan || !!s.selectedVault
+    (s) =>
+      (!!s.inProgressLoan && !!s.inProgressLoan.amount) || !!s.selectedVault
   );
 
   if (hasLoan) {
@@ -42,18 +44,47 @@ function RektScaleWithLoan({ riskLevel = "fine" }: RektScaleProps) {
     return "NFT Value";
   }, [collateralCount, currentPriceForCollection, underlying]);
   const liquidationTriggerPrice = useLiquidationTriggerPrice();
+  const selectedVault = useGlobalStore((s) => s.selectedVault);
+  const inProgressLoan = useGlobalStore((s) => s.inProgressLoan);
+  const loanSpec = useMemo(() => {
+    if (inProgressLoan) {
+      const collateralAddress = inProgressLoan.collectionAddress;
+      const collateralCount = inProgressLoan.tokenIds.length;
+      // We check for this in "hasLoan"
+      const debt = inProgressLoan.amount!;
+      return {
+        collateralAddress,
+        collateralCount,
+        debt,
+      };
+    }
+    // We check for this in "hasLoan", if inProgressLoan is null, selectedVault is not
+    const v = selectedVault!;
+    return {
+      collateralAddress: v.token.id,
+      collateralCount: v.collateral.length,
+      debt: v.debt,
+    };
+  }, [inProgressLoan, selectedVault]);
+  const riskLevelResult = useRiskLevel(loanSpec);
   return (
     <RektScaleBase
       lava={liquidationTriggerPrice || "..."}
       nftValue={nftValue}
       riskLevel={riskLevel}
+      percentage={riskLevelResult?.percentage || 0.5}
     />
   );
 }
 
 function RektScaleNoLoan({ riskLevel = "fine" }: RektScaleProps) {
   return (
-    <RektScaleBase lava="lava" nftValue="NFT Value" riskLevel={riskLevel} />
+    <RektScaleBase
+      lava="lava"
+      nftValue="NFT Value"
+      riskLevel={riskLevel}
+      percentage={0.5}
+    />
   );
 }
 
@@ -61,9 +92,15 @@ type RektScaleBaseProps = {
   lava: string;
   nftValue: string;
   riskLevel: RiskLevel;
+  percentage: number;
 };
 
-function RektScaleBase({ lava, nftValue, riskLevel }: RektScaleBaseProps) {
+function RektScaleBase({
+  lava,
+  nftValue,
+  riskLevel,
+  percentage,
+}: RektScaleBaseProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [riskLevelTop, setRiskLevelTop] = useState<number | null>(null);
   const [nftValueTop, setNFTValueTop] = useState<number | null>(null);
@@ -99,10 +136,10 @@ function RektScaleBase({ lava, nftValue, riskLevel }: RektScaleBaseProps) {
       const offset = elemRect.top - bodyRect.top;
       const height = elem.clientHeight;
       if (height !== undefined) {
-        setRiskLevelTop(offset + Math.floor(height / 2));
+        setRiskLevelTop(offset + Math.floor(height * (1 - percentage)));
       }
     }
-  }, [riskLevel]);
+  }, [riskLevel, percentage]);
 
   useLayoutEffect(() => positionRiskLevel(), [positionRiskLevel]);
   useResizeObserver(
