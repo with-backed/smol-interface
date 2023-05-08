@@ -16,6 +16,7 @@ export function NFTs({ collectionAddress, tokenIds }: NFTsProps) {
               key={tokenId}
               address={collectionAddress}
               tokenId={tokenId}
+              renderLoading={() => <img src="/loading-ellipses.svg" />}
             />
           ))}
         </Marquee>
