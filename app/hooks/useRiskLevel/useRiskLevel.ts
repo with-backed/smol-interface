@@ -6,15 +6,19 @@ import { usePaprController } from "../usePaprController";
 import type { ethers } from "ethers";
 
 type LoanSpec = {
-  tokenId: string;
+  collateralAddress: string;
   collateralCount: number;
   debt: ethers.BigNumber;
 };
 
-export function useRiskLevel({ tokenId, collateralCount, debt }: LoanSpec) {
+export function useRiskLevel({
+  collateralAddress,
+  collateralCount,
+  debt,
+}: LoanSpec) {
   const { paprToken } = usePaprController();
   const maxDebtForDefaultCollection = useMaxDebt(
-    tokenId,
+    collateralAddress,
     OraclePriceType.lower
   );
   const maxDebtForVault = useMemo(() => {

@@ -38,7 +38,7 @@ function ExistingLoan({ vault, index }: ExistingLoanProps) {
   const riskLevelResult = useRiskLevel(
     useMemo(
       () => ({
-        tokenId: vault.token.id,
+        collateralAddress: vault.token.id,
         collateralCount: vault.collateral.length,
         debt: vault.debt,
       }),
