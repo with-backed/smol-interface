@@ -13,6 +13,8 @@ import { usePaprController } from "../usePaprController";
 import { formatBigNum, formatPercent } from "~/lib/numberFormat";
 import { calculateSwapFee } from "~/lib/fees";
 import type { SubgraphVault } from "~/hooks/useVault";
+import { erc20TokenToToken, price } from "~/lib/uniswap";
+import { usePoolTokens } from "../usePoolTokens";
 
 dayjs.extend(duration);
 
@@ -67,7 +69,8 @@ export type LoanDetails = {
 };
 
 export function useLoan(vault: NonNullable<SubgraphVault>): LoanDetails {
-  const { paprToken, underlying } = usePaprController();
+  const { paprToken, underlying, token0IsUnderlying } = usePaprController();
+  const { token0, token1 } = usePoolTokens();
 
   const vaultDebt = useMemo(() => {
     return ethers.BigNumber.from(vault.debt);
@@ -110,11 +113,35 @@ export function useLoan(vault: NonNullable<SubgraphVault>): LoanDetails {
 
   const borrowedFromSwap = useMemo(() => {
     if (!recentLoanActivity) return null;
-    if (!recentLoanActivity.amountOut) return ethers.BigNumber.from(0);
+    if (!recentLoanActivity.amountOut) {
+      const paprPriceAtLoan = parseFloat(
+        price(
+          ethers.BigNumber.from(recentLoanActivity.sqrtPricePool!),
+          token0IsUnderlying ? token1 : token0,
+          token0IsUnderlying ? token0 : token1,
+          token0
+        ).toFixed(6)
+      );
+      const paprBorrowedNum = parseFloat(
+        ethers.utils.formatUnits(borrowedPapr!, 18)
+      );
+      const impliedEthBorrowed = paprBorrowedNum * paprPriceAtLoan;
+      return ethers.utils.parseUnits(
+        impliedEthBorrowed.toString(),
+        paprToken.decimals
+      );
+    }
     const amountOut = ethers.BigNumber.from(recentLoanActivity.amountOut);
 
     return amountOut.sub(calculateSwapFee(amountOut));
-  }, [recentLoanActivity]);
+  }, [
+    recentLoanActivity,
+    borrowedPapr,
+    token0IsUnderlying,
+    paprToken.decimals,
+    token0,
+    token1,
+  ]);
 
   const formattedBorrowed = useMemo(() => {
     if (!borrowedFromSwap) return "...";
