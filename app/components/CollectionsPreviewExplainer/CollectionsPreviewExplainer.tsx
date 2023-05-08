@@ -113,7 +113,7 @@ export function CollectionsPreviewExplainer() {
           ))}
         </tbody>
       </table>
-      <div className="flex flex-col justify-center items-center p-4 gap-7 mt-auto mb-[90px]">
+      <div className="flex flex-col justify-center items-center p-4 gap-7 mt-auto mb-[51px]">
         <p className="text-center">
           hero NFTs get ETH loans and must come from these meme collections
         </p>
