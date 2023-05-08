@@ -93,7 +93,16 @@ export function CollectionsPreviewExplainer() {
               <td className="w-8 h-8">
                 <Asset preset="small" address={ac.token.id} tokenId={1} />
               </td>
-              <td className="text-left">{ac.token.name}</td>
+              <td className="text-left">
+                <a
+                  href={`https://opensea.io/collection/${ac.token.name}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="no-underline text-link-text"
+                >
+                  {ac.token.name}
+                </a>
+              </td>
               <td className="text-right">
                 {inEth ? formatTokenAmount(inEth[ac.token.id]) : "..."} ETH
               </td>
