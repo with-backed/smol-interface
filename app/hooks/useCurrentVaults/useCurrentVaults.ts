@@ -5,6 +5,13 @@ import { graphql } from "~/gql";
 import type { VaultsByOwnerForControllerQuery } from "~/gql/graphql";
 import { ethers } from "ethers";
 import { erc20ABI, useAccount, useContractRead } from "wagmi";
+import type { VaultWithRiskLevel } from "~/lib/globalStore";
+import { useTarget } from "../useTarget";
+import { useOracleInfo } from "../useOracleInfo";
+import { OraclePriceType } from "~/lib/reservoir";
+import { calculateMaxDebt } from "../useMaxDebt/useMaxDebt";
+import { riskLevelFromDebts } from "~/lib/utils";
+import type { RiskLevel } from "~/lib/globalStore";
 
 const vaultsDocument = graphql(`
   query vaultsByOwnerForController($owner: Bytes, $controller: String) {
@@ -15,11 +22,16 @@ const vaultsDocument = graphql(`
 `);
 
 export function useCurrentVaults(user: string | undefined) {
-  const { id, paprToken } = usePaprController();
+  const { id, paprToken, underlying, maxLTV } = usePaprController();
   const { address } = useAccount();
+
+  const [vaultsWithRiskLevel, setVaultsWithRiskLevel] = useState<
+    VaultWithRiskLevel[] | undefined
+  >(undefined);
   const [prevData, setPrevData] = useState<
     VaultsByOwnerForControllerQuery | undefined
   >(undefined);
+
   const [{ data: vaultsData, fetching: vaultsFetching }, reexecuteQuery] =
     useQuery({
       query: vaultsDocument,
@@ -29,12 +41,15 @@ export function useCurrentVaults(user: string | undefined) {
       },
       pause: !user,
     });
+
   const { data: paprBalance } = useContractRead({
     address: paprToken.id as `0x${string}`,
     abi: erc20ABI,
     functionName: "balanceOf",
     args: [address as `0x${string}`],
   });
+  const targetResult = useTarget();
+  const oracleInfo = useOracleInfo(OraclePriceType.twap);
 
   useEffect(() => {
     if (vaultsData) {
@@ -67,9 +82,62 @@ export function useCurrentVaults(user: string | undefined) {
     });
   }, [prevData, vaultsFetching, vaultsDataToUse, paprBalance]);
 
-  return {
+  useEffect(() => {
+    if (!currentVaults || !oracleInfo || !targetResult) return;
+    const vaultsWithRiskLevel = currentVaults.map((vault) => {
+      const maxDebt = calculateMaxDebt(
+        vault.token.id,
+        oracleInfo,
+        targetResult,
+        maxLTV,
+        underlying.decimals
+      );
+
+      // if there was an error computing max debt for whatever reason, default to fine as to not break the UI, but this should never really happen
+      if (!maxDebt) return { ...vault, riskLevel: "fine" as RiskLevel };
+
+      const { riskLevel } = riskLevelFromDebts(
+        vault.debt,
+        maxDebt,
+        paprToken.decimals
+      );
+      return { ...vault, riskLevel };
+    });
+    const sortedVaults = vaultsWithRiskLevel.sort((a, b) => {
+      return riskLevelSort(a.riskLevel, b.riskLevel);
+    });
+
+    setVaultsWithRiskLevel(sortedVaults);
+  }, [
     currentVaults,
+    oracleInfo,
+    targetResult,
+    maxLTV,
+    underlying.decimals,
+    paprToken.decimals,
+  ]);
+
+  return {
+    currentVaults: vaultsWithRiskLevel,
     vaultsFetching,
     reexecuteQuery,
   };
+}
+
+function riskLevelToNumber(riskLevel: RiskLevel): number {
+  switch (riskLevel) {
+    case "fine":
+      return 2;
+    case "risky":
+      return 1;
+    case "yikes":
+      return 0;
+  }
+}
+
+function riskLevelSort(
+  riskLevelOne: RiskLevel,
+  riskLevelTwo: RiskLevel
+): number {
+  return riskLevelToNumber(riskLevelOne) - riskLevelToNumber(riskLevelTwo);
 }

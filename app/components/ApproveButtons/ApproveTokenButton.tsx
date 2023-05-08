@@ -16,6 +16,7 @@ type ApproveTokenButtonProps = {
   theme: ButtonTheme;
   token: Erc20Token;
   spender: string;
+  minApprovalRequired: ethers.BigNumber | null;
   tokenApproved: boolean;
   setTokenApproved: (val: boolean) => void;
 };
@@ -24,6 +25,7 @@ export function ApproveTokenButton({
   theme,
   token,
   spender,
+  minApprovalRequired,
   tokenApproved,
   setTokenApproved,
 }: ApproveTokenButtonProps) {
@@ -39,13 +41,13 @@ export function ApproveTokenButton({
   });
 
   useEffect(() => {
-    if (!allowanceData) return;
+    if (!allowanceData || !minApprovalRequired) return;
     if (allowanceData) setApprovedLoading(false);
 
-    if (allowanceData.gt(ethers.BigNumber.from(0))) {
+    if (allowanceData.gt(minApprovalRequired)) {
       setTokenApproved(true);
     }
-  }, [allowanceData, setTokenApproved]);
+  }, [allowanceData, minApprovalRequired, setTokenApproved]);
 
   const { config } = usePrepareContractWrite({
     address: token.id as `0x${string}`,

@@ -8,7 +8,7 @@ import { erc20ABI, useAccount, useContractRead } from "wagmi";
 import { useTokenIdsForVault } from "~/hooks/useTokenIdsForVault";
 
 type LoanDetailsForExistingLoanProps = {
-  vault: NonNullable<VaultWithRiskLevel>;
+  vault: VaultWithRiskLevel;
 };
 
 // convenience wrapper component over LoanDetails for rendering the correct version

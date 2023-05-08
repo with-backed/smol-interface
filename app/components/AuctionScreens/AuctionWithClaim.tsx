@@ -128,6 +128,7 @@ export function AuctionWithClaim({ vault }: AuctionWithClaimProps) {
                 <ApproveTokenButton
                   token={paprToken}
                   spender={swapRouterAddress[1]}
+                  minApprovalRequired={claimableAmount || null}
                   theme="bg-black"
                   tokenApproved={paprTokenApproved}
                   setTokenApproved={setPaprTokenApproved}
