@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import type { RiskLevel } from "~/lib/globalStore";
 import { useGlobalStore } from "~/lib/globalStore";
 import { HeaderState, SelectedVaultLoading } from "./";
@@ -35,7 +35,16 @@ function ExistingLoan({ vault, index }: ExistingLoanProps) {
   const setSelectedVault = useGlobalStore((s) => s.setSelectedVault);
   const state = useGlobalStore((s) => s.state);
   const { setVisible } = useHeaderDisclosureState();
-  const riskLevelResult = useRiskLevel(vault);
+  const riskLevelResult = useRiskLevel(
+    useMemo(
+      () => ({
+        tokenId: vault.token.id,
+        collateralCount: vault.collateral.length,
+        debt: vault.debt,
+      }),
+      [vault]
+    )
+  );
 
   const selectVaultAsCurrent = useCallback(
     (vault: NonNullable<SubgraphVault>, riskLevel: RiskLevel) => {
