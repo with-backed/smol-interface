@@ -9,6 +9,7 @@ import { useExplainerStore } from "~/lib/explainerStore";
 import { formatTokenAmount } from "~/lib/numberFormat";
 import { Button } from "~/components/Buttons/Button";
 import { TextButton } from "~/components/Buttons/TextButton";
+import { useConfig } from "~/hooks/useConfig";
 
 const debtIncreasedEventsQuery = graphql(`
   query allDebtIncreasedEvents {
@@ -71,12 +72,14 @@ function useTotalLentByCollection() {
 }
 
 export function CollectionsPreviewExplainer() {
+  const { network } = useConfig();
   const { allowedCollateral } = usePaprController();
   const setActiveExplainer = useExplainerStore((s) => s.setActiveExplainer);
   const handleClick = useCallback(() => {
     setActiveExplainer(null);
   }, [setActiveExplainer]);
   const { inEth } = useTotalLentByCollection();
+  console.log({ allowedCollateral });
   return (
     <div className="explainer bg-white flex flex-col relative pt-[50px]">
       <table className="border-separate border-spacing-2">
@@ -95,7 +98,7 @@ export function CollectionsPreviewExplainer() {
               </td>
               <td className="text-left">
                 <a
-                  href={`https://opensea.io/collection/${ac.token.name}`}
+                  href={`https://marketplace.reservoir.tools/collection/${network}/${ac.token.id}`}
                   target="_blank"
                   rel="noreferrer"
                   className="no-underline text-link-text"
