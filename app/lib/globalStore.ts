@@ -34,9 +34,7 @@ export function inProgressLoanFilledOut(
   );
 }
 
-export type VaultWithRiskLevel =
-  | (SubgraphVault & { riskLevel: RiskLevel })
-  | null;
+export type VaultWithRiskLevel = SubgraphVault & { riskLevel: RiskLevel };
 
 type RecentActions = {
   hasRepaid: boolean;
@@ -50,13 +48,11 @@ interface GlobalStore {
   setHeaderState: (newState: HeaderState) => void;
   userNFTs: AccountNFTsResponse[];
   setUserNFTs: (userCollectionNFTs: AccountNFTsResponse[]) => void;
-  currentVaults: VaultsByOwnerForControllerQuery["vaults"] | null;
-  setCurrentVaults: (
-    currentVaults: VaultsByOwnerForControllerQuery["vaults"]
-  ) => void;
+  currentVaults: VaultWithRiskLevel[] | null;
+  setCurrentVaults: (currentVaults: VaultWithRiskLevel[]) => void;
   refreshCurrentVaults: () => void;
   setRefreshCurrentVaults: (refreshCurrentVaults: () => void) => void;
-  selectedVault: VaultWithRiskLevel;
+  selectedVault: VaultWithRiskLevel | null;
   setSelectedVault: (selectedVault: VaultWithRiskLevel) => void;
   inProgressLoan: InProgressLoan | null;
   setInProgressLoan: (

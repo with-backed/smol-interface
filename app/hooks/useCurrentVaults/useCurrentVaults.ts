@@ -92,7 +92,10 @@ export function useCurrentVaults(user: string | undefined) {
         maxLTV,
         underlying.decimals
       );
+
+      // if there was an error computing max debt for whatever reason, default to fine as to not break the UI, but this should never really happen
       if (!maxDebt) return { ...vault, riskLevel: "fine" as RiskLevel };
+
       const riskLevel = riskLevelFromDebts(
         vault.debt,
         maxDebt,
@@ -100,7 +103,11 @@ export function useCurrentVaults(user: string | undefined) {
       );
       return { ...vault, riskLevel };
     });
-    setVaultsWithRiskLevel(vaultsWithRiskLevel);
+    const sortedVaults = vaultsWithRiskLevel.sort((a, b) => {
+      return riskLevelSort(a.riskLevel, b.riskLevel);
+    });
+
+    setVaultsWithRiskLevel(sortedVaults);
   }, [
     currentVaults,
     oracleInfo,
@@ -115,4 +122,22 @@ export function useCurrentVaults(user: string | undefined) {
     vaultsFetching,
     reexecuteQuery,
   };
+}
+
+function riskLevelToNumber(riskLevel: RiskLevel): number {
+  switch (riskLevel) {
+    case "fine":
+      return 2;
+    case "risky":
+      return 1;
+    case "yikes":
+      return 0;
+  }
+}
+
+function riskLevelSort(
+  riskLevelOne: RiskLevel,
+  riskLevelTwo: RiskLevel
+): number {
+  return riskLevelToNumber(riskLevelOne) - riskLevelToNumber(riskLevelTwo);
 }

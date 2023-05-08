@@ -1,9 +1,7 @@
-import { useCallback, useEffect, useMemo } from "react";
-import type { RiskLevel } from "~/lib/globalStore";
+import { useCallback, useEffect } from "react";
+import type { VaultWithRiskLevel } from "~/lib/globalStore";
 import { useGlobalStore } from "~/lib/globalStore";
-import { HeaderState, SelectedVaultLoading } from "./";
-import type { SubgraphVault } from "~/hooks/useVault";
-import { useRiskLevel } from "~/hooks/useRiskLevel";
+import { HeaderState } from "./";
 import { LoanDetailsForExistingLoan } from "./LoanDetailsForExistingLoan";
 import { useHeaderDisclosureState } from "~/hooks/useHeaderDisclosureState";
 
@@ -26,7 +24,7 @@ export function ExistingLoans() {
 }
 
 type ExistingLoanProps = {
-  vault: NonNullable<SubgraphVault>;
+  vault: VaultWithRiskLevel;
   index: number;
 };
 
@@ -35,51 +33,29 @@ function ExistingLoan({ vault, index }: ExistingLoanProps) {
   const setSelectedVault = useGlobalStore((s) => s.setSelectedVault);
   const state = useGlobalStore((s) => s.state);
   const { setVisible } = useHeaderDisclosureState();
-  const riskLevelResult = useRiskLevel(
-    useMemo(
-      () => ({
-        collateralAddress: vault.token.id,
-        collateralCount: vault.collateral.length,
-        debt: vault.debt,
-      }),
-      [vault]
-    )
-  );
 
   const selectVaultAsCurrent = useCallback(
-    (vault: NonNullable<SubgraphVault>, riskLevel: RiskLevel) => {
-      setSelectedVault({ ...vault, riskLevel });
+    (vault: VaultWithRiskLevel) => {
+      setSelectedVault(vault);
       setVisible(false);
     },
     [setSelectedVault, setVisible]
   );
 
   // setting the initial/default selectedVault
-  // TODO: adamgobes, potentially sort by risk level and default to highest risk loan
   useEffect(() => {
     if (selectedVault) return;
-    if (index === 0 && riskLevelResult && state === HeaderState.Default)
-      selectVaultAsCurrent(vault, riskLevelResult.riskLevel);
-  }, [
-    selectedVault,
-    state,
-    index,
-    riskLevelResult,
-    selectVaultAsCurrent,
-    vault,
-  ]);
-
-  if (!riskLevelResult) return <SelectedVaultLoading />;
+    if (index === 0 && state === HeaderState.Default)
+      selectVaultAsCurrent(vault);
+  }, [selectedVault, state, index, selectVaultAsCurrent, vault]);
 
   return (
     <div
       className="my-1 cursor-pointer"
       key={vault.id}
-      onClick={() => selectVaultAsCurrent(vault, riskLevelResult.riskLevel)}
+      onClick={() => selectVaultAsCurrent(vault)}
     >
-      <LoanDetailsForExistingLoan
-        vault={{ ...vault, riskLevel: riskLevelResult.riskLevel }}
-      />
+      <LoanDetailsForExistingLoan vault={vault} />
     </div>
   );
 }
