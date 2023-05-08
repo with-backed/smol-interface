@@ -152,12 +152,14 @@ export default function App() {
   const activeExplainer = useExplainerStore((s) => s.activeExplainer);
 
   const pageContent = useMemo(() => {
-    return <CollectionsPreviewExplainer />;
     if (activeExplainer === "lava") {
       return <LavaExplainer />;
     }
     if (activeExplainer === "value") {
       return <ValueExplainer />;
+    }
+    if (activeExplainer === "what-is") {
+      return <CollectionsPreviewExplainer />;
     }
     return (
       <>
