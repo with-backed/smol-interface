@@ -96,7 +96,7 @@ export function useCurrentVaults(user: string | undefined) {
       // if there was an error computing max debt for whatever reason, default to fine as to not break the UI, but this should never really happen
       if (!maxDebt) return { ...vault, riskLevel: "fine" as RiskLevel };
 
-      const riskLevel = riskLevelFromDebts(
+      const { riskLevel } = riskLevelFromDebts(
         vault.debt,
         maxDebt,
         paprToken.decimals
