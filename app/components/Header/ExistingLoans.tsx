@@ -4,6 +4,7 @@ import { useGlobalStore } from "~/lib/globalStore";
 import { HeaderState } from "./";
 import { LoanDetailsForExistingLoan } from "./LoanDetailsForExistingLoan";
 import { useHeaderDisclosureState } from "~/hooks/useHeaderDisclosureState";
+import { Link } from "@remix-run/react";
 
 export function ExistingLoans() {
   const currentVaults = useGlobalStore((s) => s.currentVaults);
@@ -50,12 +51,14 @@ function ExistingLoan({ vault, index }: ExistingLoanProps) {
   }, [selectedVault, state, index, selectVaultAsCurrent, vault]);
 
   return (
-    <div
-      className="my-1 cursor-pointer"
-      key={vault.id}
-      onClick={() => selectVaultAsCurrent(vault)}
-    >
-      <LoanDetailsForExistingLoan vault={vault} />
-    </div>
+    <Link to="/five" className="no-underline">
+      <div
+        className="my-1 cursor-pointer"
+        key={vault.id}
+        onClick={() => selectVaultAsCurrent(vault)}
+      >
+        <LoanDetailsForExistingLoan vault={vault} />
+      </div>
+    </Link>
   );
 }
