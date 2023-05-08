@@ -267,6 +267,7 @@ function SelectCollectionHeaderContent() {
               />
             ))}
           </ul>
+          <CancelButton />
         </>
       )}
       {!isConnected && (
