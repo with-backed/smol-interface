@@ -150,7 +150,6 @@ function RightText({
     <div className="mr-2">
       <p>
         {action === "borrow" ? "Borrow" : "Repay"} {formattedAmount}
-        {action === "borrow" && "?"}
       </p>
     </div>
   );

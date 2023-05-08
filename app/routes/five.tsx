@@ -68,5 +68,5 @@ export default function Five() {
     return <LoanSummaryContent collateralAddress={selectedVault.token.id} />;
   }
 
-  return <></>;
+  return <BorrowUnconnected />;
 }
