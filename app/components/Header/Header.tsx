@@ -269,7 +269,14 @@ function SelectCollectionHeaderContent() {
           </ul>
         </>
       )}
-      <CancelButton />
+      {!isConnected && (
+        <>
+          <div className="my-1">
+            <p>You must connect a wallet</p>
+          </div>
+          <CancelButton />
+        </>
+      )}
     </>
   );
 }
