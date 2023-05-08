@@ -23,7 +23,7 @@ export default function HowMuchBorrow() {
       // other than this screen should care about it.
       setLoggedOutRiskLevel(riskLevel);
       if (!maxDebt) return;
-      const multiplier = riskLevelToLTV[riskLevel].start;
+      const multiplier = riskLevelToLTV[riskLevel].default;
       setInProgressLoan((prev) => {
         if (prev) {
           return {
