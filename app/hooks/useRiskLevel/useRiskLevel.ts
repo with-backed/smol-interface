@@ -19,7 +19,7 @@ export function useRiskLevel({
   const { paprToken } = usePaprController();
   const maxDebtForDefaultCollection = useMaxDebt(
     collateralAddress,
-    OraclePriceType.lower
+    OraclePriceType.twap
   );
   const maxDebtForVault = useMemo(() => {
     if (!maxDebtForDefaultCollection) return null;
