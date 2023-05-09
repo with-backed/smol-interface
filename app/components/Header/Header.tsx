@@ -477,7 +477,12 @@ function NFT({ address, selected, tokenId }: NFTProps) {
   }, [selected]);
   return (
     <div className={wrapperClassName}>
-      <Asset address={address} tokenId={tokenId} preset="small" />
+      <Asset
+        address={address}
+        tokenId={tokenId}
+        preset="small"
+        renderLoading={() => <img src="/loading-ellipses.svg" />}
+      />
       <Checkmark visible={selected} />
     </div>
   );

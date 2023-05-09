@@ -1,0 +1,16 @@
+<svg viewBox="0 0 60 20" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <text x="30" y="12" font-size="16" text-anchor="middle" fill="#000">
+    <tspan id="tspan1" visibility="hidden">
+      <animate attributeName="visibility" values="hidden; visible; visible; visible" dur="1s" begin="0s" repeatCount="indefinite" />
+      .
+    </tspan>
+    <tspan id="tspan2" visibility="hidden">
+      <animate attributeName="visibility" values="hidden; hidden; visible; visible" dur="1s" begin="0s" repeatCount="indefinite" />
+      .
+    </tspan>
+    <tspan id="tspan3" visibility="hidden">
+      <animate attributeName="visibility" values="hidden; hidden; hidden; visible" dur="1s" begin="0s" repeatCount="indefinite" />
+      .
+    </tspan>
+  </text>
+</svg>
