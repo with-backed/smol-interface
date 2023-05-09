@@ -6,7 +6,7 @@ import { useHeaderDisclosureState } from "~/hooks/useHeaderDisclosureState";
 import { useExplainerStore } from "~/lib/explainerStore";
 import { useGlobalStore } from "~/lib/globalStore";
 
-export default function Intro() {
+export default function Hero() {
   const location = useLocation();
   const inProgressLoan = useGlobalStore((s) => s.inProgressLoan);
   const selectedVault = useGlobalStore((s) => s.selectedVault);

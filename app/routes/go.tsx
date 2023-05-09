@@ -11,7 +11,7 @@ import { usePaprController } from "~/hooks/usePaprController";
 import { isAuctionWithRepay, isAuctionWithClaim } from "~/lib/auctionStates";
 import { inProgressLoanFilledOut, useGlobalStore } from "~/lib/globalStore";
 
-export default function Five() {
+export default function Go() {
   const { address, isConnected } = useAccount();
   const { paprToken } = usePaprController();
 

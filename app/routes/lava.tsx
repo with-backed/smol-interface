@@ -6,7 +6,7 @@ import type { RiskLevel } from "~/lib/globalStore";
 import { useGlobalStore } from "~/lib/globalStore";
 import { riskLevelToLTV } from "~/lib/utils";
 
-export default function HowMuchBorrow() {
+export default function Lava() {
   const maxDebt = useGlobalStore((s) => s.inProgressLoan?.maxDebtForChosenPapr);
   const setInProgressLoan = useGlobalStore((s) => s.setInProgressLoan);
   const storeRiskLevel = useGlobalStore((s) =>
