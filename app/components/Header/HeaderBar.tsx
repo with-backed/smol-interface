@@ -18,7 +18,8 @@ export function HeaderBar() {
 
   const className = useMemo(() => {
     const justification = isConnected ? "justify-between" : "justify-center";
-    return `flex items-center bg-light-grey text-black relative px-4 min-h-[50px] ${justification}`;
+    const height = isConnected ? "min-h-[50px]" : "h-[0px]";
+    return `flex items-center bg-light-grey text-black relative px-4 ${height} ${justification}`;
   }, [isConnected]);
 
   const currentVaults = useGlobalStore((s) => s.currentVaults);

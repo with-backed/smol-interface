@@ -133,12 +133,6 @@ export default function App() {
   const serverSideData = useLoaderData<typeof loader>();
   const headerDisclosureState = useDisclosureState();
 
-  const allowedCollateral = useMemo(() => {
-    return serverSideData.paprSubgraphData.allowedCollateral.map(
-      (ac) => ac.token.id
-    );
-  }, [serverSideData.paprSubgraphData.allowedCollateral]);
-
   const { centerKey, centerNetwork, paprSubgraph } =
     configs[serverSideData.env.TOKEN as SupportedToken];
 
@@ -210,6 +204,13 @@ export default function App() {
                               )}`,
                             }}
                           />
+                          <script
+                            defer
+                            type="text/javascript"
+                            src="https://api.pirsch.io/pirsch.js"
+                            id="pirschjs"
+                            data-code="x65C4KLQmylut4YocxMV1JTlmY9VwfBW"
+                          ></script>
                         </HeaderDisclosureContextProvider>
                       </CenterProvider>
                     </ControllerContextProvider>
