@@ -25,8 +25,13 @@ import { useNFTSymbol } from "~/hooks/useNFTSymbol";
 import { PAGES } from "../Footer/Footer";
 
 export function Header() {
-  const { address, isConnected } = useAccount();
   const disclosure = useHeaderDisclosureState();
+  const { address, isConnected } = useAccount({
+    onDisconnect: () => {
+      disclosure.setVisible(false);
+    },
+  });
+
   const state = useGlobalStore((s) => s.state);
   const setCurrentVaults = useGlobalStore((s) => s.setCurrentVaults);
   const setRefreshCurrentVaults = useGlobalStore(
