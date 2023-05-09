@@ -20,6 +20,7 @@ type LoanDetailsBarProps = {
   riskLevel: RiskLevel;
   action: LoanDetailsAction;
   amount: ethers.BigNumber | null;
+  handleClick?: () => void;
 };
 
 export function LoanDetails({
@@ -28,6 +29,7 @@ export function LoanDetails({
   riskLevel,
   action,
   amount,
+  handleClick = undefined,
 }: LoanDetailsBarProps) {
   const { underlying, paprToken } = usePaprController();
   const hasRepaid = useGlobalStore(
@@ -75,9 +77,14 @@ export function LoanDetails({
     return "text-black";
   }, [isLiquidationAction, hasRepaid, hasClaimed]);
 
+  const pointerClassName = useMemo(() => {
+    return handleClick ? "cursor-pointer" : "";
+  }, [handleClick]);
+
   return (
     <div
-      className={`w-full rounded-lg flex flex-row justify-between items-center ${backgroundColor} ${textColor} leading-8`}
+      className={`w-full rounded-lg flex flex-row justify-between items-center ${backgroundColor} ${textColor} ${pointerClassName} leading-8`}
+      onClick={handleClick}
     >
       <div className="flex flex-row items-center">
         <NFTs collectionAddress={collectionAddress} tokenIds={tokenIds} />
