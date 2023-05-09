@@ -1,8 +1,9 @@
-import { useLocation, useParams } from "@remix-run/react";
+import { useLocation } from "@remix-run/react";
 import { useCallback, useEffect, useMemo } from "react";
 import { Button } from "~/components/Buttons/Button";
 import { HeaderState } from "~/components/Header";
 import { useHeaderDisclosureState } from "~/hooks/useHeaderDisclosureState";
+import { useExplainerStore } from "~/lib/explainerStore";
 import { useGlobalStore } from "~/lib/globalStore";
 
 export default function Intro() {
@@ -12,6 +13,7 @@ export default function Intro() {
   const clear = useGlobalStore((s) => s.clear);
   const { setVisible } = useHeaderDisclosureState();
   const { setHeaderState } = useGlobalStore();
+  const setActiveExplainer = useExplainerStore((s) => s.setActiveExplainer);
 
   useEffect(() => {
     if (location.state?.startCreate) {
@@ -50,6 +52,13 @@ export default function Intro() {
         WARNING! your NFT will be at risk until ETH repaid. More borrow = More
         risky
       </p>
+
+      <Button
+        onClick={() => setActiveExplainer("what-is")}
+        theme="bg-unclickable-grey"
+      >
+        what is hero?
+      </Button>
     </div>
   );
 }

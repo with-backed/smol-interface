@@ -41,6 +41,7 @@ import { HeaderDisclosureContextProvider } from "./hooks/useHeaderDisclosureStat
 import { TargetProvider } from "./hooks/useTarget";
 import { LavaExplainer, ValueExplainer } from "./components/RektScale";
 import { useExplainerStore } from "./lib/explainerStore";
+import { CollectionsPreviewExplainer } from "./components/CollectionsPreviewExplainer";
 
 declare global {
   interface Window {
@@ -156,6 +157,9 @@ export default function App() {
     }
     if (activeExplainer === "value") {
       return <ValueExplainer />;
+    }
+    if (activeExplainer === "what-is") {
+      return <CollectionsPreviewExplainer />;
     }
     return (
       <>

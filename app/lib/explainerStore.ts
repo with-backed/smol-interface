@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type Explainer = "value" | "lava";
+export type Explainer = "value" | "lava" | "what-is";
 
 interface ExplainerStore {
   activeExplainer: Explainer | null;
