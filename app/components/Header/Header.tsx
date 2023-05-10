@@ -8,7 +8,6 @@ import { Link } from "@remix-run/react";
 import { TextButton } from "../Buttons/TextButton";
 import { useAccountNFTs } from "~/hooks/useAccountNFTs";
 import { usePaprController } from "~/hooks/usePaprController";
-import { Asset } from "@center-inc/react";
 import { useHeaderDisclosureState } from "~/hooks/useHeaderDisclosureState";
 import { useCurrentVaults } from "~/hooks/useCurrentVaults";
 import { getAddress } from "ethers/lib/utils";
@@ -24,6 +23,7 @@ import type { ethers } from "ethers";
 import { useNFTSymbol } from "~/hooks/useNFTSymbol";
 import { PAGES } from "../Footer/Footer";
 import { useExplainerStore } from "~/lib/explainerStore";
+import { CenterAsset } from "../CenterAsset";
 
 export function Header() {
   const disclosure = useHeaderDisclosureState();
@@ -496,12 +496,7 @@ function NFT({ address, selected, tokenId }: NFTProps) {
   }, [selected]);
   return (
     <div className={wrapperClassName}>
-      <Asset
-        address={address}
-        tokenId={tokenId}
-        preset="small"
-        renderLoading={() => <img src="/loading-ellipses.svg" />}
-      />
+      <CenterAsset address={address} tokenId={tokenId} preset="small" />
       <Checkmark visible={selected} />
     </div>
   );

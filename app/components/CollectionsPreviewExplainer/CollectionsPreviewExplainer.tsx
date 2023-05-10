@@ -1,4 +1,3 @@
-import { Asset } from "@center-inc/react";
 import { ethers } from "ethers";
 import { useCallback, useMemo } from "react";
 import { useQuery } from "urql";
@@ -9,6 +8,7 @@ import { useExplainerStore } from "~/lib/explainerStore";
 import { formatTokenAmount } from "~/lib/numberFormat";
 import { TextButton } from "~/components/Buttons/TextButton";
 import { useConfig } from "~/hooks/useConfig";
+import { CenterAsset } from "../CenterAsset";
 
 const debtIncreasedEventsQuery = graphql(`
   query allDebtIncreasedEvents {
@@ -99,7 +99,7 @@ export function CollectionsPreviewExplainer() {
           {allowedCollateral.map((ac) => (
             <tr key={ac.id}>
               <td className="w-8 h-8">
-                <Asset preset="small" address={ac.token.id} tokenId={1} />
+                <CenterAsset preset="small" address={ac.token.id} tokenId={1} />
               </td>
               <td className="text-left">
                 <a

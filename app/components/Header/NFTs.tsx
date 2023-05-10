@@ -1,5 +1,5 @@
-import { Asset } from "@center-inc/react";
 import Marquee from "react-fast-marquee";
+import { CenterAsset } from "../CenterAsset";
 
 type NFTsProps = {
   collectionAddress: string;
@@ -12,7 +12,7 @@ export function NFTs({ collectionAddress, tokenIds }: NFTsProps) {
       <div className="w-full h-full">
         <Marquee play={tokenIds.length > 1} className="marquee">
           {tokenIds.map((tokenId) => (
-            <Asset
+            <CenterAsset
               key={tokenId}
               address={collectionAddress}
               tokenId={tokenId}
