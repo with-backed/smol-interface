@@ -6,7 +6,7 @@ import type { RiskLevel } from "~/lib/globalStore";
 import { useGlobalStore } from "~/lib/globalStore";
 import { formatBigNum } from "~/lib/numberFormat";
 import { NFTs } from "./NFTs";
-import { Button } from "reakit/ts";
+import { Button } from "reakit/Button";
 
 type LoanDetailsAction =
   | "borrow"
