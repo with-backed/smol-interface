@@ -9,7 +9,7 @@ import { OraclePriceType } from "~/lib/reservoir";
 import { ApproveTokenButton } from "../ApproveButtons";
 import { usePaprController } from "~/hooks/usePaprController";
 import { TransactionButton } from "../Buttons/TransactionButton";
-import { erc20ABI, useAccount, useContractRead } from "wagmi";
+import { Address, erc20ABI, useAccount, useContractRead } from "wagmi";
 
 type RepayProps = {
   vault: NonNullable<VaultWithRiskLevel>;
@@ -31,10 +31,10 @@ export function Repay({
   const oracleSynced = useOracleSynced(vault.token.id, OraclePriceType.lower);
   const [underlyingApproved, setUnderlyingApproved] = useState<boolean>(false);
   const { data: underlyingBalance } = useContractRead({
-    address: underlying.id as `0x${string}`,
+    address: underlying.id as Address,
     abi: erc20ABI,
     functionName: "balanceOf",
-    args: [address as `0x${string}`],
+    args: [address as Address],
   });
 
   const notEnoughWeth = useMemo(() => {
