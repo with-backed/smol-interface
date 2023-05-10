@@ -40,7 +40,7 @@ export default function Hero() {
 
   return (
     <div className="flex flex-col items-center p-4 gap-4 justify-evenly h-full grow graph-papr">
-      <div className="flex w-full gap-2">
+      <div className="flex w-full justify-center gap-2">
         <Button onClick={handleClick}>{buttonText}</Button>
         <Button
           onClick={() => setActiveExplainer("what-is")}
