@@ -8,6 +8,7 @@ import { riskLevelToLTV } from "~/lib/utils";
 
 export default function Lava() {
   const maxDebt = useGlobalStore((s) => s.inProgressLoan?.maxDebtForChosenPapr);
+  const inProgressLoanExists = useGlobalStore((s) => !!s.inProgressLoan);
   const setInProgressLoan = useGlobalStore((s) => s.setInProgressLoan);
   const storeRiskLevel = useGlobalStore((s) =>
     s.inProgressLoan ? s.inProgressLoan.riskLevel : s.selectedVault?.riskLevel
@@ -54,13 +55,15 @@ export default function Lava() {
           <FrogCooker riskLevel={storeRiskLevel || loggedOutRiskLevel} />
         </div>
       </div>
-      <div className="flex flex-col py-2 items-center">
-        <span>How much to borrow?</span>
-        <RiskRadio
-          riskLevel={storeRiskLevel || loggedOutRiskLevel}
-          handleChange={setSelectedBorrow}
-        />
-      </div>
+      {inProgressLoanExists && (
+        <div className="flex flex-col py-2 items-center">
+          <span>How much to borrow?</span>
+          <RiskRadio
+            riskLevel={storeRiskLevel || loggedOutRiskLevel}
+            handleChange={setSelectedBorrow}
+          />
+        </div>
+      )}
     </>
   );
 }
