@@ -93,9 +93,9 @@ function LavaExplainerBase() {
           interest charges go up and down based on demand from lenders and
           borrowers
         </p>
-      </div>
-      <div className="mt-auto mb-[90px] text-center">
-        <TextButton onClick={handleClick}>close</TextButton>
+        <div className="mt-auto mb-[90px] text-center">
+          <TextButton onClick={handleClick}>close</TextButton>
+        </div>
       </div>
     </div>
   );
