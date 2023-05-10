@@ -25,6 +25,7 @@ export function AuctionWithRepay({ vault }: AuctionWithRepayProps) {
         <Link
           className="text-link-text"
           to={`https://papr.wtf/tokens/${tokenName}/auctions/${currentOngoingAuction.id}`}
+          target="_blank"
         >
           liquidation auction!
         </Link>{" "}
