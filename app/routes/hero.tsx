@@ -34,14 +34,21 @@ export default function Hero() {
   }, [inProgressLoan, clear, setHeaderState, setVisible]);
 
   const buttonText = useMemo(() => {
-    if (selectedVault) return "create new loan";
+    if (selectedVault) return "create loan";
     return "pick ur hero";
   }, [selectedVault]);
 
   return (
     <div className="flex flex-col items-center p-4 gap-4 justify-evenly h-full grow graph-papr">
-      <Button onClick={handleClick}>{buttonText}</Button>
-
+      <div className="flex w-full gap-2">
+        <Button onClick={handleClick}>{buttonText}</Button>
+        <Button
+          onClick={() => setActiveExplainer("what-is")}
+          theme="bg-unclickable-grey"
+        >
+          what hero?
+        </Button>
+      </div>
       <img
         src="3-hero-super-dance.svg"
         className="scalable"
@@ -52,13 +59,6 @@ export default function Hero() {
         WARNING! your NFT will be at risk until ETH repaid. More borrow = More
         risky
       </p>
-
-      <Button
-        onClick={() => setActiveExplainer("what-is")}
-        theme="bg-unclickable-grey"
-      >
-        what is hero?
-      </Button>
     </div>
   );
 }

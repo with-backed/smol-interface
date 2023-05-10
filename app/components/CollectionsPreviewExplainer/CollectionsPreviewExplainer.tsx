@@ -82,6 +82,12 @@ export function CollectionsPreviewExplainer() {
   console.log({ allowedCollateral });
   return (
     <div className="explainer bg-white flex flex-col relative pt-[50px]">
+      <div className="flex flex-col justify-center items-center p-4 gap-7">
+        <p className="text-center">
+          hero NFTs get ETH loans and must come from these meme collections
+        </p>
+        <TextButton onClick={handleClick}>close</TextButton>
+      </div>
       <table className="border-separate border-spacing-2">
         <thead className="uppercase">
           <tr>
@@ -113,15 +119,6 @@ export function CollectionsPreviewExplainer() {
           ))}
         </tbody>
       </table>
-      <div className="flex flex-col justify-center items-center p-4 gap-7 mt-auto mb-[51px]">
-        <p className="text-center">
-          hero NFTs get ETH loans and must come from these meme collections
-        </p>
-        <Button onClick={handleClick} theme="bg-unclickable-grey">
-          what is hero?
-        </Button>
-        <TextButton onClick={handleClick}>close</TextButton>
-      </div>
     </div>
   );
 }
