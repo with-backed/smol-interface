@@ -42,16 +42,29 @@ export function LoanSummaryRepay({ vault, refresh }: LoanSummaryRepayProps) {
         numDays={loanDetails.numDays}
         costPercentage={loanDetails.formattedCostPercentage}
       />
-      <div className="my-4">
-        {vaultHasDebt && <img src="/5-instrument-super-dance.svg" />}
-        {!vaultHasDebt && <img src="/5-happy-super-dance.svg" />}
+      <div className="mt-auto">
+        {vaultHasDebt && (
+          <img
+            className="mb-[-25px] px-8"
+            src="/5-instrument-super-dance.svg"
+            alt=""
+          />
+        )}
+        {!vaultHasDebt && (
+          <img
+            className="mb-[-25px] px-8"
+            src="/5-happy-super-dance.svg"
+            alt=""
+          />
+        )}
+
+        <Repay
+          vault={{ ...vault, riskLevel }}
+          loanDetails={loanDetails}
+          buttonText={repayButtonText}
+          refresh={refresh}
+        />
       </div>
-      <Repay
-        vault={{ ...vault, riskLevel }}
-        loanDetails={loanDetails}
-        buttonText={repayButtonText}
-        refresh={refresh}
-      />
     </>
   );
 }

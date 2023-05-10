@@ -122,7 +122,7 @@ export function AuctionWithClaim({ vault }: AuctionWithClaimProps) {
               you in paprMEME, click here to swap it for ETH.
             </p>
           </div>
-          <div className="graph-papr flex-auto flex flex-col justify-center items-center">
+          <div className="graph-papr flex flex-col justify-center items-center py-16 mt-auto">
             {!paprTokenApproved && (
               <div className="my-2">
                 <ApproveTokenButton
