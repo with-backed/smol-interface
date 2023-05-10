@@ -18,7 +18,8 @@ type RektScaleProps = {
 export function RektScale({ riskLevel }: RektScaleProps) {
   const hasLoan = useGlobalStore(
     (s) =>
-      (!!s.inProgressLoan && !!s.inProgressLoan.amount) || !!s.selectedVault
+      (!!s.inProgressLoan && !!s.inProgressLoan.amount) ||
+      (!!s.selectedVault && !s.inProgressLoan)
   );
 
   if (hasLoan) {
