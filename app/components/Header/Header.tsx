@@ -23,6 +23,7 @@ import { formatBigNum } from "~/lib/numberFormat";
 import type { ethers } from "ethers";
 import { useNFTSymbol } from "~/hooks/useNFTSymbol";
 import { PAGES } from "../Footer/Footer";
+import { useExplainerStore } from "~/lib/explainerStore";
 
 export function Header() {
   const disclosure = useHeaderDisclosureState();
@@ -200,6 +201,7 @@ function SelectCollectionHeaderContent() {
   const currentVaults = useGlobalStore((s) => s.currentVaults);
   const setInProgressLoan = useGlobalStore((s) => s.setInProgressLoan);
   const setHeaderState = useGlobalStore((s) => s.setHeaderState);
+  const setActiveExplainer = useExplainerStore((s) => s.setActiveExplainer);
 
   const userNFTs = useGlobalStore((s) => s.userNFTs);
   const setUserNFTs = useGlobalStore((s) => s.setUserNFTs);
@@ -253,7 +255,7 @@ function SelectCollectionHeaderContent() {
 
   return (
     <>
-      {isConnected && (
+      {isConnected && uniqueCollections.length > 0 && (
         <>
           <p className="self-start">Select collection (max loan)</p>
           <ul className="list-[square] pl-6 self-start">
@@ -273,6 +275,18 @@ function SelectCollectionHeaderContent() {
               />
             ))}
           </ul>
+          <CancelButton />
+        </>
+      )}
+      {isConnected && uniqueCollections.length === 0 && (
+        <>
+          <p className="self-start">
+            This wallet does not hold any NFTs from{" "}
+            <TextButton onClick={() => setActiveExplainer("what-is")}>
+              eligible collections
+            </TextButton>
+            .
+          </p>
           <CancelButton />
         </>
       )}
