@@ -9,6 +9,7 @@ import { OraclePriceType } from "~/lib/reservoir";
 import { ApproveTokenButton } from "../ApproveButtons";
 import { usePaprController } from "~/hooks/usePaprController";
 import { TransactionButton } from "../Buttons/TransactionButton";
+import { Address, erc20ABI, useAccount, useContractRead } from "wagmi";
 
 type RepayProps = {
   vault: NonNullable<VaultWithRiskLevel>;
@@ -25,17 +26,38 @@ export function Repay({
   refresh,
   disabled = false,
 }: RepayProps) {
+  const { address } = useAccount();
   const { id, underlying } = usePaprController();
   const oracleSynced = useOracleSynced(vault.token.id, OraclePriceType.lower);
   const [underlyingApproved, setUnderlyingApproved] = useState<boolean>(false);
+  const { data: underlyingBalance } = useContractRead({
+    address: underlying.id as Address,
+    abi: erc20ABI,
+    functionName: "balanceOf",
+    args: [address as Address],
+  });
+
+  const notEnoughWeth = useMemo(() => {
+    if (!underlyingBalance || !loanDetails.totalOwed) return false;
+
+    return underlyingBalance.lt(loanDetails.totalOwed);
+  }, [underlyingBalance, loanDetails.totalOwed]);
+
   const repayDisabled = useMemo(() => {
     return (
       !underlyingApproved ||
       !oracleSynced ||
       loanDetails.vaultDebt.isZero() ||
+      notEnoughWeth ||
       disabled
     );
-  }, [underlyingApproved, oracleSynced, loanDetails.vaultDebt, disabled]);
+  }, [
+    underlyingApproved,
+    oracleSynced,
+    loanDetails.vaultDebt,
+    disabled,
+    notEnoughWeth,
+  ]);
 
   const vaultNFTs = useMemo(() => {
     return loanDetails.vaultNFTs;
@@ -74,6 +96,9 @@ export function Repay({
 
   return (
     <div className="graph-papr flex flex-col justify-center items-center gap-2 py-16">
+      {notEnoughWeth && (
+        <p className="text-black">Insufficient {underlying.symbol} balance!</p>
+      )}
       {!underlyingApproved && (
         <div>
           <ApproveTokenButton
