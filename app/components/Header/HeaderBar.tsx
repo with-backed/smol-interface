@@ -6,7 +6,7 @@ import { LoanDetailsForExistingLoan } from "./LoanDetailsForExistingLoan";
 import { usePoolQuote } from "~/hooks/usePoolQuote";
 import { usePaprController } from "~/hooks/usePaprController";
 import { formatBigNum } from "~/lib/numberFormat";
-import { useMatches } from "@remix-run/react";
+import { useMatches, useNavigate } from "@remix-run/react";
 import { PAGES } from "../Footer/Footer";
 
 export function HeaderBar() {
@@ -15,6 +15,7 @@ export function HeaderBar() {
   const pathname = useMemo(() => {
     return routeMatches[routeMatches.length - 1].pathname;
   }, [routeMatches]);
+  const navigate = useNavigate();
 
   const className = useMemo(() => {
     const justification = isConnected ? "justify-between" : "justify-center";
@@ -42,7 +43,10 @@ export function HeaderBar() {
     if (selectedVault) {
       return (
         <div className={className}>
-          <LoanDetailsForExistingLoan vault={selectedVault} />
+          <LoanDetailsForExistingLoan
+            vault={selectedVault}
+            handleClick={() => navigate(PAGES[4])}
+          />
         </div>
       );
     }

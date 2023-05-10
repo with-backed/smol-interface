@@ -9,12 +9,14 @@ import { useTokenIdsForVault } from "~/hooks/useTokenIdsForVault";
 
 type LoanDetailsForExistingLoanProps = {
   vault: VaultWithRiskLevel;
+  handleClick: () => void;
 };
 
 // convenience wrapper component over LoanDetails for rendering the correct version
 // of that component based on a vaults liquidation status, if any
 export function LoanDetailsForExistingLoan({
   vault,
+  handleClick,
 }: LoanDetailsForExistingLoanProps) {
   const { paprToken } = usePaprController();
   const { address } = useAccount();
@@ -47,6 +49,7 @@ export function LoanDetailsForExistingLoan({
         riskLevel={vault.riskLevel}
         action={vault.ongoingAuctions.length > 0 ? "liquidating" : "liquidated"}
         amount={ethers.BigNumber.from(vault.debt)}
+        handleClick={handleClick}
       />
     );
   }
@@ -59,6 +62,7 @@ export function LoanDetailsForExistingLoan({
         riskLevel={vault.riskLevel}
         action="claim"
         amount={ethers.BigNumber.from(0)}
+        handleClick={handleClick}
       />
     );
   }
@@ -70,6 +74,7 @@ export function LoanDetailsForExistingLoan({
       riskLevel={vault.riskLevel}
       action="repay"
       amount={ethers.BigNumber.from(vault.debt)}
+      handleClick={handleClick}
     />
   );
 }
