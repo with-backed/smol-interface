@@ -1,4 +1,4 @@
-export const APP_NAME = "paprSMOOTHBRAIN";
+export const APP_NAME = "papr adventure";
 export const MAINNET_CONTROLLER_ID =
   "0x3b29c19ff2fcea0ff98d0ef5b184354d74ea74b0";
 
