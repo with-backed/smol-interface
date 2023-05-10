@@ -73,9 +73,9 @@ export function Repay({
   });
 
   return (
-    <div className="graph-papr flex-auto flex flex-col justify-center items-center">
+    <div className="graph-papr flex flex-col justify-center items-center gap-2 py-16">
       {!underlyingApproved && (
-        <div className="my-2">
+        <div>
           <ApproveTokenButton
             token={underlying}
             spender={id}
@@ -86,7 +86,7 @@ export function Repay({
           />
         </div>
       )}
-      <div className="my-2">
+      <div>
         <TransactionButton
           text={!oracleSynced ? "Waiting for oracle..." : buttonText}
           theme={`bg-${vault.riskLevel}`}

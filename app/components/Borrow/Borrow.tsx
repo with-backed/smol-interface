@@ -103,30 +103,39 @@ export function BorrowConnected({
 
   return (
     <div className="flex flex-col h-full justify-center">
-      <BorrowBase />
-      <div className="graph-papr flex-auto flex flex-col justify-center items-center">
-        {!usingSafeTransferFrom && !collateralApproved && (
-          <div className="my-2">
-            <ApproveNFTButton
-              collateralContractAddress={collateralContractAddress}
+      <div className="w-3/5 text-center py-4">
+        <p>GET ETH NOW RESCUE TOAD LATER</p>
+      </div>
+      <div className="mt-auto">
+        <img
+          className="mb-[-25px] px-8"
+          src="/5-instrument-super-dance.svg"
+          alt="frog says: I am a financial instrument"
+        />
+        <div className="graph-papr flex flex-col justify-center items-center gap-2 py-16">
+          {!usingSafeTransferFrom && !collateralApproved && (
+            <div>
+              <ApproveNFTButton
+                collateralContractAddress={collateralContractAddress}
+                theme={`bg-${riskLevel}`}
+                setApproved={setCollateralApproved}
+              />
+            </div>
+          )}
+          <div>
+            <TransactionButton
+              text={
+                !oracleSynced
+                  ? "Waiting for oracle..."
+                  : `Borrow ${formattedBorrow}`
+              }
               theme={`bg-${riskLevel}`}
-              setApproved={setCollateralApproved}
+              onClick={write!}
+              transactionData={data}
+              disabled={disabled}
+              error={error?.message}
             />
           </div>
-        )}
-        <div className="my-2">
-          <TransactionButton
-            text={
-              !oracleSynced
-                ? "Waiting for oracle..."
-                : `Borrow ${formattedBorrow}`
-            }
-            theme={`bg-${riskLevel}`}
-            onClick={write!}
-            transactionData={data}
-            disabled={disabled}
-            error={error?.message}
-          />
         </div>
       </div>
     </div>
@@ -154,19 +163,6 @@ export function BorrowUnconnected() {
             Borrow $$$
           </Button>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function BorrowBase() {
-  return (
-    <div className="w-full flex flex-col items-center px-8 py-4">
-      <div className="w-3/5 text-center">
-        <p>GET ETH NOW RESCUE TOAD LATER</p>
-      </div>
-      <div className="mt-16">
-        <img src="/5-instrument-super-dance.svg" />
       </div>
     </div>
   );
