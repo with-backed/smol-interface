@@ -18,12 +18,10 @@ export function FrogCooker({ riskLevel }: FrogCookerProps) {
   }, [riskLevel]);
 
   return (
-    <div className="mt-auto">
-      <img
-        className="scalable"
-        src={image}
-        alt={`this frog is feeling ${riskLevel}`}
-      />
-    </div>
+    <img
+      className="max-h-[90%] mt-auto"
+      src={image}
+      alt={`this frog is feeling ${riskLevel}`}
+    />
   );
 }
