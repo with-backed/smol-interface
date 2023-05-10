@@ -29,7 +29,7 @@ export function Button({
   const className = useMemo(
     () =>
       [
-        `py-2 px-4 rounded-lg text-base leading-7 ${theme}`,
+        `py-2 px-4 flex flex-col items-center rounded-lg text-base leading-7 ${theme}`,
         `${theme === "bg-black" ? "text-white" : ""}`,
         ...additionalClassNames,
       ].join(" "),
