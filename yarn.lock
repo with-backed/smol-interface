@@ -1189,10 +1189,10 @@
     form-data "^4.0.0"
     headers-polyfill "^3.0.10"
 
-"@center-inc/react@1.1.7":
-  version "1.1.7"
-  resolved "https://registry.yarnpkg.com/@center-inc/react/-/react-1.1.7.tgz#a854da463fab1f44b8b82951defe7acb9119cb61"
-  integrity sha512-YxSu5BkUbjzsk9htEOh9QadTq2qZvgzkJw0eQeM4f0CxPYXQv8Z9SscmFSsL3irmbs4rWBzGPQw3WvzQiFrDQw==
+"@center-inc/react@1.1.11":
+  version "1.1.11"
+  resolved "https://registry.yarnpkg.com/@center-inc/react/-/react-1.1.11.tgz#9c6985807438c41783ae932bb11a5b1881af5a21"
+  integrity sha512-vXPMbDBT8tmz10DRZynUq5AwU/bZsxVZQD/V7VH3qw5ik/eUCBWqY3pasXHy+vtRWvHJNO2GSNY5oJd/iBowLw==
   dependencies:
     "@babel/core" ">=7.11.0 <8.0.0"
     "@center-inc/api-client" "^1.1.7"
