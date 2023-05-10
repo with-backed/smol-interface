@@ -86,7 +86,7 @@ export function useCurrentVaults(user: string | undefined) {
     if (!currentVaults || !oracleInfo || !targetResult) return;
     const vaultsWithRiskLevel = currentVaults.map((vault) => {
       const maxDebt = calculateMaxDebt(
-        vault.token.id,
+        new Array(vault.collateral.length).fill(vault.token.id),
         oracleInfo,
         targetResult,
         maxLTV,
