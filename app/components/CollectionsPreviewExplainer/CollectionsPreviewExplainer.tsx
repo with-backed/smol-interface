@@ -80,7 +80,7 @@ export function CollectionsPreviewExplainer() {
   const { inEth } = useTotalLentByCollection();
 
   return (
-    <div className="explainer bg-white flex flex-col relative pt-[50px]">
+    <div className="explainer bg-white flex flex-col relative pt-[50px] overflow-scroll">
       <div className="flex flex-col justify-center items-center p-4 gap-7">
         <p className="text-center">
           hero NFTs get ETH loans and must come from these meme collections
