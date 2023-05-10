@@ -6,6 +6,7 @@ import type { RiskLevel } from "~/lib/globalStore";
 import { useGlobalStore } from "~/lib/globalStore";
 import { formatBigNum } from "~/lib/numberFormat";
 import { NFTs } from "./NFTs";
+import { Button } from "reakit/ts";
 
 type LoanDetailsAction =
   | "borrow"
@@ -82,7 +83,8 @@ export function LoanDetails({
   }, [handleClick]);
 
   return (
-    <div
+    <Button
+      as="div"
       className={`w-full rounded-lg flex flex-row justify-between items-center ${backgroundColor} ${textColor} ${pointerClassName} leading-8`}
       onClick={handleClick}
     >
@@ -98,7 +100,7 @@ export function LoanDetails({
         hasRepaid={hasRepaid}
         hasClaimed={hasClaimed}
       />
-    </div>
+    </Button>
   );
 }
 
