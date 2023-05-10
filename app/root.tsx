@@ -75,31 +75,6 @@ export const links: LinksFunction = () => [
   },
 ];
 
-const { chains, provider, webSocketProvider } = configureChains(
-  [mainnet, goerli],
-  [
-    alchemyProvider({
-      apiKey:
-        typeof window === "undefined"
-          ? process.env.ALCHEMY_KEY || ""
-          : window.ENV.ALCHEMY_KEY || "",
-    }),
-    publicProvider(),
-  ]
-);
-
-const { connectors } = getDefaultWallets({
-  appName: APP_NAME,
-  chains,
-});
-
-const wagmiClient = createClient({
-  autoConnect: true,
-  connectors,
-  provider,
-  webSocketProvider,
-});
-
 export const loader = async () => {
   const { controllerAddress, paprSubgraph } =
     configs[process.env.TOKEN as SupportedToken];
@@ -133,8 +108,41 @@ export default function App() {
   const serverSideData = useLoaderData<typeof loader>();
   const headerDisclosureState = useDisclosureState();
 
-  const { centerKey, centerNetwork, paprSubgraph } =
+  const { centerKey, centerNetwork, paprSubgraph, tokenName } =
     configs[serverSideData.env.TOKEN as SupportedToken];
+
+  const chainsForEnv = useMemo(
+    () => (tokenName === "paprMeme" ? [mainnet] : [mainnet, goerli]),
+    [tokenName]
+  );
+
+  const { chains, provider, webSocketProvider } = useMemo(() => {
+    return configureChains(chainsForEnv, [
+      alchemyProvider({
+        apiKey:
+          typeof window === "undefined"
+            ? process.env.ALCHEMY_KEY || ""
+            : window.ENV.ALCHEMY_KEY || "",
+      }),
+      publicProvider(),
+    ]);
+  }, [chainsForEnv]);
+
+  const { connectors } = useMemo(() => {
+    return getDefaultWallets({
+      appName: APP_NAME,
+      chains,
+    });
+  }, [chains]);
+
+  const wagmiClient = useMemo(() => {
+    return createClient({
+      autoConnect: true,
+      connectors,
+      provider,
+      webSocketProvider,
+    });
+  }, [connectors, provider, webSocketProvider]);
 
   const paprClient = useMemo(() => {
     return createUrqlClient({
