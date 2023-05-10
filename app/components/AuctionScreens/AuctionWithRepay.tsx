@@ -3,21 +3,35 @@ import { useGlobalStore } from "~/lib/globalStore";
 import { useLoan } from "~/hooks/useLoan";
 import { Repay } from "../Repay";
 import type { VaultWithRiskLevel } from "~/lib/globalStore";
+import { Link } from "@remix-run/react";
+import { useConfig } from "~/hooks/useConfig";
 
 type AuctionWithRepayProps = {
   vault: NonNullable<VaultWithRiskLevel>;
 };
 
 export function AuctionWithRepay({ vault }: AuctionWithRepayProps) {
+  const { tokenName } = useConfig();
   const loanDetails = useLoan(vault);
 
   const currentOngoingAuction = useMemo(() => {
     return vault.ongoingAuctions[0]; // assume only one ongoing auction, will rarely ever have two in a rational market
   }, [vault.ongoingAuctions]);
-  const currentAuctionString = useMemo(() => {
+  const currentAuctionRender = useMemo(() => {
     if (!currentOngoingAuction) return "";
-    return `tokenID #${currentOngoingAuction.auctionAssetID} is being sold via liquidation auction! The proceeds will pay down debt and you will receive any excess.`;
-  }, [currentOngoingAuction]);
+    return (
+      <span>
+        tokenID #${currentOngoingAuction.auctionAssetID} is being sold via{" "}
+        <Link
+          className="text-link-text"
+          to={`https://papr.wtf/tokens/${tokenName}/auctions/${currentOngoingAuction.id}`}
+        >
+          liquidation auction!
+        </Link>{" "}
+        The proceeds will pay down debt and you will receive any excess.
+      </span>
+    );
+  }, [currentOngoingAuction, tokenName]);
 
   const pastAuctions = useMemo(() => {
     return vault.pastAuctions.filter(
@@ -78,7 +92,7 @@ export function AuctionWithRepay({ vault }: AuctionWithRepayProps) {
         <>
           <div className="px-6 py-1">
             <p className="leading-loose">
-              Uh oh! {pastAuctionedString} {currentAuctionString}
+              Uh oh! {pastAuctionedString} {currentAuctionRender}
             </p>
           </div>
           <Repay
