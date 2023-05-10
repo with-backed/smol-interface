@@ -29,7 +29,7 @@ export function Button({
   const className = useMemo(
     () =>
       [
-        `p-2 rounded-lg w-56 text-base leading-7 ${theme}`,
+        `p-2 rounded-lg w-full text-base leading-7 ${theme}`,
         `${theme === "bg-black" ? "text-white" : ""}`,
         ...additionalClassNames,
       ].join(" "),
