@@ -7,7 +7,6 @@ import { useLatestMarketPrice } from "~/hooks/useLatestMarketPrice";
 import { usePaprController } from "~/hooks/usePaprController";
 import { useExplainerStore } from "~/lib/explainerStore";
 import { formatTokenAmount } from "~/lib/numberFormat";
-import { Button } from "~/components/Buttons/Button";
 import { TextButton } from "~/components/Buttons/TextButton";
 import { useConfig } from "~/hooks/useConfig";
 
