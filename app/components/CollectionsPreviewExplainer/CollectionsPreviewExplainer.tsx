@@ -79,7 +79,7 @@ export function CollectionsPreviewExplainer() {
     setActiveExplainer(null);
   }, [setActiveExplainer]);
   const { inEth } = useTotalLentByCollection();
-  console.log({ allowedCollateral });
+
   return (
     <div className="explainer bg-white flex flex-col relative pt-[50px]">
       <table className="border-separate border-spacing-2">
