@@ -8,6 +8,7 @@ import { usePaprController } from "~/hooks/usePaprController";
 import { useLiquidationTriggerPrice } from "~/hooks/useLiquidationTriggerPrice";
 import { useGlobalStore } from "~/lib/globalStore";
 import { TextButton } from "../Buttons/TextButton";
+import { useCollectionTwapBidChange } from "~/hooks/useCollectionTwapBidChange";
 
 export function LavaExplainer() {
   const hasLoan = useGlobalStore(
@@ -111,6 +112,10 @@ export function ValueExplainer() {
   const ref = useRef<HTMLDivElement>(null);
   const { collateralCount, currentPriceForCollection } =
     useSelectedCollectionValue();
+  const collection = useGlobalStore(
+    (s) => s.selectedVault?.token.id || s.inProgressLoan?.collectionAddress
+  );
+  const { twapPriceChange } = useCollectionTwapBidChange(collection || "");
 
   const positionNFTValue = useCallback(() => {
     if (ref.current) {
@@ -119,6 +124,16 @@ export function ValueExplainer() {
       setNFTValueTop(top + 16);
     }
   }, []);
+
+  const yesterdayValueTop = useMemo(() => {
+    if (!nftValueTop || !twapPriceChange) {
+      return null;
+    }
+    if (twapPriceChange > 0) {
+      return Math.floor(nftValueTop - nftValueTop * twapPriceChange);
+    }
+    return Math.floor(nftValueTop + nftValueTop * twapPriceChange);
+  }, [nftValueTop, twapPriceChange]);
 
   const nftValue = useMemo(() => {
     if (currentPriceForCollection && collateralCount) {
@@ -146,6 +161,9 @@ export function ValueExplainer() {
   return (
     <div ref={ref} className="explainer bg-white flex relative">
       <div className="bg-[url('/scale/yaxis.svg')] w-2.5 bg-repeat-y bg-[center_top] flex flex-col justify-end">
+        <MessageBox color="purple" top={yesterdayValueTop}>
+          24 Hours Ago
+        </MessageBox>
         <MessageBox color="black" top={nftValueTop}>
           {nftValue}
           <img src="/scale/question-mark.svg" alt="more info" />

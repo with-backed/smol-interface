@@ -5,7 +5,7 @@ import { useConfig } from "../useConfig";
 import { useOracleInfo } from "../useOracleInfo";
 import { OraclePriceType } from "~/lib/reservoir";
 
-const _allTwabProperties = graphql(`
+graphql(`
   fragment allTwabsProperties on twabs {
     price
     token_address
