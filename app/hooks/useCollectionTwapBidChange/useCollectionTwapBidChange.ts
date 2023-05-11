@@ -4,6 +4,7 @@ import { graphql } from "~/gql/twabs";
 import { useConfig } from "../useConfig";
 import { useOracleInfo } from "../useOracleInfo";
 import { OraclePriceType } from "~/lib/reservoir";
+import { percentChange } from "~/lib/utils";
 
 graphql(`
   fragment allTwabsProperties on twabs {
@@ -85,8 +86,4 @@ export function useCollectionTwapBidChange(collection: string) {
     price24hrAgo,
     twapPriceChange,
   };
-}
-
-function percentChange(v1: number, v2: number) {
-  return (v2 - v1) / v1;
 }

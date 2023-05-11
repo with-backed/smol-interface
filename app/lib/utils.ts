@@ -50,3 +50,7 @@ export function riskLevelFromDebts(
   const percentage = (ratio - range.start) / (range.border - range.start);
   return { riskLevel, percentage };
 }
+
+export function percentChange(v1: number, v2: number) {
+  return (v2 - v1) / v1;
+}

@@ -5,13 +5,13 @@ import { useMemo } from "react";
 import { ethers } from "ethers";
 import { formatTokenAmount } from "~/lib/numberFormat";
 
-export function useLiquidationTriggerPrice() {
+export function useLiquidationTriggerPrice(when: "now" | "yesterday" = "now") {
   const {
     maxLTV,
     paprToken: { decimals },
     underlying: { symbol: underlyingSymbol },
   } = usePaprController();
-  const newTargetResult = useTarget();
+  const newTargetResult = useTarget(when);
   const debt = useGlobalStore(
     (s) => s.selectedVault?.debt || s.inProgressLoan?.amount
   );
@@ -29,23 +29,27 @@ export function useLiquidationTriggerPrice() {
         : null,
     [decimals, newTargetResult]
   );
-  const liquidationTriggerPrice = useMemo(() => {
-    if (!chosenDebt) {
+  const amount = useMemo(() => {
+    if (!chosenDebt || !newTargetNumber) {
       return null;
-    }
-    if (!newTargetNumber) {
-      return "...";
     }
     const maxLTVNumber = convertOneScaledValue(
       ethers.BigNumber.from(maxLTV),
       2
     );
-
-    const amount = (chosenDebt * newTargetNumber) / maxLTVNumber;
+    return (chosenDebt * newTargetNumber) / maxLTVNumber;
+  }, [chosenDebt, maxLTV, newTargetNumber]);
+  const formattedLiquidationTriggerPrice = useMemo(() => {
+    if (!chosenDebt) {
+      return null;
+    }
+    if (!amount) {
+      return "...";
+    }
     return `${formatTokenAmount(amount)} ${underlyingSymbol}`;
-  }, [chosenDebt, maxLTV, newTargetNumber, underlyingSymbol]);
+  }, [amount, chosenDebt, underlyingSymbol]);
 
-  return liquidationTriggerPrice;
+  return { formattedLiquidationTriggerPrice, amount };
 }
 
 const ONE = ethers.BigNumber.from(10).pow(18);

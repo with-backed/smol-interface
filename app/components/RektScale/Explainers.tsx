@@ -9,6 +9,8 @@ import { useLiquidationTriggerPrice } from "~/hooks/useLiquidationTriggerPrice";
 import { useGlobalStore } from "~/lib/globalStore";
 import { TextButton } from "../Buttons/TextButton";
 import { useCollectionTwapBidChange } from "~/hooks/useCollectionTwapBidChange";
+import { useRiskLevel } from "~/hooks/useRiskLevel";
+import { percentChange } from "~/lib/utils";
 
 export function LavaExplainer() {
   const hasLoan = useGlobalStore(
@@ -23,21 +25,71 @@ export function LavaExplainer() {
 }
 
 function LavaExplainerWithLoan() {
-  return <LavaExplainerBase />;
+  const { formattedLiquidationTriggerPrice, amount: amountToday } =
+    useLiquidationTriggerPrice();
+  const { amount: amountYesterday } = useLiquidationTriggerPrice("yesterday");
+  const selectedVault = useGlobalStore((s) => s.selectedVault);
+  const inProgressLoan = useGlobalStore((s) => s.inProgressLoan);
+  const loanSpec = useMemo(() => {
+    if (inProgressLoan) {
+      const collateralAddress = inProgressLoan.collectionAddress;
+      const collateralCount = inProgressLoan.tokenIds.length;
+      // We check for this in "hasLoan"
+      const debt = inProgressLoan.amount!;
+      return {
+        collateralAddress,
+        collateralCount,
+        debt,
+      };
+    }
+    // We check for this in "hasLoan", if inProgressLoan is null, selectedVault is not
+    const v = selectedVault!;
+    return {
+      collateralAddress: v.token.id,
+      collateralCount: v.collateral.length,
+      debt: v.debt,
+    };
+  }, [inProgressLoan, selectedVault]);
+  const riskLevelResult = useRiskLevel(loanSpec);
+  const changePercentage = useMemo(() => {
+    if (!amountToday || !amountYesterday || !riskLevelResult?.percentage) {
+      return null;
+    }
+    return percentChange(amountYesterday, amountToday);
+  }, [amountToday, amountYesterday, riskLevelResult]);
+  console.log({ amountToday, amountYesterday });
+  return (
+    <LavaExplainerBase
+      liquidationTriggerPrice={formattedLiquidationTriggerPrice || "..."}
+      percentage={riskLevelResult?.percentage || 0.5}
+      changePercentage={changePercentage}
+    />
+  );
 }
 
 function LavaExplainerNoLoan() {
-  return <LavaExplainerBase />;
+  return <LavaExplainerBase liquidationTriggerPrice="lava" percentage={0.5} />;
 }
 
-function LavaExplainerBase() {
+type LavaExplainerBaseProps = {
+  liquidationTriggerPrice: string;
+  percentage: number;
+  changePercentage?: number | null;
+};
+function LavaExplainerBase({
+  liquidationTriggerPrice,
+  percentage,
+  changePercentage = null,
+}: LavaExplainerBaseProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [riskLevelTop, setRiskLevelTop] = useState<number | null>(null);
   const setActiveExplainer = useExplainerStore((s) => s.setActiveExplainer);
   const handleClick = useCallback(() => {
     setActiveExplainer(null);
   }, [setActiveExplainer]);
-  const liquidationTriggerPrice = useLiquidationTriggerPrice();
+  const { formattedLiquidationTriggerPrice, amount: amountToday } =
+    useLiquidationTriggerPrice();
+  const { amount: amountYesterday } = useLiquidationTriggerPrice("yesterday");
   const riskLevel = useGlobalStore(
     (s) => s.selectedVault?.riskLevel || s.inProgressLoan?.riskLevel || "fine"
   );
@@ -60,10 +112,27 @@ function LavaExplainerBase() {
       const offset = elemRect.top - bodyRect.top;
       const height = elem.clientHeight;
       if (height !== undefined) {
-        setRiskLevelTop(offset + Math.floor(height / 2));
+        setRiskLevelTop(offset + Math.floor(height * (1 - percentage)));
       }
     }
-  }, [riskLevel]);
+  }, [riskLevel, percentage]);
+
+  const percentChangeTop = useMemo(() => {
+    if (!changePercentage || !riskLevelTop) {
+      return null;
+    }
+    return Math.floor(riskLevelTop + riskLevelTop * changePercentage);
+  }, [changePercentage, riskLevelTop]);
+
+  const percentChangeText = useMemo(() => {
+    if (!changePercentage) {
+      return null;
+    }
+    const direction = changePercentage > 0 ? "up" : "down";
+    return `Compared to 24 hours ago, it has moved ${direction} ${formatPercent(
+      Math.abs(changePercentage)
+    )}`;
+  }, [changePercentage]);
 
   useLayoutEffect(() => positionRiskLevel(), [positionRiskLevel]);
   useResizeObserver(
@@ -78,8 +147,11 @@ function LavaExplainerBase() {
           <div className="w-full bg-yikes h-16 rounded-lg"></div>
           <div className="w-full bg-risky h-16 rounded-lg"></div>
           <div className="w-full bg-fine flex-1 rounded-t-lg"></div>
+          <MessageBox color="purple" top={percentChangeTop}>
+            24 Hours Ago
+          </MessageBox>
           <MessageBox color="red" top={riskLevelTop}>
-            {liquidationTriggerPrice || "lava"}{" "}
+            {liquidationTriggerPrice}{" "}
             <img src="/scale/question-mark.svg" alt="more info" />
           </MessageBox>
         </div>
@@ -94,6 +166,10 @@ function LavaExplainerBase() {
           interest charges go up and down based on demand from lenders and
           borrowers
         </p>
+
+        {!!percentChangeText && (
+          <p className="text-[#9831FF]">{percentChangeText}</p>
+        )}
         <div className="mt-auto mb-[90px] text-center">
           <TextButton onClick={handleClick}>close</TextButton>
         </div>
