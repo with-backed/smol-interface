@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import type { VaultsByOwnerForControllerQuery } from "~/gql/graphql";
 import { HeaderState } from "~/components/Header/HeaderState";
 import type { ethers } from "ethers";
 import type { SubgraphVault } from "~/hooks/useVault";
@@ -12,8 +11,6 @@ interface InProgressLoan {
   tokenIds: string[];
   // maximum debt they can take for the collection based on how many of that NFT they have, in papr
   maxDebtForCollectionPapr: ethers.BigNumber;
-  // maximum debt they can take for the collection based on how many of that NFT they have, in eth
-  maxDebtForCollectionEth: ethers.BigNumber | null;
 
   // maximum debt they can take for the # of tokenIds chosen, in papr
   // this cannot be derived, since we need to know the total # of tokenIds they have
