@@ -232,18 +232,13 @@ function SelectCollectionHeaderContent() {
   }, [userNFTs, currentVaults]);
 
   const handleClick = useCallback(
-    (
-      selectedCollectionAddress: string,
-      maxDebtPapr: ethers.BigNumber,
-      maxDebtEth: ethers.BigNumber
-    ) => {
+    (selectedCollectionAddress: string, maxDebtPapr: ethers.BigNumber) => {
       setInProgressLoan((_prev) => {
         return {
           collectionAddress: selectedCollectionAddress,
           tokenIds: [],
           maxDebtForCollectionPapr: maxDebtPapr,
-          maxDebtForCollectionEth: maxDebtEth,
-          maxDebtForChosenPapr: undefined,
+          maxDebtForChosenPapr: maxDebtPapr,
           amount: undefined,
           riskLevel: undefined,
         };
@@ -308,8 +303,7 @@ type LineItemProps = {
   numCollateral: number;
   handleClick: (
     selectedCollectionAddress: string,
-    maxDebtPapr: ethers.BigNumber,
-    maxDebtEth: ethers.BigNumber
+    maxDebtPapr: ethers.BigNumber
   ) => void;
 };
 
@@ -347,9 +341,7 @@ function SelectCollectionLineItem({
           !maxDebtInPapr ||
           !maxDebtInETH
         }
-        onClick={() =>
-          handleClick(collateralAddress, maxDebtInPapr!, maxDebtInETH!)
-        }
+        onClick={() => handleClick(collateralAddress, maxDebtInPapr!)}
       >
         <span
           className={
@@ -372,24 +364,17 @@ function SelectCollectionLineItem({
 }
 
 function SelectNFTsHeaderContent() {
-  const { underlying } = usePaprController();
+  const { underlying, paprToken } = usePaprController();
   const selectedCollectionAddress = useGlobalStore(
     (s) => s.inProgressLoan?.collectionAddress
   );
-
+  const setInProgressLoan = useGlobalStore((s) => s.setInProgressLoan);
+  const [selectedTokenIds, setSelectedTokenIds] = useState<{
+    [tokenId: string]: boolean;
+  }>({});
   const maxDebtForCollectionPapr = useGlobalStore(
     (s) => s.inProgressLoan?.maxDebtForCollectionPapr
   );
-  const maxDebtForCollectionEth = useGlobalStore(
-    (s) => s.inProgressLoan?.maxDebtForCollectionEth
-  );
-
-  const formattedMaxDebt = useMemo(() => {
-    if (!maxDebtForCollectionEth) return "...";
-    return `${formatBigNum(maxDebtForCollectionEth, underlying.decimals, 3)} ${
-      underlying.symbol
-    }`;
-  }, [maxDebtForCollectionEth, underlying.decimals, underlying.symbol]);
 
   const userNFTs = useGlobalStore((s) => s.userNFTs);
   const nftsForCollection = useMemo(() => {
@@ -399,10 +384,30 @@ function SelectNFTsHeaderContent() {
     );
   }, [selectedCollectionAddress, userNFTs]);
 
-  const setInProgressLoan = useGlobalStore((s) => s.setInProgressLoan);
-  const [selectedTokenIds, setSelectedTokenIds] = useState<{
-    [tokenId: string]: boolean;
-  }>({});
+  const localMaxForChosen = useMemo(() => {
+    const tokenIds = Object.entries(selectedTokenIds).reduce(
+      (acc, [id, include]) => (include ? [...acc, id] : acc),
+      [] as string[]
+    );
+    if (!maxDebtForCollectionPapr || tokenIds.length === 0) return null;
+    return maxDebtForCollectionPapr
+      .mul(tokenIds.length)
+      .div(nftsForCollection.length);
+  }, [maxDebtForCollectionPapr, nftsForCollection.length, selectedTokenIds]);
+  const localMaxForChosenInEth = usePoolQuote({
+    amount: localMaxForChosen,
+    inputToken: paprToken.id,
+    outputToken: underlying.id,
+    tradeType: "exactIn",
+    skip: !localMaxForChosen,
+  });
+
+  const formattedMaxDebt = useMemo(() => {
+    if (!localMaxForChosenInEth) return "...";
+    return `${formatBigNum(localMaxForChosenInEth, underlying.decimals, 3)} ${
+      underlying.symbol
+    }`;
+  }, [localMaxForChosenInEth, underlying.decimals, underlying.symbol]);
 
   useEffect(() => {
     if (nftsForCollection.length > 0) {
