@@ -3,7 +3,7 @@ import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { MessageBox } from "./MessageBox";
 import { useExplainerStore } from "~/lib/explainerStore";
 import { useSelectedCollectionValue } from "~/hooks/useSelectedCollectionValue";
-import { formatTokenAmount } from "~/lib/numberFormat";
+import { formatPercent, formatTokenAmount } from "~/lib/numberFormat";
 import { usePaprController } from "~/hooks/usePaprController";
 import { useLiquidationTriggerPrice } from "~/hooks/useLiquidationTriggerPrice";
 import { useGlobalStore } from "~/lib/globalStore";
@@ -129,10 +129,7 @@ export function ValueExplainer() {
     if (!nftValueTop || !twapPriceChange) {
       return null;
     }
-    if (twapPriceChange > 0) {
-      return Math.floor(nftValueTop - nftValueTop * twapPriceChange);
-    }
-    return Math.floor(nftValueTop + nftValueTop * twapPriceChange);
+    return Math.floor(nftValueTop - nftValueTop * twapPriceChange);
   }, [nftValueTop, twapPriceChange]);
 
   const nftValue = useMemo(() => {
@@ -151,6 +148,16 @@ export function ValueExplainer() {
       nftValueTop ? { top: `${nftValueTop - 40}px` } : { display: "none" },
     [nftValueTop]
   );
+
+  const percentChangeText = useMemo(() => {
+    if (!twapPriceChange) {
+      return null;
+    }
+    const direction = twapPriceChange > 0 ? "up" : "down";
+    return `Compared to 24 hours ago, it has moved ${direction} ${formatPercent(
+      Math.abs(twapPriceChange)
+    )}`;
+  }, [twapPriceChange]);
 
   useLayoutEffect(() => positionNFTValue(), [positionNFTValue]);
   useResizeObserver(
@@ -187,7 +194,10 @@ export function ValueExplainer() {
           your NFT will be liquidated (auctioned) if this value drops to lava
           level
         </p>
-        <div className="mt-auto mb-[90px] text-center">
+        <div className="mt-auto mb-[90px] flex flex-col gap-2 items-center justify-center">
+          {percentChangeText && (
+            <p className="text-[#9831FF]">{percentChangeText}</p>
+          )}
           <TextButton onClick={handleClick}>close</TextButton>
         </div>
       </div>
