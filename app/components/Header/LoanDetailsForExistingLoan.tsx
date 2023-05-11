@@ -9,7 +9,7 @@ import { useTokenIdsForVault } from "~/hooks/useTokenIdsForVault";
 
 type LoanDetailsForExistingLoanProps = {
   vault: VaultWithRiskLevel;
-  handleClick: () => void;
+  handleClick?: () => void;
 };
 
 // convenience wrapper component over LoanDetails for rendering the correct version
