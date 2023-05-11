@@ -21,7 +21,7 @@ export function useMulticallWrite(
       ...multicallConfig,
       request: {
         ...multicallConfig.request,
-        gasLimit: multicallConfig.request.gasLimit.add(5000),
+        gasLimit: multicallConfig.request.gasLimit.add(35_000),
       },
     };
   }, [multicallConfig]);
