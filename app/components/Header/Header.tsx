@@ -218,6 +218,8 @@ function SelectCollectionHeaderContent() {
   }, [currentVaults]);
 
   const uniqueCollections = useMemo(() => {
+    if (!userNFTs) return [];
+
     const userCollectionCollateral = userNFTs.map((nft) =>
       getAddress(nft.address)
     );
@@ -253,28 +255,38 @@ function SelectCollectionHeaderContent() {
     [setHeaderState, setInProgressLoan]
   );
 
+  if (!userNFTs)
+    return (
+      <>
+        <p className="self-start">Select collection (max loan)</p>
+      </>
+    );
+
   return (
     <>
       {isConnected && uniqueCollections.length > 0 && (
         <>
           <p className="self-start">Select collection (max loan)</p>
-          <ul className="list-[square] pl-6 self-start">
-            {uniqueCollections.map((c) => (
-              <SelectCollectionLineItem
-                key={c}
-                collateralAddress={c}
-                numCollateral={
-                  userNFTs.filter(
-                    (nft) => getAddress(nft.address) === getAddress(c)
-                  ).length
-                }
-                collateralAddressesForExistingVaults={
-                  collateralAddressesForExistingVaults
-                }
-                handleClick={handleClick}
-              />
-            ))}
-          </ul>
+          {userNFTs && (
+            <ul className="list-[square] pl-6 self-start">
+              {uniqueCollections.map((c) => (
+                <SelectCollectionLineItem
+                  key={c}
+                  collateralAddress={c}
+                  numCollateral={
+                    userNFTs.filter(
+                      (nft) => getAddress(nft.address) === getAddress(c)
+                    ).length
+                  }
+                  collateralAddressesForExistingVaults={
+                    collateralAddressesForExistingVaults
+                  }
+                  handleClick={handleClick}
+                />
+              ))}
+            </ul>
+          )}
+
           <CancelButton />
         </>
       )}
@@ -393,7 +405,7 @@ function SelectNFTsHeaderContent() {
 
   const userNFTs = useGlobalStore((s) => s.userNFTs);
   const nftsForCollection = useMemo(() => {
-    if (!selectedCollectionAddress) return [];
+    if (!selectedCollectionAddress || !userNFTs) return [];
     return userNFTs.filter(
       (nft) => getAddress(nft.address) === getAddress(selectedCollectionAddress)
     );

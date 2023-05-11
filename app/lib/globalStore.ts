@@ -46,8 +46,8 @@ type RecentActionsMap = { [key: string]: RecentActions };
 interface GlobalStore {
   state: HeaderState;
   setHeaderState: (newState: HeaderState) => void;
-  userNFTs: AccountNFTsResponse[];
-  setUserNFTs: (userCollectionNFTs: AccountNFTsResponse[]) => void;
+  userNFTs: AccountNFTsResponse[] | undefined;
+  setUserNFTs: (userCollectionNFTs: AccountNFTsResponse[] | undefined) => void;
   currentVaults: VaultWithRiskLevel[] | null;
   setCurrentVaults: (currentVaults: VaultWithRiskLevel[]) => void;
   refreshCurrentVaults: () => void;
@@ -66,7 +66,7 @@ interface GlobalStore {
 export const useGlobalStore = create<GlobalStore>((set) => ({
   state: HeaderState.Default,
   setHeaderState: (state) => set({ state }),
-  userNFTs: [],
+  userNFTs: undefined,
   setUserNFTs: (userCollectionNFTs) => set({ userNFTs: userCollectionNFTs }),
   currentVaults: null,
   setCurrentVaults: (currentVaults) => set({ currentVaults }),
