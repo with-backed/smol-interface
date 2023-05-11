@@ -1,13 +1,13 @@
 import useResizeObserver from "@react-hook/resize-observer";
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { MessageBox } from "./MessageBox";
-import { Button } from "reakit/Button";
 import { useExplainerStore } from "~/lib/explainerStore";
 import { useSelectedCollectionValue } from "~/hooks/useSelectedCollectionValue";
 import { formatTokenAmount } from "~/lib/numberFormat";
 import { usePaprController } from "~/hooks/usePaprController";
 import { useLiquidationTriggerPrice } from "~/hooks/useLiquidationTriggerPrice";
 import { useGlobalStore } from "~/lib/globalStore";
+import { TextButton } from "../Buttons/TextButton";
 
 export function LavaExplainer() {
   const hasLoan = useGlobalStore(
@@ -71,12 +71,7 @@ function LavaExplainerBase() {
   );
 
   return (
-    <Button
-      as="div"
-      onClick={handleClick}
-      className="explainer bg-white flex relative"
-      ref={ref}
-    >
+    <div className="explainer bg-white flex relative" ref={ref}>
       <div className="bg-[url('/scale/yaxis.svg')] w-2.5 bg-repeat-y bg-[center_top] flex flex-col justify-end">
         <div className="flex flex-col h-2/4">
           <div className="w-full bg-yikes h-16 rounded-lg"></div>
@@ -98,8 +93,11 @@ function LavaExplainerBase() {
           interest charges go up and down based on demand from lenders and
           borrowers
         </p>
+        <div className="mt-auto mb-[90px] text-center">
+          <TextButton onClick={handleClick}>close</TextButton>
+        </div>
       </div>
-    </Button>
+    </div>
   );
 }
 
@@ -146,12 +144,7 @@ export function ValueExplainer() {
   );
 
   return (
-    <Button
-      as="div"
-      onClick={handleClick}
-      ref={ref}
-      className="explainer bg-white flex relative"
-    >
+    <div ref={ref} className="explainer bg-white flex relative">
       <div className="bg-[url('/scale/yaxis.svg')] w-2.5 bg-repeat-y bg-[center_top] flex flex-col justify-end">
         <MessageBox color="black" top={nftValueTop}>
           {nftValue}
@@ -176,7 +169,10 @@ export function ValueExplainer() {
           your NFT will be liquidated (auctioned) if this value drops to lava
           level
         </p>
+        <div className="mt-auto mb-[90px] text-center">
+          <TextButton onClick={handleClick}>close</TextButton>
+        </div>
       </div>
-    </Button>
+    </div>
   );
 }
