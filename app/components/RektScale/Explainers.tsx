@@ -3,11 +3,14 @@ import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { MessageBox } from "./MessageBox";
 import { useExplainerStore } from "~/lib/explainerStore";
 import { useSelectedCollectionValue } from "~/hooks/useSelectedCollectionValue";
-import { formatTokenAmount } from "~/lib/numberFormat";
+import { formatPercent, formatTokenAmount } from "~/lib/numberFormat";
 import { usePaprController } from "~/hooks/usePaprController";
 import { useLiquidationTriggerPrice } from "~/hooks/useLiquidationTriggerPrice";
 import { useGlobalStore } from "~/lib/globalStore";
 import { TextButton } from "../Buttons/TextButton";
+import { useCollectionTwapBidChange } from "~/hooks/useCollectionTwapBidChange";
+import { useRiskLevel } from "~/hooks/useRiskLevel";
+import { percentChange } from "~/lib/utils";
 
 export function LavaExplainer() {
   const hasLoan = useGlobalStore(
@@ -22,21 +25,71 @@ export function LavaExplainer() {
 }
 
 function LavaExplainerWithLoan() {
-  return <LavaExplainerBase />;
+  const { formattedLiquidationTriggerPrice, amount: amountToday } =
+    useLiquidationTriggerPrice();
+  const { amount: amountYesterday } = useLiquidationTriggerPrice("yesterday");
+  const selectedVault = useGlobalStore((s) => s.selectedVault);
+  const inProgressLoan = useGlobalStore((s) => s.inProgressLoan);
+  const loanSpec = useMemo(() => {
+    if (inProgressLoan) {
+      const collateralAddress = inProgressLoan.collectionAddress;
+      const collateralCount = inProgressLoan.tokenIds.length;
+      // We check for this in "hasLoan"
+      const debt = inProgressLoan.amount!;
+      return {
+        collateralAddress,
+        collateralCount,
+        debt,
+      };
+    }
+    // We check for this in "hasLoan", if inProgressLoan is null, selectedVault is not
+    const v = selectedVault!;
+    return {
+      collateralAddress: v.token.id,
+      collateralCount: v.collateral.length,
+      debt: v.debt,
+    };
+  }, [inProgressLoan, selectedVault]);
+  const riskLevelResult = useRiskLevel(loanSpec);
+  const changePercentage = useMemo(() => {
+    if (!amountToday || !amountYesterday || !riskLevelResult?.percentage) {
+      return null;
+    }
+    return percentChange(amountYesterday, amountToday);
+  }, [amountToday, amountYesterday, riskLevelResult]);
+  console.log({ amountToday, amountYesterday });
+  return (
+    <LavaExplainerBase
+      liquidationTriggerPrice={formattedLiquidationTriggerPrice || "..."}
+      percentage={riskLevelResult?.percentage || 0.5}
+      changePercentage={changePercentage}
+    />
+  );
 }
 
 function LavaExplainerNoLoan() {
-  return <LavaExplainerBase />;
+  return <LavaExplainerBase liquidationTriggerPrice="lava" percentage={0.5} />;
 }
 
-function LavaExplainerBase() {
+type LavaExplainerBaseProps = {
+  liquidationTriggerPrice: string;
+  percentage: number;
+  changePercentage?: number | null;
+};
+function LavaExplainerBase({
+  liquidationTriggerPrice,
+  percentage,
+  changePercentage = null,
+}: LavaExplainerBaseProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [riskLevelTop, setRiskLevelTop] = useState<number | null>(null);
   const setActiveExplainer = useExplainerStore((s) => s.setActiveExplainer);
   const handleClick = useCallback(() => {
     setActiveExplainer(null);
   }, [setActiveExplainer]);
-  const liquidationTriggerPrice = useLiquidationTriggerPrice();
+  const { formattedLiquidationTriggerPrice, amount: amountToday } =
+    useLiquidationTriggerPrice();
+  const { amount: amountYesterday } = useLiquidationTriggerPrice("yesterday");
   const riskLevel = useGlobalStore(
     (s) => s.selectedVault?.riskLevel || s.inProgressLoan?.riskLevel || "fine"
   );
@@ -59,10 +112,27 @@ function LavaExplainerBase() {
       const offset = elemRect.top - bodyRect.top;
       const height = elem.clientHeight;
       if (height !== undefined) {
-        setRiskLevelTop(offset + Math.floor(height / 2));
+        setRiskLevelTop(offset + Math.floor(height * (1 - percentage)));
       }
     }
-  }, [riskLevel]);
+  }, [riskLevel, percentage]);
+
+  const percentChangeTop = useMemo(() => {
+    if (!changePercentage || !riskLevelTop) {
+      return null;
+    }
+    return Math.floor(riskLevelTop + riskLevelTop * changePercentage);
+  }, [changePercentage, riskLevelTop]);
+
+  const percentChangeText = useMemo(() => {
+    if (!changePercentage) {
+      return null;
+    }
+    const direction = changePercentage > 0 ? "up" : "down";
+    return `Compared to 24 hours ago, it has moved ${direction} ${formatPercent(
+      Math.abs(changePercentage)
+    )}`;
+  }, [changePercentage]);
 
   useLayoutEffect(() => positionRiskLevel(), [positionRiskLevel]);
   useResizeObserver(
@@ -77,8 +147,11 @@ function LavaExplainerBase() {
           <div className="w-full bg-yikes h-16 rounded-lg"></div>
           <div className="w-full bg-risky h-16 rounded-lg"></div>
           <div className="w-full bg-fine flex-1 rounded-t-lg"></div>
+          <MessageBox color="purple" top={percentChangeTop}>
+            24 Hours Ago
+          </MessageBox>
           <MessageBox color="red" top={riskLevelTop}>
-            {liquidationTriggerPrice || "lava"}{" "}
+            {liquidationTriggerPrice}{" "}
             <img src="/scale/question-mark.svg" alt="more info" />
           </MessageBox>
         </div>
@@ -93,6 +166,10 @@ function LavaExplainerBase() {
           interest charges go up and down based on demand from lenders and
           borrowers
         </p>
+
+        {!!percentChangeText && (
+          <p className="text-[#9831FF]">{percentChangeText}</p>
+        )}
         <div className="mt-auto mb-[90px] text-center">
           <TextButton onClick={handleClick}>close</TextButton>
         </div>
@@ -111,6 +188,10 @@ export function ValueExplainer() {
   const ref = useRef<HTMLDivElement>(null);
   const { collateralCount, currentPriceForCollection } =
     useSelectedCollectionValue();
+  const collection = useGlobalStore(
+    (s) => s.selectedVault?.token.id || s.inProgressLoan?.collectionAddress
+  );
+  const { twapPriceChange } = useCollectionTwapBidChange(collection || "");
 
   const positionNFTValue = useCallback(() => {
     if (ref.current) {
@@ -119,6 +200,13 @@ export function ValueExplainer() {
       setNFTValueTop(top + 16);
     }
   }, []);
+
+  const yesterdayValueTop = useMemo(() => {
+    if (!nftValueTop || !twapPriceChange) {
+      return null;
+    }
+    return Math.floor(nftValueTop - nftValueTop * twapPriceChange);
+  }, [nftValueTop, twapPriceChange]);
 
   const nftValue = useMemo(() => {
     if (currentPriceForCollection && collateralCount) {
@@ -137,6 +225,16 @@ export function ValueExplainer() {
     [nftValueTop]
   );
 
+  const percentChangeText = useMemo(() => {
+    if (!twapPriceChange) {
+      return null;
+    }
+    const direction = twapPriceChange > 0 ? "up" : "down";
+    return `Compared to 24 hours ago, it has moved ${direction} ${formatPercent(
+      Math.abs(twapPriceChange)
+    )}`;
+  }, [twapPriceChange]);
+
   useLayoutEffect(() => positionNFTValue(), [positionNFTValue]);
   useResizeObserver(
     (ref.current || null) as HTMLElement | null,
@@ -146,6 +244,9 @@ export function ValueExplainer() {
   return (
     <div ref={ref} className="explainer bg-white flex relative">
       <div className="bg-[url('/scale/yaxis.svg')] w-2.5 bg-repeat-y bg-[center_top] flex flex-col justify-end">
+        <MessageBox color="purple" top={yesterdayValueTop}>
+          24 Hours Ago
+        </MessageBox>
         <MessageBox color="black" top={nftValueTop}>
           {nftValue}
           <img src="/scale/question-mark.svg" alt="more info" />
@@ -169,7 +270,10 @@ export function ValueExplainer() {
           your NFT will be liquidated (auctioned) if this value drops to lava
           level
         </p>
-        <div className="mt-auto mb-[90px] text-center">
+        <div className="mt-auto mb-[90px] flex flex-col gap-2 items-center justify-center">
+          {percentChangeText && (
+            <p className="text-[#9831FF]">{percentChangeText}</p>
+          )}
           <TextButton onClick={handleClick}>close</TextButton>
         </div>
       </div>

@@ -33,6 +33,9 @@ export function MessageBox({ children, color, top }: MessageBoxProps) {
     if (color === "black") {
       return `${base} bg-black`;
     }
+    if (color === "purple") {
+      return `${base} ${PURPLE}`;
+    }
     return `${base} ${RED}`;
   }, [color]);
 

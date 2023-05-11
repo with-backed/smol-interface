@@ -70,7 +70,7 @@ function RektScaleWithLoan({ riskLevel = "fine" }: RektScaleProps) {
   const riskLevelResult = useRiskLevel(loanSpec);
   return (
     <RektScaleBase
-      lava={liquidationTriggerPrice || "..."}
+      lava={liquidationTriggerPrice.formattedLiquidationTriggerPrice || "..."}
       nftValue={nftValue}
       riskLevel={riskLevel}
       percentage={riskLevelResult?.percentage || 0.5}
