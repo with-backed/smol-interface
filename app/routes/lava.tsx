@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 import { FrogCooker } from "~/components/FrogCooker";
 import { RektScale } from "~/components/RektScale";
