@@ -79,6 +79,19 @@ export function CollectionsPreviewExplainer() {
   }, [setActiveExplainer]);
   const { inEth } = useTotalLentByCollection();
 
+  const sortedCollateral = useMemo(() => {
+    if (!inEth) {
+      return [];
+    }
+
+    const collateral = allowedCollateral.map((c) => ({
+      ...c,
+      ethPrice: inEth[c.token.id],
+    }));
+    collateral.sort((a, b) => b.ethPrice - a.ethPrice);
+    return collateral;
+  }, [allowedCollateral, inEth]);
+
   return (
     <div className="explainer bg-white flex flex-col relative pt-[50px] overflow-scroll">
       <div className="flex flex-col justify-center items-center p-4 gap-7">
@@ -96,23 +109,23 @@ export function CollectionsPreviewExplainer() {
           </tr>
         </thead>
         <tbody>
-          {allowedCollateral.map((ac) => (
-            <tr key={ac.id}>
+          {sortedCollateral.map((c) => (
+            <tr key={c.id}>
               <td className="w-8 h-8">
-                <CenterAsset preset="small" address={ac.token.id} tokenId={1} />
+                <CenterAsset preset="small" address={c.token.id} tokenId={1} />
               </td>
               <td className="text-left max-w-[11rem] overflow-hidden text-ellipsis">
                 <a
-                  href={`https://marketplace.reservoir.tools/collection/${network}/${ac.token.id}`}
+                  href={`https://marketplace.reservoir.tools/collection/${network}/${c.token.id}`}
                   target="_blank"
                   rel="noreferrer"
                   className="no-underline text-link-text"
                 >
-                  {ac.token.name}
+                  {c.token.name}
                 </a>
               </td>
               <td className="text-right whitespace-nowrap">
-                {inEth ? formatTokenAmount(inEth[ac.token.id]) : "..."} ETH
+                {formatTokenAmount(c.ethPrice)} ETH
               </td>
             </tr>
           ))}
