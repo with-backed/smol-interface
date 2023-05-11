@@ -51,7 +51,7 @@ export default function Lava() {
     <>
       <div className="flex h-full">
         <RektScale riskLevel={storeRiskLevel || loggedOutRiskLevel} />
-        <div className="flex flex-col items-center w-full grow-0 pt-6 h-2/4">
+        <div className="flex flex-col items-center w-full grow-0 h-2/4">
           <FrogCooker riskLevel={storeRiskLevel || loggedOutRiskLevel} />
         </div>
       </div>
