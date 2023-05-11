@@ -105,7 +105,7 @@ export function BorrowConnected({
     <div className="flex flex-col h-full justify-center">
       <div className="text-center py-4">
         <p>
-          GET ETH NOW <br /> RESCUE TOAD LATER
+          GET ETH NOW <br /> RESCUE JPEG LATER
         </p>
       </div>
       <div className="mt-auto">
@@ -149,7 +149,7 @@ export function BorrowUnconnected() {
     <div className="flex flex-col h-full items-center">
       <div className="text-center py-4">
         <p>
-          GET ETH NOW <br /> RESCUE TOAD LATER
+          GET ETH NOW <br /> RESCUE JPEG LATER
         </p>
       </div>
       <div className="mt-auto">
