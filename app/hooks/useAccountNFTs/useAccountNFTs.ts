@@ -12,9 +12,9 @@ export const useAccountNFTs = (
 ) => {
   const { centerKey } = useConfig();
   const [nftsLoading, setNftsLoading] = useState<boolean>(true);
-  const [nftsFromCenter, setNFTsFromCenter] = useState<AccountNFTsResponse[]>(
-    []
-  );
+  const [nftsFromCenter, setNFTsFromCenter] = useState<
+    AccountNFTsResponse[] | undefined
+  >(undefined);
 
   const fetchUserNFTs = useCallback(async () => {
     if (address && collections) {
