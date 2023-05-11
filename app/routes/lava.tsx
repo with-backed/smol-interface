@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useAccount } from "wagmi";
 import { FrogCooker } from "~/components/FrogCooker";
 import { RektScale } from "~/components/RektScale";
 import { RiskRadio } from "~/components/RiskRadio";
@@ -7,6 +8,7 @@ import { useGlobalStore } from "~/lib/globalStore";
 import { riskLevelToLTV } from "~/lib/utils";
 
 export default function Lava() {
+  const { isConnected } = useAccount();
   const maxDebt = useGlobalStore((s) => s.inProgressLoan?.maxDebtForChosenPapr);
   const inProgressLoanExists = useGlobalStore((s) => !!s.inProgressLoan);
   const setInProgressLoan = useGlobalStore((s) => s.setInProgressLoan);
@@ -55,7 +57,7 @@ export default function Lava() {
           <FrogCooker riskLevel={storeRiskLevel || loggedOutRiskLevel} />
         </div>
       </div>
-      {inProgressLoanExists && (
+      {(inProgressLoanExists || !isConnected) && (
         <div className="flex flex-col py-2 items-center">
           <span>How much to borrow?</span>
           <RiskRadio
