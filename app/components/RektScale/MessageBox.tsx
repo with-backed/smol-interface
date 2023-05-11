@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { Button } from "reakit/Button";
 
 const RED = "bg-[#FF3131]";
 const PURPLE = "bg-[#9831FF]";
@@ -24,10 +25,11 @@ function Pointer({ color }: PointerProps) {
 type MessageBoxProps = React.PropsWithChildren<
   Colorable & {
     top: number | null;
+    onClick?: () => void;
   }
 >;
 
-export function MessageBox({ children, color, top }: MessageBoxProps) {
+export function MessageBox({ children, color, top, onClick }: MessageBoxProps) {
   const className = useMemo(() => {
     const base = `text-white px-2 py-1 ml-[-1px] flex justify-center items-center gap-2`;
     if (color === "black") {
@@ -46,12 +48,14 @@ export function MessageBox({ children, color, top }: MessageBoxProps) {
   );
 
   return (
-    <div
+    <Button
+      as="div"
       className="absolute flex flex-row justify-center items-center ml-1 whitespace-nowrap"
       style={style}
+      onClick={onClick}
     >
       <Pointer color={color} />
       <div className={className}>{children}</div>
-    </div>
+    </Button>
   );
 }

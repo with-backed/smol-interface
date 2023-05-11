@@ -154,6 +154,16 @@ function RektScaleBase({
     positionNFTValue
   );
 
+  const setActiveExplainer = useExplainerStore((s) => s.setActiveExplainer);
+  const handleLavaClick = useCallback(
+    () => setActiveExplainer("lava"),
+    [setActiveExplainer]
+  );
+  const handleValueClick = useCallback(
+    () => setActiveExplainer("value"),
+    [setActiveExplainer]
+  );
+
   return (
     <>
       <div
@@ -164,12 +174,16 @@ function RektScaleBase({
           <div className="w-full bg-yikes h-16 rounded-lg"></div>
           <div className="w-full bg-risky h-16 rounded-lg"></div>
           <div className="w-full bg-fine flex-1 rounded-t-lg"></div>
-          <MessageBox color="black" top={nftValueTop}>
-            {nftValue} <InfoButton explainer="value" />
+          <MessageBox
+            onClick={handleValueClick}
+            color="black"
+            top={nftValueTop}
+          >
+            {nftValue} <Info />
           </MessageBox>
           <Lava top={riskLevelTop ? riskLevelTop - 40 : null} />
-          <MessageBox color="red" top={riskLevelTop}>
-            {lava} <InfoButton explainer="lava" />
+          <MessageBox onClick={handleLavaClick} color="red" top={riskLevelTop}>
+            {lava} <Info />
           </MessageBox>
         </div>
       </div>
@@ -193,18 +207,6 @@ function Lava({ top }: LavaProps) {
   );
 }
 
-type InfoButtonProps = {
-  explainer: Explainer;
-};
-
-function InfoButton({ explainer }: InfoButtonProps) {
-  const setActiveExplainer = useExplainerStore((s) => s.setActiveExplainer);
-  const handleClick = useCallback(() => {
-    setActiveExplainer(explainer);
-  }, [explainer, setActiveExplainer]);
-  return (
-    <Button onClick={handleClick}>
-      <img src="/scale/question-mark.svg" alt="more info" />
-    </Button>
-  );
+function Info() {
+  return <img src="/scale/question-mark.svg" alt="more info" />;
 }

@@ -150,7 +150,7 @@ function LavaExplainerBase({
           <MessageBox color="purple" top={percentChangeTop}>
             24 Hours Ago
           </MessageBox>
-          <MessageBox color="red" top={riskLevelTop}>
+          <MessageBox onClick={handleClick} color="red" top={riskLevelTop}>
             {liquidationTriggerPrice}{" "}
             <img src="/scale/question-mark.svg" alt="more info" />
           </MessageBox>
@@ -247,10 +247,6 @@ export function ValueExplainer() {
         <MessageBox color="purple" top={yesterdayValueTop}>
           24 Hours Ago
         </MessageBox>
-        <MessageBox color="black" top={nftValueTop}>
-          {nftValue}
-          <img src="/scale/question-mark.svg" alt="more info" />
-        </MessageBox>
         {nftValueTop && (
           <div
             className="absolute w-full flex justify-center"
@@ -259,6 +255,10 @@ export function ValueExplainer() {
             <img src="/scale/plank.svg" alt="" />
           </div>
         )}
+        <MessageBox onClick={handleClick} color="black" top={nftValueTop}>
+          {nftValue}
+          <img src="/scale/question-mark.svg" alt="more info" />
+        </MessageBox>
       </div>
       <div className="w-9/12 flex flex-col gap-8 mt-12 ml-8">
         <p>
