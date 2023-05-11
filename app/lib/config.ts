@@ -16,7 +16,7 @@ const paprHero: Config = {
   ...baseConfig,
   tokenName: "paprHero",
   centerNetwork: "ethereum-goerli",
-  centerKey: "quaint-plywood-796b48676dc6",
+  centerKey: "key-43ed0f00c03c-4cf3908a1526",
   chainId: 5,
   jsonRpcProvider: `https://eth-goerli.alchemyapi.io/v2/${alchemyId}`,
   etherscanUrl: "https://goerli.etherscan.io",

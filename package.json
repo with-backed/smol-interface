@@ -16,7 +16,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@center-inc/react": "1.1.7",
+    "@center-inc/react": "1.1.13",
     "@rainbow-me/rainbowkit": "0.12.6",
     "@react-hook/resize-observer": "1.2.6",
     "@remix-run/node": "1.14.3",
