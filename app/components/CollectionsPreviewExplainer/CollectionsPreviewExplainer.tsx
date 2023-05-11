@@ -80,7 +80,7 @@ export function CollectionsPreviewExplainer() {
   const { inEth } = useTotalLentByCollection();
 
   return (
-    <div className="explainer bg-white flex flex-col relative pt-[50px]">
+    <div className="explainer bg-white flex flex-col relative pt-[50px] overflow-scroll">
       <div className="flex flex-col justify-center items-center p-4 gap-7">
         <p className="text-center">
           hero NFTs get ETH loans and must come from these meme collections
@@ -101,7 +101,7 @@ export function CollectionsPreviewExplainer() {
               <td className="w-8 h-8">
                 <CenterAsset preset="small" address={ac.token.id} tokenId={1} />
               </td>
-              <td className="text-left">
+              <td className="text-left max-w-[11rem] overflow-hidden text-ellipsis">
                 <a
                   href={`https://marketplace.reservoir.tools/collection/${network}/${ac.token.id}`}
                   target="_blank"
@@ -111,7 +111,7 @@ export function CollectionsPreviewExplainer() {
                   {ac.token.name}
                 </a>
               </td>
-              <td className="text-right">
+              <td className="text-right whitespace-nowrap">
                 {inEth ? formatTokenAmount(inEth[ac.token.id]) : "..."} ETH
               </td>
             </tr>
