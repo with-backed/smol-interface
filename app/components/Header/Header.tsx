@@ -250,9 +250,21 @@ function SelectCollectionHeaderContent() {
     [setHeaderState, setInProgressLoan]
   );
 
+  if (!isConnected) {
+    return (
+      <>
+        <div className="my-1">
+          <p>You must connect a wallet</p>
+        </div>
+        <CancelButton />
+      </>
+    );
+  }
+
   if (!userNFTs)
     return (
       <>
+        {/* presumably we should indicate that they don't actually have any supported NFTs */}
         <p className="self-start">Select collection (max loan)</p>
       </>
     );
@@ -294,14 +306,6 @@ function SelectCollectionHeaderContent() {
             </TextButton>
             .
           </p>
-          <CancelButton />
-        </>
-      )}
-      {!isConnected && (
-        <>
-          <div className="my-1">
-            <p>You must connect a wallet</p>
-          </div>
           <CancelButton />
         </>
       )}
