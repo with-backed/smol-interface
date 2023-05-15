@@ -219,6 +219,13 @@ export default function App() {
                             id="pirschjs"
                             data-code="x65C4KLQmylut4YocxMV1JTlmY9VwfBW"
                           ></script>
+                          <script
+                            defer
+                            type="text/javascript"
+                            src="https://api.pirsch.io/pirsch-events.js"
+                            id="pirscheventsjs"
+                            data-code="x65C4KLQmylut4YocxMV1JTlmY9VwfBW"
+                          ></script>
                         </HeaderDisclosureContextProvider>
                       </CenterProvider>
                     </ControllerContextProvider>
