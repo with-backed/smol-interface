@@ -5,7 +5,7 @@ import { usePaprController } from "~/hooks/usePaprController";
 import { useVaultWrite } from "~/hooks/useVaultWrite";
 import { VaultWriteType } from "~/hooks/useVaultWrite/helpers";
 import { getUniqueNFTId } from "~/lib/utils";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { OraclePriceType } from "~/lib/reservoir";
 import { useOracleSynced } from "~/hooks/useOracleSynced";
 import { formatBigNum } from "~/lib/numberFormat";
@@ -14,6 +14,7 @@ import { getAddress } from "ethers/lib/utils.js";
 import type { ethers } from "ethers";
 import { Button } from "../Buttons/Button";
 import { ApproveNFTButton } from "../ApproveButtons";
+import { pirsch } from "~/lib/pirsch";
 
 type BorrowConnectedProps = {
   collateralContractAddress: string;
@@ -34,6 +35,13 @@ export function BorrowConnected({
   const currentVaults = useGlobalStore((s) => s.currentVaults);
   const refresh = useGlobalStore((s) => s.refreshCurrentVaults);
   const setSelectedVault = useGlobalStore((s) => s.setSelectedVault);
+
+  const refreshWithPirsch = useCallback(() => {
+    refresh();
+    pirsch("User borrowed", {
+      meta: { collateralContractAddress },
+    });
+  }, [refresh, collateralContractAddress]);
 
   // when the user has borrowed, update the selected vault to be the fresh one that comes
   // in from the subgraph refresh
@@ -98,7 +106,7 @@ export function BorrowConnected({
     quote: amountBorrowInEth,
     usingSafeTransferFrom,
     disabled,
-    refresh,
+    refresh: refreshWithPirsch,
   });
 
   return (

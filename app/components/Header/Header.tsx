@@ -25,6 +25,7 @@ import { PAGES } from "../Footer/Footer";
 import { useExplainerStore } from "~/lib/explainerStore";
 import { CenterAsset } from "../CenterAsset";
 import { useIsOnWrongNetwork } from "~/hooks/useIsOnWrongNetwork";
+import { pirsch } from "~/lib/pirsch";
 
 export function Header() {
   const onWrongNetwork = useIsOnWrongNetwork();
@@ -108,9 +109,16 @@ function DropdownButton({ visible, ...props }: DropdownButtonProps) {
 
 function NewLoan() {
   const { isConnected } = useAccount();
+  const handleClick = useCallback(
+    () => pirsch("Create new loan clicked (header)", {}),
+    []
+  );
   return (
     <>
-      <button className="bg-medium-grey rounded-lg h-7 w-full text-black">
+      <button
+        onClick={handleClick}
+        className="bg-medium-grey rounded-lg h-7 w-full text-black"
+      >
         <Link
           to={PAGES[2]}
           state={{ startCreate: true }}
@@ -455,17 +463,18 @@ function SelectNFTsHeaderContent() {
     );
     if (!maxDebtForCollectionPapr || tokenIds.length === 0) return;
     setInProgressLoan((prev) => {
-      if (prev) {
-        return {
-          ...prev,
-          tokenIds: [...new Set(tokenIds)],
-          amount: undefined,
-          maxDebtForChosenPapr: maxDebtForCollectionPapr
-            .mul(tokenIds.length)
-            .div(nftsForCollection.length),
-        };
-      }
-      return null;
+      const updated = prev
+        ? {
+            ...prev,
+            tokenIds: [...new Set(tokenIds)],
+            amount: undefined,
+            maxDebtForChosenPapr: maxDebtForCollectionPapr
+              .mul(tokenIds.length)
+              .div(nftsForCollection.length),
+          }
+        : null;
+      pirsch("Done clicked (header)", { meta: { updated } });
+      return updated;
     });
     toggle();
   }, [
@@ -558,6 +567,7 @@ function CancelButton() {
   const { toggle } = useHeaderDisclosureState();
   const clear = useGlobalStore((s) => s.clear);
   const handleClick = useCallback(() => {
+    pirsch("Canceled loan creation (header)", {});
     if (isConnected) {
       clear();
       toggle();

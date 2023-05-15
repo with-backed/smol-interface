@@ -1,6 +1,8 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useIsOnWrongNetwork } from "~/hooks/useIsOnWrongNetwork";
 import { TextButton } from "../TextButton";
+import { useCallback } from "react";
+import { pirsch } from "~/lib/pirsch";
 
 export function ConnectWallet() {
   const onWrongNetwork = useIsOnWrongNetwork();
@@ -32,7 +34,13 @@ export function ConnectWallet() {
             {(() => {
               if (!connected) {
                 return (
-                  <TextButton onClick={openConnectModal} type="button">
+                  <TextButton
+                    onClick={() => {
+                      pirsch("Wallet connection modal opened", {});
+                      openConnectModal();
+                    }}
+                    type="button"
+                  >
                     Connect Wallet
                   </TextButton>
                 );

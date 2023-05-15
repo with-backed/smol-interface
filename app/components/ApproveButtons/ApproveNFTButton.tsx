@@ -11,6 +11,7 @@ import {
   usePrepareContractWrite,
 } from "wagmi";
 import type { ButtonTheme } from "~/components/Buttons/Button";
+import { pirsch } from "~/lib/pirsch";
 
 type ApproveNFTButtonProps = {
   theme: ButtonTheme;
@@ -54,7 +55,13 @@ export function ApproveNFTButton({
     ...config,
     onSuccess: (data: any) => {
       data.wait().then(() => {
+        pirsch("Approved NFT", { meta: { collateralContractAddress } });
         setApproved(true);
+      });
+    },
+    onError: (e) => {
+      pirsch("NFT approval failed", {
+        meta: { collateralContractAddress, message: e.message },
       });
     },
   });

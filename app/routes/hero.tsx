@@ -5,6 +5,7 @@ import { HeaderState } from "~/components/Header";
 import { useHeaderDisclosureState } from "~/hooks/useHeaderDisclosureState";
 import { useExplainerStore } from "~/lib/explainerStore";
 import { useGlobalStore } from "~/lib/globalStore";
+import { pirsch } from "~/lib/pirsch";
 
 export default function Hero() {
   const location = useLocation();
@@ -25,8 +26,10 @@ export default function Hero() {
 
   const handleClick = useCallback(() => {
     if (inProgressLoan) {
+      pirsch("Reopening hero selection from step 3", {});
       setVisible(true);
     } else {
+      pirsch("Starting new loan from step 3", {});
       clear();
       setHeaderState(HeaderState.ListEligibleCollections);
       setVisible(true);

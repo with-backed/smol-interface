@@ -11,6 +11,7 @@ import {
 } from "wagmi";
 import type { Erc20Token } from "~/gql/graphql";
 import type { ButtonTheme } from "~/components/Buttons/Button";
+import { pirsch } from "~/lib/pirsch";
 
 type ApproveTokenButtonProps = {
   theme: ButtonTheme;
@@ -63,12 +64,16 @@ export function ApproveTokenButton({
     ...config,
     onSuccess: (data) => {
       data.wait().then(() => {
-        // pirsch(`ERC20 ${token.symbol} approved`, {});
+        pirsch("ERC20 approved", {
+          meta: { tokenId: token.id, symbol: token.symbol },
+        });
         setTokenApproved(true);
       });
     },
-    onError: () => {
-      // pirsch(`ERC20 ${token.symbol} approval failed`, {});
+    onError: (e) => {
+      pirsch("ERC20 approval failed", {
+        meta: { tokenId: token.id, symbol: token.symbol, message: e.message },
+      });
     },
   });
 
