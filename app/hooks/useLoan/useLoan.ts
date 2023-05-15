@@ -114,8 +114,8 @@ export function useLoan(vault: NonNullable<SubgraphVault>): LoanDetails {
 
   const usedPaprWtf = useMemo(() => {
     if (!borrowedPapr) return false;
-    return !borrowedPapr.eq(ethers.BigNumber.from(vault.debt));
-  }, [borrowedPapr, vault.debt]);
+    return !borrowedPapr.eq(ethers.BigNumber.from(vault.debt)) && !loanRepaid;
+  }, [borrowedPapr, vault.debt, loanRepaid]);
 
   const borrowedFromSwap = useMemo(() => {
     if (!recentLoanActivity) return null;
