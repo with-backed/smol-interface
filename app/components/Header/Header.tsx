@@ -473,7 +473,17 @@ function SelectNFTsHeaderContent() {
               .div(nftsForCollection.length),
           }
         : null;
-      pirsch("Done clicked (header)", { meta: { updated } });
+      if (updated) {
+        pirsch("Done clicked (header)", {
+          meta: {
+            collectionAddress: updated.collectionAddress,
+            tokenIds: updated.tokenIds,
+            riskLevel: updated.riskLevel,
+          },
+        });
+      } else {
+        pirsch("Done clicked without inProgressLoan (header)", {});
+      }
       return updated;
     });
     toggle();
