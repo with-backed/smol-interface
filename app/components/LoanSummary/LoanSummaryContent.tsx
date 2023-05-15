@@ -2,6 +2,7 @@ import { useVault } from "~/hooks/useVault";
 import { LoanDetails } from "./LoanDetails";
 import { useCallback } from "react";
 import { LoanSummaryRepay } from "./";
+import { pirsch } from "~/lib/pirsch";
 
 type LoanSummaryContentProps = {
   collateralAddress: string;
@@ -14,6 +15,7 @@ export function LoanSummaryContent({
 
   const refresh = useCallback(() => {
     refreshVault({ requestPolicy: "cache-and-network" });
+    pirsch("User repaid", {});
   }, [refreshVault]);
 
   if (fetching || !vaultData?.vault)

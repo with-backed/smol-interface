@@ -16,6 +16,7 @@ import {
 import { ethers } from "ethers";
 import { oracleInfoArgEncoded, swapParamsArgEncoded } from "~/lib/constants";
 import type { SwapParamsStruct } from "~/hooks/useSwapParams";
+import { pirsch } from "~/lib/pirsch";
 
 const OnERC721ReceivedArgsEncoderString = `tuple(address proceedsTo, uint256 debt, ${swapParamsArgEncoded}, ${oracleInfoArgEncoded})`;
 
@@ -81,6 +82,11 @@ export function useSafeTransferFromWrite(
     ...configWithGasOverride,
     onSuccess: (data) => {
       data.wait().then(refresh);
+    },
+    onError: (error) => {
+      pirsch("safeTransferFrom failed", {
+        meta: { message: error.message },
+      });
     },
   });
 

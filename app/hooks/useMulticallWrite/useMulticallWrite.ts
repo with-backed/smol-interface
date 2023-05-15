@@ -2,6 +2,7 @@ import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import { useMemo } from "react";
 import { paprControllerABI } from "types/generatedABI";
 import { usePaprController } from "../usePaprController";
+import { pirsch } from "~/lib/pirsch";
 
 export function useMulticallWrite(
   calldata: string[],
@@ -30,6 +31,11 @@ export function useMulticallWrite(
     ...configWithGasOverride,
     onSuccess: (data) => {
       data.wait().then(refresh);
+    },
+    onError: (error) => {
+      pirsch("multicall failed", {
+        meta: { message: error.message },
+      });
     },
   });
 
