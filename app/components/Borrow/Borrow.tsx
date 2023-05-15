@@ -38,8 +38,10 @@ export function BorrowConnected({
 
   const refreshWithPirsch = useCallback(() => {
     refresh();
-    pirsch("User borrowed", {});
-  }, [refresh]);
+    pirsch("User borrowed", {
+      meta: { collateralContractAddress },
+    });
+  }, [refresh, collateralContractAddress]);
 
   // when the user has borrowed, update the selected vault to be the fresh one that comes
   // in from the subgraph refresh

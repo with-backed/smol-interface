@@ -9,7 +9,9 @@ import { OraclePriceType } from "~/lib/reservoir";
 import { ApproveTokenButton } from "../ApproveButtons";
 import { usePaprController } from "~/hooks/usePaprController";
 import { TransactionButton } from "../Buttons/TransactionButton";
-import { Address, erc20ABI, useAccount, useContractRead } from "wagmi";
+import type { Address } from "wagmi";
+import { erc20ABI, useAccount, useContractRead } from "wagmi";
+import { pirsch } from "~/lib/pirsch";
 
 type RepayProps = {
   vault: NonNullable<VaultWithRiskLevel>;
@@ -80,7 +82,10 @@ export function Repay({
   const refreshWithRecentAction = useCallback(() => {
     refresh();
     setHasRepaid();
-  }, [refresh, setHasRepaid]);
+    pirsch("User repaid", {
+      meta: { collateralContractAddress: vault.token.id },
+    });
+  }, [refresh, setHasRepaid, vault.token.id]);
 
   const { data, write, error } = useVaultWrite({
     writeType: VaultWriteType.RepayWithSwap,
