@@ -252,9 +252,21 @@ function SelectCollectionHeaderContent() {
     [setHeaderState, setInProgressLoan]
   );
 
+  if (!isConnected) {
+    return (
+      <>
+        <div className="my-1">
+          <p>You must connect a wallet</p>
+        </div>
+        <CancelButton />
+      </>
+    );
+  }
+
   if (!userNFTs)
     return (
       <>
+        {/* This is a loading state, we may want to indicate that. */}
         <p className="self-start">Select collection (max loan)</p>
       </>
     );
@@ -296,14 +308,6 @@ function SelectCollectionHeaderContent() {
             </TextButton>
             .
           </p>
-          <CancelButton />
-        </>
-      )}
-      {!isConnected && (
-        <>
-          <div className="my-1">
-            <p>You must connect a wallet</p>
-          </div>
           <CancelButton />
         </>
       )}
