@@ -264,7 +264,7 @@ function SelectCollectionHeaderContent() {
   if (!userNFTs)
     return (
       <>
-        {/* presumably we should indicate that they don't actually have any supported NFTs */}
+        {/* This is a loading state, we may want to indicate that. */}
         <p className="self-start">Select collection (max loan)</p>
       </>
     );
