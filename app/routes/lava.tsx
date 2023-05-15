@@ -5,6 +5,7 @@ import { RektScale } from "~/components/RektScale";
 import { RiskRadio } from "~/components/RiskRadio";
 import type { RiskLevel } from "~/lib/globalStore";
 import { useGlobalStore } from "~/lib/globalStore";
+import { pirsch } from "~/lib/pirsch";
 import { riskLevelToLTV } from "~/lib/utils";
 
 export default function Lava() {
@@ -27,6 +28,7 @@ export default function Lava() {
       // other than this screen should care about it.
       setLoggedOutRiskLevel(riskLevel);
       if (!maxDebt) return;
+      pirsch("Risk level selected", { meta: { riskLevel } });
       const multiplier = riskLevelToLTV[riskLevel].default;
       setInProgressLoan((prev) => {
         if (prev) {
