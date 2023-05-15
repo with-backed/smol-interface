@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useConfig } from "../useConfig";
 
 export type AccountNFTsResponse = {
@@ -10,7 +10,7 @@ export const useAccountNFTs = (
   address: string | undefined,
   collections: string[] | undefined
 ) => {
-  const { centerKey } = useConfig();
+  const { centerKey, centerNetwork } = useConfig();
   const [nftsLoading, setNftsLoading] = useState<boolean>(true);
   const [nftsFromCenter, setNFTsFromCenter] = useState<
     AccountNFTsResponse[] | undefined
@@ -19,7 +19,7 @@ export const useAccountNFTs = (
   const fetchUserNFTs = useCallback(async () => {
     if (address && collections) {
       const res = await fetch(
-        `https://api.center.dev/v1/ethereum-goerli/account/${address}/assets-owned?collection=${collections?.join(
+        `https://api.center.dev/v1/${centerNetwork}/account/${address}/assets-owned?collection=${collections?.join(
           ","
         )}&limit=100`,
         {
