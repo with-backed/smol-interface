@@ -66,6 +66,7 @@ export type LoanDetails = {
   formattedCostPercentage: string;
   numDays: number | null;
   vaultNFTs: string[];
+  usedPaprWtf: boolean;
 };
 
 export function useLoan(vault: NonNullable<SubgraphVault>): LoanDetails {
@@ -110,6 +111,11 @@ export function useLoan(vault: NonNullable<SubgraphVault>): LoanDetails {
     if (!recentLoanActivity) return null;
     return ethers.BigNumber.from(recentLoanActivity.amountBorrowed);
   }, [recentLoanActivity]);
+
+  const usedPaprWtf = useMemo(() => {
+    if (!borrowedPapr) return false;
+    return !borrowedPapr.eq(ethers.BigNumber.from(vault.debt));
+  }, [borrowedPapr, vault.debt]);
 
   const borrowedFromSwap = useMemo(() => {
     if (!recentLoanActivity) return null;
@@ -247,5 +253,6 @@ export function useLoan(vault: NonNullable<SubgraphVault>): LoanDetails {
     formattedCostPercentage,
     numDays,
     vaultNFTs,
+    usedPaprWtf,
   };
 }

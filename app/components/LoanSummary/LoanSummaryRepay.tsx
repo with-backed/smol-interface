@@ -4,6 +4,7 @@ import { LoanDetails } from "./LoanDetails";
 import { useGlobalStore } from "~/lib/globalStore";
 import { Repay } from "../Repay";
 import { useMemo } from "react";
+import { Link } from "@remix-run/react";
 
 type LoanSummaryRepayProps = {
   vault: NonNullable<SubgraphVault>;
@@ -35,13 +36,32 @@ export function LoanSummaryRepay({ vault, refresh }: LoanSummaryRepayProps) {
 
   return (
     <>
-      <LoanDetails
-        borrowed={loanDetails.formattedBorrowed}
-        interest={loanDetails.formattedInterest}
-        totalRepayment={owedOrRepaid}
-        numDays={loanDetails.numDays}
-        costPercentage={loanDetails.formattedCostPercentage}
-      />
+      {loanDetails.usedPaprWtf && (
+        <div className="p-6 text-sm leading-7 flex flex-col">
+          <p>
+            This loan was created or edited on{" "}
+            <Link
+              to="https://papr.wtf"
+              className="text-link-text"
+              target="_blank"
+            >
+              papr.wtf
+            </Link>
+            . View detailed history and manage loan there.
+          </p>
+        </div>
+      )}
+
+      {!loanDetails.usedPaprWtf && (
+        <LoanDetails
+          borrowed={loanDetails.formattedBorrowed}
+          interest={loanDetails.formattedInterest}
+          totalRepayment={owedOrRepaid}
+          numDays={loanDetails.numDays}
+          costPercentage={loanDetails.formattedCostPercentage}
+        />
+      )}
+
       <div className="mt-auto">
         {vaultHasDebt && (
           <img
