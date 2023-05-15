@@ -8,8 +8,10 @@ import { usePaprController } from "~/hooks/usePaprController";
 import { formatBigNum } from "~/lib/numberFormat";
 import { useMatches, useNavigate } from "@remix-run/react";
 import { PAGES } from "../Footer/Footer";
+import { useIsOnWrongNetwork } from "~/hooks/useIsOnWrongNetwork";
 
 export function HeaderBar() {
+  const onWrongNetwork = useIsOnWrongNetwork();
   const { isConnected } = useAccount();
   const routeMatches = useMatches();
   const pathname = useMemo(() => {
@@ -30,6 +32,10 @@ export function HeaderBar() {
     () => inProgressLoan && inProgressLoan.tokenIds.length > 0,
     [inProgressLoan]
   );
+
+  if (onWrongNetwork) {
+    return null;
+  }
 
   if (!inProgressLoan) {
     if (currentVaults && currentVaults.length > 0 && !selectedVault) {

@@ -24,8 +24,10 @@ import { useNFTSymbol } from "~/hooks/useNFTSymbol";
 import { PAGES } from "../Footer/Footer";
 import { useExplainerStore } from "~/lib/explainerStore";
 import { CenterAsset } from "../CenterAsset";
+import { useIsOnWrongNetwork } from "~/hooks/useIsOnWrongNetwork";
 
 export function Header() {
+  const onWrongNetwork = useIsOnWrongNetwork();
   const disclosure = useHeaderDisclosureState();
   const { address, isConnected } = useAccount({
     onDisconnect: () => {
@@ -66,7 +68,7 @@ export function Header() {
     <header className="bg-black relative">
       <div className={className}>
         <ConnectWallet />
-        {isConnected && <DropdownButton {...disclosure} />}
+        {isConnected && !onWrongNetwork && <DropdownButton {...disclosure} />}
       </div>
       <DisclosureContent
         className={`absolute ${

@@ -1,7 +1,10 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useIsOnWrongNetwork } from "~/hooks/useIsOnWrongNetwork";
 import { TextButton } from "../TextButton";
 
 export function ConnectWallet() {
+  const onWrongNetwork = useIsOnWrongNetwork();
+
   return (
     <ConnectButton.Custom>
       {({
@@ -35,7 +38,7 @@ export function ConnectWallet() {
                 );
               }
 
-              if (chain.unsupported) {
+              if (onWrongNetwork) {
                 return (
                   <TextButton onClick={openChainModal} type="button">
                     Wrong network
