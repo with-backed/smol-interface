@@ -67,8 +67,6 @@ function useTotalLentByCollection() {
     );
   }, [inPapr, marketPrice]);
 
-  console.log({ data, inEth });
-
   return { inPapr, inEth };
 }
 
