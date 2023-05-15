@@ -12,7 +12,7 @@ import { CenterAsset } from "../CenterAsset";
 
 const debtIncreasedEventsQuery = graphql(`
   query allDebtIncreasedEvents {
-    debtIncreasedEvents {
+    debtIncreasedEvents(first: 1000) {
       amount
       vault {
         token {
@@ -86,7 +86,7 @@ export function CollectionsPreviewExplainer() {
 
     const collateral = allowedCollateral.map((c) => ({
       ...c,
-      ethPrice: inEth[c.token.id],
+      ethPrice: inEth[c.token.id] || 0,
     }));
     collateral.sort((a, b) => b.ethPrice - a.ethPrice);
     return collateral;
