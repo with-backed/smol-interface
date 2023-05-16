@@ -87,9 +87,6 @@ function LavaExplainerBase({
   const handleClick = useCallback(() => {
     setActiveExplainer(null);
   }, [setActiveExplainer]);
-  const { formattedLiquidationTriggerPrice, amount: amountToday } =
-    useLiquidationTriggerPrice();
-  const { amount: amountYesterday } = useLiquidationTriggerPrice("yesterday");
   const riskLevel = useGlobalStore(
     (s) => s.selectedVault?.riskLevel || s.inProgressLoan?.riskLevel || "fine"
   );
@@ -179,7 +176,7 @@ function LavaExplainerBase({
 }
 
 export function ValueExplainer() {
-  const { underlying } = usePaprController();
+  const { underlying, allowedCollateral } = usePaprController();
   const setActiveExplainer = useExplainerStore((s) => s.setActiveExplainer);
   const handleClick = useCallback(() => {
     setActiveExplainer(null);

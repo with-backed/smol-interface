@@ -9,7 +9,7 @@ const config: CodegenConfig = {
       documents: [
         "app/**/*.{ts,tsx}",
         "!app/hooks/useAccountNFTs/useAccountNFTs.ts",
-        "!app/hooks/useCollectionTwapBidChange/useCollectionTwapBidChange.ts",
+        "!app/routes/tokens/$token/twabs/**/*.{ts,tsx}",
         "!app/hooks/useLatestMarketPrice/useLatestMarketPrice.ts",
       ],
       preset: "client",
@@ -26,8 +26,7 @@ const config: CodegenConfig = {
           },
         },
       ],
-      documents:
-        "app/hooks/useCollectionTwapBidChange/useCollectionTwapBidChange.ts",
+      documents: "app/routes/tokens/$token/twabs/**/*.{ts,tsx}",
       preset: "client",
       plugins: [],
       presetConfig: {
