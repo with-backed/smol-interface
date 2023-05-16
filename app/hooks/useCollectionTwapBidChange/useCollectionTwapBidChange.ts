@@ -1,74 +1,33 @@
-import { useMemo } from "react";
-import { useQuery } from "urql";
-import { graphql } from "~/gql/twabs";
-import { useConfig } from "../useConfig";
-import { useOracleInfo } from "../useOracleInfo";
+import { useConfig } from "~/hooks/useConfig";
+import { useOracleInfo } from "~/hooks/useOracleInfo";
+import { useEffect, useMemo, useState } from "react";
 import { OraclePriceType } from "~/lib/reservoir";
 import { percentChange } from "~/lib/utils";
-
-graphql(`
-  fragment allTwabsProperties on twabs {
-    price
-    token_address
-    created_at
-  }
-`);
-
-const latestTwabForCollectionBeforeTime = graphql(`
-  query latestTwabForCollectionBeforeTime(
-    $collection: bpchar
-    $earlierThan: timestamptz
-  ) {
-    twabs(
-      limit: 1
-      order_by: { created_at: desc }
-      where: {
-        token_address: { _eq: $collection }
-        created_at: { _lt: $earlierThan }
-      }
-    ) {
-      ...allTwabsProperties
-    }
-  }
-`);
+import type { LatestTwabForCollectionBeforeTimeQuery } from "~/gql/twabs/graphql";
 
 export function useCollectionTwapBidChange(collection: string) {
-  const { twabsApi } = useConfig();
-
-  const twentyFourHoursAgo = useMemo(() => {
-    const now = new Date();
-    const twentyFourHoursAgo = new Date(
-      (now.getTime() / 1000 - 24 * 60 * 60) * 1000
-    ).toISOString();
-    return twentyFourHoursAgo;
-  }, []);
-
+  const { tokenName } = useConfig();
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
+  const [twabData, setTwabData] =
+    useState<LatestTwabForCollectionBeforeTimeQuery | null>(null);
 
-  const [{ data: twabData }] = useQuery({
-    query: latestTwabForCollectionBeforeTime,
-    variables: {
-      collection: collection.toLowerCase(),
-      earlierThan: twentyFourHoursAgo,
-    },
-    context: useMemo(
-      () => ({
-        url: twabsApi,
-        fetchOptions: {
-          headers: {
-            "content-type": "application/json",
-            "x-hasura-admin-secret": process.env.HASURA_ADMIN_KEY!,
-          },
-          method: "POST",
-        },
-      }),
-      [twabsApi]
-    ),
-  });
+  useEffect(() => {
+    async function getData() {
+      const req = await fetch(
+        `/tokens/${tokenName}/twabs/collections/${collection}`,
+        {
+          method: "GET",
+        }
+      );
+      return req.json();
+    }
+
+    getData().then(setTwabData);
+  }, [collection, tokenName]);
 
   const currentPriceForCollection = useMemo(() => {
-    if (!oracleInfo || !oracleInfo[collection]) return null;
-    return oracleInfo[collection].price;
+    if (!oracleInfo) return null;
+    return oracleInfo[collection]?.price;
   }, [oracleInfo, collection]);
   const price24hrAgo = useMemo(() => {
     if (!twabData) return null;
